@@ -1,0 +1,34 @@
+1 download linux-x.x.x.tar.bz2 from kernel.org, unpack under
+  /usr/src/, symlink to /usr/src/linux
+
+2 for each separatetely distributed kernel module (e.g. alsa, nvidia
+  driver, lirc):
+
+  2.1 apt-get install <module>-source
+
+  2.2 (installs to /usr/src/<module>.tar.gz)
+
+  2.3 cd /usr/src/
+
+  2.4 tar xzf <module>.tar.gz
+
+  2.5 (ends up in /usr/src/modules/<module>/*)
+
+3 cd /usr/src/linux
+
+4 make menuconfig
+
+5 configure...
+
+6 if necessary: "make-kpkg modules_clean" to clean the src/modules
+  directory (see above) of stale object files from previous builds.
+
+7 make-kpkg --us --uc buildpackage modules_image
+
+8 (creates ../kernel-{image,source,headers,doc}-x.x.x....deb as well
+  as a deb for each module unpacked above, name like
+  <module>-<kernelversion>.deb
+
+9 cd ..
+
+10 dpkg -i <just created packages>
