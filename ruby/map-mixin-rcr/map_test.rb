@@ -34,6 +34,10 @@ class XmlMappingTest < Test::Unit::TestCase
     @m.default="DEFAULT"
     assert_equal "DEFAULT", @m["notthere"]
 
+    assert_equal 42, @m.fetch("answer")
+    assert_raises(IndexError) {@m.fetch("notthere")}
+    assert_equal "foobar", @m.fetch("notthere","foobar")
+
     assert_equal 3, @m.size
     assert_equal 3, @m.length
 
@@ -43,7 +47,7 @@ class XmlMappingTest < Test::Unit::TestCase
     assert @m.key?("age")
     assert_equal false, @m.key?("notthere")
 
-    assert_equal [196,"DEFAULT",7], @m.indexes("iq","notthere","age")
+    assert_equal [196,"DEFAULT",7], @m.indices("iq","notthere","age")
 
     assert_equal "iq", @m.index(196)
     assert_equal "DEFAULT", @m.index(1234)
@@ -57,5 +61,15 @@ class XmlMappingTest < Test::Unit::TestCase
     @m.each_pair{|k,v| ks << k; vs << v }
     assert_equal ["age", "answer", "iq"], ks.sort
     assert_equal [7, 42, 196], vs.sort
+
+    a=[]
+    @m.each_key{|x| a << x}
+    assert_equal ["age", "answer", "iq"], a.sort
+
+    a=[]
+    @m.each_value{|x| a << x}
+    assert_equal [7, 42, 196], a.sort
+
+    assert_equal false, @m.empty?
   end
 end
