@@ -1,0 +1,161 @@
+ISO-FS (CDROM-Dateisystem) erzeugen:
+
+mkisofs -o outputfile.iso -R path ...
+
+Schreibt Pfade path ... nach outputfile.iso. outputfile.iso kann
+anschließend z.B. loopback-gemounted werden
+(Dateisystemspez. "iso9660").
+
+Weglassen von "-o outputfile.iso" => File geht nach stdout
+
+"-R" bewirkt, dass dem ISO-FS Metadaten nach dem Rock-Ridge-Standard
+hinuzgefuegt werden. Dies ermöglicht:
+
+- lange Dateinamen (ISO9660 unterstützt nur 8.3)
+- uid,gid,Rechtebits
+- Symlinks
+
+Mit "-R" werden uid,gid, Rechtebits 1:1 von den Quellfiles
+übernommen. Mit "-r" statt "-R" werden die Dateien word-readable und
+mit uid, gid = 0,0 gespeichert (und noch einige andere Kleinigkeiten,
+siehe man mkisofs)
+
+
+Directories werden ins Root-Verz. des ISO-FS geschrieben, z.B.:
+
+mkisofs -o outputfile.iso -R /home/olaf/test/
+
+=> /home/olaf/test/ wird zum Root-Verz. des ISO-FS
+
+
+deshalb VARIATION:
+
+mkisofs -o outputfile.iso -R -graft-points test/=/home/olaf/test/ ...
+
+=> Verz. /home/olaf/test/ wird nach /test ins ISO-FS kopiert
+
+
+
+
+zus. interessante Optionen (nicht getestet, siehe "man mkisofs"):
+
+-A <id>  -- CD-Titel <id>
+
+-b <eltorito_boot_image>
+   Image Bootfähig machen,
+   <eltorito_boot_image> bezeichnet ein 1.2- 1.44- oder
+   2.88-MB-Floppyimage (z.B. eine lilo-Bootfloppy)
+
+-C last_sess_start,next_sess_start
+   Fuer Multi-Session-CDs (siehe Manpage)
+
+
+
+===========
+cdrecord
+
+Schreiben eines ISO-Images auf eine CDRW
+
+cdrecord -v -speed=6 dev=0,1,0 -data image.iso
+
+Oder (Multi-Session, s.u.)
+cdrecord -v -speed=6 -multi dev=0,1,0 -data image.iso
+
+0,1,0 ist die SCSI-ID des Brenners (s. /proc/scsi), -v = verbose,
+-speed=6 stellte 6fach-Brenngeschwindigkeit ein, -data (im Ggs. zu
+"-audio") sagt, dass ein Datentrack geschrieben werden soll, image.iso
+ist das zu schreibende Image.
+
+Die SCSI-ID kann alternativ auch in der Umgebungsvariable $CDR_DEVICE
+stehen.
+
+Generell: Eine CD enthält einen oder mehrere "Traks". Dies können
+Daten- oder Audio-Tracks sein. Bei handelsüblichen Audio-CDs ist jeder
+Titel ein Track. Anzeigen des "Inhalsverzeichnisses" (Auflistung der
+Tracks) einer CD:
+
+cdrecord -toc dev=0,1,0
+
+
+ungetestet: Schreiben von Audio-Tracks
+
+cdrecord speed=<number> dev=0,1,0 -audio file1.wav file2.wav ...
+
+(cdrecord erkennt die WAV-Files als solche (16bit/44.1kHz/stereo
+erforderlich) und extrahiert die reinen Audiodaten. Rohe
+Audio-Datenfiles ohne Header können auch übergeben werden,
+s. Manpage. Jede Datei wird zu einem Audio-Track)
+
+
+
+ungetestet: Pipen von mkisofs nach cdrecord (keine Erzeugung einer
+isofs-Datei):
+
+mkisofs -R /master/tree | cdrecord -v fs=6m speed=2 dev=0,1,0 -data -
+
+fs=6m setzt die FIFO-Schreibqueue von 4 auf 6MB hoch, um
+Timing-Probleme zu verhindern. Bei viel Load oder langsamer Maschine
+sollte man den Weg über ein explizites iso-File wählen.
+
+
+Blanken (Loeschen aller Tracks) einer CD-RW:
+
+cdrecord blank=fast speed=4 dev=0,1,0
+
+
+Multi-Session-CDs brennen:
+
+Option "-multi" fuer cdrecord brennt die Tracks so, dass später
+weitere Tracks angehängt werden können.
+
+Eigentlich sollte man wohl immmer "-multi" verwenden, da damit keine
+Nachteile verbunden zu sein scheinen (die CDs sind trotzdem noch für
+CDROM/DVD-Laufwerke lesbar). TODO: Audio-CDs und Standalone-CD-Player
+testen.
+
+Datentracks (ISO-Filesysteme), die in der 2ten,dritten,... Session
+gebrannt werden, müssen mit der mkisofs-Option "-C <n1,n2>" erstellt
+werden. <n1,n2> wird durch Aufruf von
+
+cdrecord -msinfo dev=0,1,0
+
+gewonnen. Es werden zwei Zahlen (irgendwelche Sektornummern, siehe
+Manpage) ausgegeben, die mkisofs beim Brennen des Filesystems mit
+einpflegt.
+
+
+
+Nützliche Option (ungetestet): -dummy
+
+Doku:  The  CD-Recorder will go through all steps of the recording
+process, but the laser is turned off during this procedure
+
+D.h. alle Probleme (incl. Timing, zu hohe Schreibgeschw., etc.)
+sollten auch hier auftreten, aber der Rohling wird nicht angerührt.
+
+
+===========
+Tools:
+
+isoinfo -- Anschauen von ISO-Images/-Devices
+
+z.B.:
+
+isoinfo -J -l -i /dev/cdrw
+
+Inhalt von in /dev/cdrw eingelegter Joilet-CD listen
+
+
+isoinfo -R -l -i file.iso
+
+Inhalt von in file.iso befindlichem RockRidge-ISO-FS listen
+
+
+===========
+TODO: cdrdao noch genauer untersuchen...
+
+cdrdao disk-info --driver generic-mmc --device 0,1,0
+                                      ^^^^^^^^^^^^^^ --device bus,id,lun -- s. /proc/scsi
+
+
+
