@@ -1,0 +1,11 @@
+Zeilenweise arbeiten (ähnlich awk): perl -ne
+
+Beispiel:
+
+command | perl -ne 's/bla/blubb/; print' 
+
+
+----
+"in-place"-Editieren:
+
+perl -pi -e 's/^(default.*)/#$1/g' /tmp/menu.lst

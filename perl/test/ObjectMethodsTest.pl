@@ -44,4 +44,4 @@ $obj->objmeth2(42);
 
 print "obj is a: ",ref $obj, "\n";
 
-print "the end\n";
+print $obj->isa('C'),"\n";
