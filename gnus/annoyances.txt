@@ -1,0 +1,14 @@
+big, messy
+
+lots of global variables
+
+"The nnfolder directory" nnfolder-directory (used by
+e.g. nnfolder-generate-active-file) -- huh? Should be per server.
+
+e.g.
+(let ((nnfolder-directory "~/Mail/archive/archive"))
+  (nnfolder-generate-active-file))
+
+creates the active file for the "first" nnfolder server (don't know
+the exact criteria, but it's always the same server, no matter what
+the value of nnfolder-directory is)
