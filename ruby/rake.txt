@@ -1,0 +1,51 @@
+The suffix "Task" in class names like "RDocTask" etc. is confusing
+because an RDocTask isn't actually a task. It is a class whose objects
+create several tasks inside the Rakefile they're created in. For
+example, "RDocTask" defines a task :rdoc for generating the
+documentation, a task :clobber_rdoc to delete the generated
+documentation, and a task :clobber to first delete, then re-generate
+the documentation.
+
+Tasks are the things that can be directly created using "task".
+
+Multiple invocations of "task" with the same task name modify the same
+task instead of creating a new one each time.
+
+
+--internal--
+
+rake.rb:
+
+Tasks are instances of Task (or one of its subclasses).
+
+A task's prerequisites are in @prerequisites (list of strings, not
+interpreted immediately).
+
+A task's actions (the actions given as blocks to "task") are in
+@actions.
+
+Task.needed? tells whether or not the task must be run.
+
+A task is run using Task.invoke. Task.invoke first runs all
+prerequisites via "@prerequisites.each { |n| Task[n].invoke }" (see
+below for Task.[]), then calls self.execute if self.needed?.
+
+The needed? implementation in Task returns true.
+
+The execute implementation in Task runs all @actions (in order of
+definition). If no actions have been defined, [TODO: rules].
+
+Task.[](task_name): If a task task_name was defined explicitly, return
+it. Else, if a rule matches, return it [TODO: rules]. Else, if a file
+named task_name exists, return a file(task_name) task. Else, fail.
+
+
+file(name, &block) calls FileTask.define_task(name,&block).
+
+FileTask (< Task) only overrides needed? (and timestamp): A FileTask
+is needed if its file doesn't exist, or is not younger than all its
+prerequisites (if there are no prerequisites and the file exists, the
+FileTask is not needed).
+
+Task.timestamp returns the maximum of the task's prerequisites's
+timestamps or, if that isn't defined, the current time.
