@@ -1,5 +1,10 @@
 update-alternatives:
 
+interactive:
+
+update-alternatives --config name
+
+
 modes
 ------
 
