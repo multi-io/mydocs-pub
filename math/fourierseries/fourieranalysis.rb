@@ -87,7 +87,7 @@ if __FILE__ == $0
   plot.title("fourier analysis")
   plot.xlabel("time")
   plot.ylabel("signal")
-  plot.draw(FunctionDataSet.new(f,0.0,8.0),
-            FunctionDataSet.new(fapprox,0.0,8.0))
+  plot.draw(RealFunction.new(f,0.0,8.0,"title"=>"f"),
+            RealFunction.new(fapprox,0.0,8.0,"title"=>"fapprox"))
   readline
 end
