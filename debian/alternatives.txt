@@ -1,0 +1,58 @@
+update-alternatives:
+
+modes
+------
+
+--install $alink,$name,$apath,$apriority,@ARGV
+--remove $name,$apath,@ARGV
+--display $name
+
+
+options
+-------
+--slave$ $slink,$sname,$spath,@ARGV
+
+        $aslavelinkcount{$slink}++ && &badusage("slave link $slink duplicated");
+        $aslavelink{$sname}= $slink;
+        $aslavepath{$sname}= $spath;
+
+--altdir $altdir
+
+--admindir $admindir
+
+
+
+
+
+Format of /var/lib/dpkg/alternatives/$name:
+
+-------
+"auto"|"manual"
+link
+(sname
+ slink)*
+
+(version
+ priority
+ spath* (so viele wie oben snames)
+)*
+
+
+link => $link
+
+(sname,slink)s => @slavenames, @slavelinks
+
+(version,priority,spath*) => $versions[lfd.Nr.],
+                             $priorities[lfd.Nr.],
+                             $slavepath{lfd.Nr., spathnr}
+
+lfd.Nr. für version v steht in $versionnum{v}
+
+
+
+--install $alink,$name,$apath,$apriority,@ARGV {
+    rename_mv($link,$alink);  # d.h. alink mit link identifiziert
+    $link= $alink;
+
+    lfd.Nr. := $versionnum{$apath}; # d.h. apath mit version identifiziert
+}
