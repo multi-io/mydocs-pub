@@ -14,12 +14,12 @@ SANE (scanner access now easy) -- scanner drivers for Unix systems
   load into their address space
 
 TODO: verify
-- a special "plugin discovery" API is provided that apps use to enlist
-  available plugins and load specified ones. This API is implemented
-  in a hardware-independent library and loads specified plugin via
-  dlopen(2). This means Apps have to link only this library
-  statically, in order to use all available plugins
 
+- a special "plugin discovery" API is provided that apps use to
+  enumerate available plugins and load specified ones. This API is
+  implemented in a hardware-independent library and loads specified
+  plugin via dlopen(2). This means Apps have to link only this library
+  statically in order to use all available plugins
 
 - a special "net" plugin is provided which can be used to access SANE
   plugins on other hosts on the network
@@ -34,7 +34,18 @@ TODO: verify
 
   - a solution involving the net-plugin/saned may also be needed for
     some plugins which need root access in order to be able to access
-    the scanner (as plugins are .so's and run in the context of the
+    the scanner (since plugins are .sos and run in the context of the
     SANE-using application, that application would otherwise have to
     be running with root privileges)
 
+
+
+RANT:
+
+- insufficient documentation:
+
+  - no explanation of the way backend discovery works
+
+  - backend discovery via "dll" backend?
+
+  - no explanation of the relation between sane-net and saned
