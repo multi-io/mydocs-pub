@@ -1,0 +1,79 @@
+- serial, reliable, connection-oriented transport protocol on top of
+  Bluetooth, IrDA, (?)
+
+- defines concept of "channels" similar to ports in TCP
+
+
+Implementation (on Linux):
+
+- Kernel module
+
+- new endpoint type sockaddr_rc (compatible to sockaddr)
+
+- can be used with the usual BSD socket API (bind(2), accept(2),
+  connect(2) etc.)
+
+- definition:
+
+  (from bluetooth/rfcomm.h)
+
+  struct sockaddr_rc {
+      sa_family_t     rc_family;   //AF_BLUETOOTH|AF_...
+      bdaddr_t        rc_bdaddr;
+      uint8_t         rc_channel;
+  }
+
+  /* BD Address */ (from bluetooth/bluetooth.h)
+  typedef struct {
+        uint8_t b[6];
+  } __attribute__((packed)) bdaddr_t;
+
+  //this is confusing -- it appears the rfcomm socket type
+  //(sockaddr_rc) refers to a bluetooth-specific endpoint (rc_bdaddr)
+  //explicitly
+
+char *batostr(const bdaddr_t *ba)
+{
+        char *str = malloc(18);
+        if (!str)
+                return NULL;
+
+        sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+                ba->b[0], ba->b[1], ba->b[2], 
+                ba->b[3], ba->b[4], ba->b[5]);
+        return str;
+}
+
+bluetooth/rfcomm.h basically defines only the sockaddr_rc
+structure. The hard work happens in the kernel.
+
+
+
+basic usage (Bluetooth transport)
+---------------------------------
+
+connecting:
+
+input:
+bdaddr_t *src, bdaddr_t *dst, uint8_t channel;
+
+
+work:
+
+        sockaddr_rc self, peer;
+
+        self.rc_family = AF_BLUETOOTH;
+        bacpy(&self.rc_bdaddr, src);
+        self.rc_channel = 0;
+
+        peer.rc_family = AF_BLUETOOTH;
+        bacpy(&peer.rc_bdaddr, dst);
+        peer.rc_channel = htobs(channel);
+
+        int selffd = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+        bind(selffd, (struct sockaddr*) &self,
+             sizeof(struct sockaddr_rc));
+
+        connect(selffd, (struct sockaddr*) &peer,
+                sizeof(struct sockaddr_rc));
