@@ -127,7 +127,6 @@ sub publish($) {
     #    using "our" (i.e. dynamically scoped) variables in recursive
     #    functions tends to be messy
     my $_dir = shift;
-    our $dir = $_dir;
     my $targetdir = "${PUBHTMLDIR}/$_dir->{PATH}/";
     print STDERR "publishing: $targetdir\n";
     unless (-d $targetdir) {
@@ -135,29 +134,35 @@ sub publish($) {
     }
     open(IDXHTM, ">$targetdir/index.html");
     my $_target_templ = "wwwpublish.d/index.templ";
-    our $target_templ = $_target_templ;
     my $tpl = Template->new("wwwpublish.d/wrapper.templ", *IDXHTM);
+
+    our $dir = $_dir;
+    our $target_templ = $_target_templ;
     $tpl->run();
+
     close IDXHTM;
 
-    foreach my $f (@{$_dir->{FILES}}) {
-        my $_fqsrcname = "$_dir->{PATH}/$f";
-        our $fqsrcname = $_fqsrcname;
+    foreach my $_f (@{$_dir->{FILES}}) {
+        my $_fqsrcname = "$_dir->{PATH}/$_f";
 
         if (!htmlizable($_fqsrcname)) {
-            copy($_fqsrcname, "${targetdir}/$f");
+            copy($_fqsrcname, "${targetdir}/$_f");
             next;
         }
 
         local $/=undef;
         open(F,"<$_fqsrcname") or die "couldn't open $_fqsrcname: $!";
         my $_text = <F>;
-        our $text = $_text;
         close F;
         $target_templ = "wwwpublish.d/file.templ";
-        open(FILEHTM, ">${targetdir}/$f.html");
+        open(FILEHTM, ">${targetdir}/$_f.html");
         my $tpl = Template->new("wwwpublish.d/wrapper.templ", *FILEHTM);
+
+        our $f = $_f;
+        our $fqsrcname = $_fqsrcname;
+        our $text = $_text;
         $tpl->run();
+
         close FILEHTM;
     }
 
