@@ -1,17 +1,25 @@
 <!-- -*- html -*- -->
 
+<% no strict 'refs'; no warnings; %>
+
+<% @parents=(); for ($curr=$dir; $curr; $curr=$curr->{PARENT}) { @parents = ($curr->{NAME}, @parents); } %>
+
 <head>
   <title> <%= $fqsrcname %> </title>
 </head>
 
 <body>
 
-  <h1> <%= $fqsrcname %> </h1>
+  <h1> <%= $nd=@parents; join("/", map {qq[<a href="${\("../" x ($nd-- -1))}.">$_</a>]} @parents) %>/<%= $f %> </h1>
 
   <pre>
-<%= $text %>
+<%= htmlescape $text %>
   </pre>
 
   <a href="."> back to <%= $dir->{NAME} %> </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-<%= 1900+(localtime())[5] %> Olaf Klischat  &lt;klischat (at) cs (dot) tu-berlin (dot) de&gt; </font>
 
 <body>

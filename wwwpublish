@@ -22,7 +22,25 @@ sub rejected {
     m!^./passwords.txt.asc! or
     m!aerzte!i or
     m!\#$! or
-    m!^./wwwpublish!;
+     # m!^./wwwpublish! or
+    not (
+         m!^.$! or
+         m!^./$! or
+         m!^./ruby! or
+         m!^./perl! or
+         m!^./java/nio! or
+         m!^./svn! or
+         m!^./gnus! or
+         m!^./wget! or
+         m!^./longhorn! or
+         m!^./debian! or
+         m!^./emacs! or
+         m!^./bluetooth/bluetooth.txt! or
+         m!^./bluetooth/rfcomm.txt! or
+         m!^./lisp! or
+         m!^./root! or
+         m!^./wwwpublish!
+        );
 }
 
 
@@ -75,7 +93,7 @@ sub htmlizable {
     m!xml$!;
 }
 
-our $root = {};
+my $root = {};
 
 find(sub {
          return if rejected($File::Find::name,$_);
@@ -143,7 +161,7 @@ sub publish($) {
     close IDXHTM;
 
     foreach my $_f (@{$_dir->{FILES}}) {
-        my $_fqsrcname = "$_dir->{PATH}/$_f";
+        my $_fqsrcname = "$_dir->{PATH}$_f";
 
         if (!htmlizable($_fqsrcname)) {
             copy($_fqsrcname, "${targetdir}/$_f");
@@ -170,5 +188,19 @@ sub publish($) {
         publish($_dir->{DIRS}->{$d});
     }
 }
+
+
+# for use by templates
+sub htmlescape {
+    $_=shift;
+    my $repl = rand() . rand() . rand();
+    my $replre = qr/$repl/;
+    s!&!$repl!sig;
+    s!<!&lt;!sig;
+    s!>!&gt;!sig;
+    s!$replre!&amp;!sig;
+    $_;
+}
+
 
 publish $root;
