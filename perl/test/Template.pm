@@ -5,8 +5,8 @@ use Carp 'croak';
 
 sub new {
     my $self = bless {}, shift;
-#    $self->{out} = (shift || *STDOUT);
     $self->load(shift) if @_;
+    $self->{out} = shift || *STDOUT;
     $self;
 }
 
@@ -40,11 +40,11 @@ sub load {
 }
 
 
-# override to print to string, file, ... instead of stdout
+# override to print to string, ... instead of $self->{out}
 # and/or apply transformations to the expanded text
 sub print {
     my ($self, $string) = @_;
-    print $string;  # just print to stdout by default
+    print {$self->{out}} $string;
 }
 
 # override to apply some transformation to user expressions
