@@ -1,0 +1,40 @@
+# RTFM /usr/src/linux/Documentation/{scsi.txt, scsi-generic.txt}
+
+
+high-level
+(?)
+
+  scsi_mod
+  (SCSI core)
+  (always needed)
+
+
+mid-level                 
+(device type drivers)
+
+
+  sr_mod                 
+  (SCSI CD-ROM devices)  
+
+  sd_mod                 
+  (SCSI disk devices)
+
+  st
+  (SCSI tape devices)
+
+  sg
+  (everything else, e.g
+   scanners, CD writers, ...)
+
+
+
+
+low-level
+(SCSI device drivers)
+
+  aha1542 (Adaptec 1542 SCSI adapter)
+
+  ide-scsi (pseudo adapter which
+     converts SCSI to atapi)
+
+  ....

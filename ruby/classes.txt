@@ -1,0 +1,22 @@
+see: "programming ruby", section "classes and objects"
+
+irb(main):022:0> def callf(obj)
+irb(main):023:1>   obj.f
+irb(main):024:1> end
+nil
+irb(main):025:0> s="hello"
+"hello"
+irb(main):026:0> callf(s)
+NameError: undefined method `f' for "hello":String
+	from (irb):23:in `callf'
+	from (irb):26
+irb(main):027:0> class <<s
+irb(main):028:1>   def f
+irb(main):029:2>     p "i am s.f!"
+irb(main):030:2>   end
+irb(main):031:1> end
+nil
+irb(main):032:0> callf(s)
+"i am s.f!"
+nil
+irb(main):033:0> 

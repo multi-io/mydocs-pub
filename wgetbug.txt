@@ -1,0 +1,22 @@
+URL:
+
+http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&q=walrus&btnG=Google+Search
+
+
+Debug: proto='http'; host='groups.google.com'; path='/groups'; args='hl=en&lr=&ie=UTF-8&oe=UTF-8&q=walrus&btnG=Google+Search'; user:pass='(null):(null)'.
+
+
+wgetwof 'http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&q=walrus&btnG=Google+Search'
+
+==>
+-------snip--------
+wwwoffled[27518] Information: HTTP Proxy connection from host tack (192.168.0.2).
+wwwoffled[27518] Information: Forked wwwoffles -spool (pid=27528).
+wwwoffles[27528] Information: URL='http://groups.google.com/groups?hl=en&lr=&ie=UTF-8&oe=UTF-8&q=walrus&btnG=Google+Search'.
+wwwoffles[27528] Debug: proto='http'; host='groups.google.com'; path='/groups'; args='hl=en&lr=&ie=UTF-8&oe=UTF-8&q=walrus&btnG=Google+Search'; user:pass='(null):(null)'.
+wwwoffles[27528] Information: Cache Access Status='Cached Page Used'.
+wwwoffled[27518] Information: Child wwwoffles exited with status 0 (pid=27528).
+wwwoffled[27518] Debug: Currently running: 0 servers total, 0 fetchers.
+-------snap--------
+
+
