@@ -1,8 +1,10 @@
 require "map"
 
 class MyMap
+  attr_accessor :backend
+
   def initialize
-    @backend = {"age"=>7, "iq"=>196, "answer"=>42}
+    @backend = {"age"=>52, "iq"=>196, "answer"=>42}
   end
 
   def get_mapped_value(key)
@@ -28,48 +30,82 @@ class XmlMappingTest < Test::Unit::TestCase
   end
 
   def test_misc
-    assert_equal 42, @m["answer"]
-    assert_nil @m["notthere"]
+    run_test_misc_on @m
+    # test with backend too to make sure we're compatible to Hash
+    run_test_misc_on @m.backend
+  end
 
-    @m.default="DEFAULT"
-    assert_equal "DEFAULT", @m["notthere"]
+  def run_test_misc_on(m)
+    assert_equal 42, m["answer"]
+    assert_nil m["notthere"]
 
-    assert_equal 42, @m.fetch("answer")
-    assert_raises(IndexError) {@m.fetch("notthere")}
-    assert_equal "foobar", @m.fetch("notthere","foobar")
+    m.default="DEFAULT"
+    assert_equal "DEFAULT", m["notthere"]
 
-    assert_equal 3, @m.size
-    assert_equal 3, @m.length
+    assert_equal "DEFAULT", m.default
+    assert_equal "DEFAULT", m.default("foo")
 
-    assert_equal ["age", "answer", "iq"], @m.keys.sort
-    assert_equal [7, 42, 196], @m.values.sort
+    assert_equal 42, m.fetch("answer")
+    assert_raises(IndexError) {m.fetch("notthere")}
+    assert_equal "foobar", m.fetch("notthere","foobar")
 
-    assert @m.key?("age")
-    assert_equal false, @m.key?("notthere")
+    assert_equal 3, m.size
+    assert_equal 3, m.length
 
-    assert_equal [196,"DEFAULT",7], @m.indices("iq","notthere","age")
+    assert_equal ["age", "answer", "iq"], m.keys.sort
+    assert_equal [42, 52, 196], m.values.sort
 
-    assert_equal "iq", @m.index(196)
-    assert_equal "DEFAULT", @m.index(1234)
+    assert_equal({52=>"age", 196=>"iq", 42=>"answer"}, m.invert)
+
+    m2 = {"iq"=>75, "answer"=>42, "shoe_size"=>45}
+    assert_equal({"age"=>52, "iq"=>75, "answer"=>42, "shoe_size"=>45},
+                 m.merge(m2))
+    assert_equal({"age"=>52, "iq"=>196, "answer"=>42, "shoe_size"=>45},
+                 m.merge(m2){|k,o,n| o})
+
+    assert_equal({"age"=>52, "answer"=>42},
+                 m.reject{|k,v| v>100})
+
+    assert_equal([["age",52], ["answer",42]],
+                 m.select{|k,v| v<100}.sort_by{|(k,v)|k})
+
+    assert_equal [["age",52], ["answer",42], ["iq",196]], m.sort
+    assert_equal [["answer",42], ["age",52], ["iq",196]], m.sort{|(a,b)| a[1]<=>b[1]}
+
+    # this test depends on Hash's implementation for succeeding
+    #  (it depends on the assumption that @m.backend.to_s doesn't
+    #  change over time)
+    assert_equal "answer42iq196age52", m.to_s
+
+    assert m.key?("age")
+    assert_equal false, m.key?("notthere")
+
+    assert m.value?(42)
+    assert_equal false, m.value?(1234)
+
+    assert_equal [196,"DEFAULT",52], m.values_at("iq","notthere","age")
+
+    assert_equal "iq", m.index(196)
+    assert_nil m.index(1234)
 
     ks=[]; vs=[]
-    @m.each{|k,v| ks << k; vs << v }
+    m.each{|k,v| ks << k; vs << v }
     assert_equal ["age", "answer", "iq"], ks.sort
-    assert_equal [7, 42, 196], vs.sort
+    assert_equal [42, 52, 196], vs.sort
 
     ks=[]; vs=[]
-    @m.each_pair{|k,v| ks << k; vs << v }
+    m.each_pair{|k,v| ks << k; vs << v }
     assert_equal ["age", "answer", "iq"], ks.sort
-    assert_equal [7, 42, 196], vs.sort
+    assert_equal [42, 52, 196], vs.sort
 
     a=[]
-    @m.each_key{|x| a << x}
+    m.each_key{|x| a << x}
     assert_equal ["age", "answer", "iq"], a.sort
 
     a=[]
-    @m.each_value{|x| a << x}
-    assert_equal [7, 42, 196], a.sort
+    m.each_value{|x| a << x}
+    assert_equal [42, 52, 196], a.sort
 
-    assert_equal false, @m.empty?
+    assert_equal false, m.empty?
   end
 end
