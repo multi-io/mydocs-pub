@@ -36,7 +36,7 @@ sub load {
 
                 foreach my $x ($text, $expr || do{my $x="";$x}) { $x=~s!\\<%!<%!g; $x=~s!\\>!>!g; }
                 $templ .= qq[q($text) . ];
-                $templ .= "\$self->quote_expr(scalar($expr)) ." if $expr;
+                $templ .= "\$self->quote_expr(scalar(do\{$expr\})) ." if $expr;
             }
             $templ .= q["");];
             $templ .= $code if $code;
