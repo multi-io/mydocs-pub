@@ -71,8 +71,8 @@ stehen.
 
 Generell: Eine CD enthält einen oder mehrere "Traks". Dies können
 Daten- oder Audio-Tracks sein. Bei handelsüblichen Audio-CDs ist jeder
-Titel ein Track. Anzeigen des "Inhalsverzeichnisses" (Auflistung der
-Tracks) einer CD:
+Titel ein Audio-Track. Anzeigen des "Inhalsverzeichnisses" (Auflistung
+der Tracks) einer CD:
 
 cdrecord -toc dev=0,1,0
 
@@ -113,6 +113,11 @@ Nachteile verbunden zu sein scheinen (die CDs sind trotzdem noch für
 CDROM/DVD-Laufwerke lesbar). TODO: Audio-CDs und Standalone-CD-Player
 testen.
 
+Z.B.:
+
+cdrecord -v -multi speed=6 dev=0,1,0 -data track1.iso 
+
+
 Datentracks (ISO-Filesysteme), die in der 2ten,dritten,... Session
 gebrannt werden, müssen mit der mkisofs-Option "-C <n1,n2>" erstellt
 werden. <n1,n2> wird durch Aufruf von
@@ -120,8 +125,27 @@ werden. <n1,n2> wird durch Aufruf von
 cdrecord -msinfo dev=0,1,0
 
 gewonnen. Es werden zwei Zahlen (irgendwelche Sektornummern, siehe
-Manpage) ausgegeben, die mkisofs beim Brennen des Filesystems mit
-einpflegt.
+Manpage) ausgegeben, die mkisofs in das erzeugte Filesystems mit
+einpflegt. mkisofs benötigt zusätzlich das in der vorherigen Session
+geschriebene ISO-FS, um das neue FS damit zusammenzuführen ("mergen")
+zu können. Z.B.:
+
+mkisofs -o track2.iso -R -C `cdrecord -msinfo dev=0,1,0` -M track1.iso -graft-points cvsroot/=/home/olaf/cvsroot test/=/home/olaf/test
+
+cdrecord -v -multi speed=6 dev=0,1,0 -data track2.iso
+
+Die Filesysteme track1.iso und track2.iso stehen jetzt "gemerged" auf
+der CD.
+
+Man kann bei -M auch direkt das Brennerdevice angeben (es wird dann
+der zuletzt geschriebene Track ausgelesen):
+
+mkisofs -o track3.iso -R -C `cdrecord -msinfo dev=0,1,0` -M 0,1,0 -graft-points wstk/=/home/olaf/wstk-2.4
+
+cdrecord -v -multi speed=6 dev=0,1,0 -data track3.iso
+
+Die Filesysteme track1.iso, track2.iso und track3.iso stehen jetzt
+"gemerged" auf der CD.
 
 
 
@@ -159,3 +183,13 @@ cdrdao disk-info --driver generic-mmc --device 0,1,0
 
 
 
+CD kopieren (1:1, alle Tracks) von /dev/dvd.sg nach /dev/cdrw.sg
+(SCSI-Notation "x,x,x" von oben ist alternativ auch angebbar):
+
+cdrdao copy --source-device /dev/dvd.sg --device /dev/cdrw.sg --driver generic-mmc-raw  --source-driver generic-mmc-raw --speed 6
+
+(erzeugt zunächst Imagedatei im aktuellen Verzeichnis, brennt dieses
+dann auf die Ziel-CD. Option "--on-the-fly" piped direkt, ohne
+Imagedatei)
+
+Leider bleibt meine Kiste beim Auslesen des Images fast stehen
