@@ -7,6 +7,12 @@ sub new {
     my $self = bless {}, shift;
     $self->load(shift) if @_;
     $self->{out} = shift || *STDOUT;
+    my $outtype = ref $self->{out};
+    # TODO: check for '' needed because of FILEHANDLEs, but means
+    # that I can't tell scalar from ref-to-scalar here (only the latter will work)
+    unless (($outtype eq '') or ($outtype eq 'SCALAR')) {
+        croak "can't output to type $outtype";
+    }
     $self;
 }
 
@@ -44,7 +50,12 @@ sub load {
 # and/or apply transformations to the expanded text
 sub print {
     my ($self, $string) = @_;
-    print {$self->{out}} $string;
+    if (ref($self->{out}) eq '') {
+        print {$self->{out}} $string;
+    }
+    else {
+        ${$self->{out}} .= $string;
+    }
 }
 
 # override to apply some transformation to user expressions
