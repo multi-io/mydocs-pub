@@ -1,0 +1,11 @@
+18:14 < multi_io> when pattern-matching against an array, is it possible to 
+                  ignore the first array element?
+18:15 < multi_io> e.g. ,foo,bar = [1,2,3]
+18:15 < multi_io> => foo==2, bar==3
+18:15 < jaska> _ ?
+18:15 < imperator> eule: with fdwalk, you can associate a callback
+18:15 < loser> very ml-ish :)
+18:15 < multi_io> assigns to variable _
+18:15 < eule> (*), foo, bar = [1,2,3]
+18:16 < multi_io> thanks eule 
+18:16 < eule> multi_io> no prob, got it from redhanded blog...

@@ -1,0 +1,22 @@
+18:24 < multi_io> why doesn't splicing arrays into argument lists work in the 
+                  middle of the list, e.g. foo(1,2,*args,8,9) ?
+18:28 < multi_io> splicing arrays into the middle of other arrays doesn't work 
+                  either, e.g. [1,2,*arr,8,9] :(
+18:29 < ThreeDayMonk> multi_io: a1[2,a2.length] = a2 ?
+18:29 -!- wnorrix [~warren@202.68.158.180] has quit [Read error: 60 (Operation 
+          timed out)]
+18:29 < ThreeDayMonk> oh,that replaces it... I see what you mean
+18:30 < ThreeDayMonk> the trick is to use length 0
+18:30 < ThreeDayMonk> multi_io: a1[2,0] = a2
+18:32 < ThreeDayMonk> nedric: are you trapping INT in webrick?
+18:33 < ThreeDayMonk> it works on my debian
+18:34 < multi_io> ThreeDayMonk: hm, ok thanks. But it still uglifies my code a 
+                  bit. I don't have a name for a1, so I'd like to create the 
+                  whole thing in one expression.
+18:34 < ThreeDayMonk> ah... let me think on it
+18:35 < multi_io> [1,2]+args+[8,9] maybe
+18:35 < multi_io> :)
+18:36 < ThreeDayMonk> would be easier if you want a one-liner :-)
+18:36 < multi_io> so in the function call case, that would be 
+                  foo(*([1,2]+args+[8,9]))
+18:36 < multi_io> foo(1,2,*args,8,9) would be prettier
