@@ -44,6 +44,10 @@
   intern die "-command"s seiner Scrollbars. Setzt man die "-command"s
   um, gibt es "witzige" Effekte...
 
+- kein "visible"-Flag für Fenster; wenn Fenster geschlossen werden,
+  werden sie scheinbar automatisch zerstört -- Zustände der Widgets
+  gehen verloren
+
 - "destroy"-Event eines Fensters wird mehrfach aufgerufen, wenn der
   User das Fenster m.H.des Windowmanagers schließt (offenbar einmal pro
   Kind des Fensters?) 
