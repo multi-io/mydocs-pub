@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+BEGIN { @INC = (".", @INC); }
+
 use Template;
 
 

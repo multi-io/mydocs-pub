@@ -5,6 +5,7 @@ use Carp 'croak';
 
 sub new {
     my $self = bless {}, shift;
+#    $self->{out} = (shift || *STDOUT);
     $self->load(shift) if @_;
     $self;
 }
@@ -16,16 +17,18 @@ sub load {
     open(F, "<$filename") or croak "couldn't open $filename: $!";
     my $templ = "";
     while (<F>) {
-        my @line = split /<<<([^=].*?)>>>/;
+        my @line = split /(?=[^\\]?)?<%([^=].*?[^\\]?)%>/;
         for (my ($printed, $code) = (shift @line, shift @line);
              defined $printed;
              ($printed, $code) = (shift @line, shift @line)) {
 
             $templ .= q[$self->print ( ];
-            my @printed = split(/<<<=(.*?)>>>/, $printed);
+            my @printed = split(/(?=[^\\]?)<%=(.*?[^\\]?)%>/, $printed);
             for (my ($text, $expr) = (shift @printed, shift @printed);
                  defined $text;
                  ($text, $expr) = (shift @printed, shift @printed)) {
+
+                foreach my $x ($text, $expr || do{my $x="";$x}) { $x=~s!\\<%!<%!g; $x=~s!\\>!>!g; }
                 $templ .= qq[q($text) . ];
                 $templ .= "\$self->quote_expr(scalar($expr)) ." if $expr;
             }
@@ -56,11 +59,10 @@ sub run {
     no strict 'vars';
     my ($self) = @_;
     my $callingpkg = caller();
+    # print qq[evaling:\n$self->{templ}\n];
     eval qq[package $callingpkg; $self->{templ}];
     croak $@ if $@;
 }
 
 
 1;
-
-# TODO: escaping...
