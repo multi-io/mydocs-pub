@@ -1,17 +1,19 @@
-# provides Map functionality (mapping keys to values) in terms of a
+# Provides Map functionality (mapping keys to values) in terms of a
 # method get_mapped_value(key) and - optionally - each{|k,v|..} in the
 # class this module is included in.
 #
 # get_mapped_value(key) should return the value belonging to key, or
 # raise IndexError if there's no such value in the map.
 #
-# if you want methods like keys, values, each_key, each_value, empty?
+# If you want methods like keys, values, each_key, each_value, empty?
 # etc. to work, you also have to provide a method "each{|k,v|..}" that
 # calls the given block with all key-value pairs of the map
-# consecutively. In that case, you may also include Enumerable (which
-# also relies on "each").
+# consecutively. In that case, you may additionally include Enumerable
+# (which also relies on "each") to inherit all standard features of an
+# enumeration as well.
 #
-# a test for this module is in map_test.rb
+# I've provided a test for this module at
+# http://user.cs.tu-berlin.de/~klischat/map_test.rb
 module Map
   # this particular implementation of Map is still (to a lesser
   # extent) vulnerable to the fragile base class problem because the
@@ -22,8 +24,7 @@ module Map
   # helper methods that must not be overridden)
 
 
-  # hmm...we need a default value to be compatible with Hash#[],
-  # Hash#indices etc.
+  # hmm...we need a default value to be compatible with Hash#[]
   def default(key=nil)
     @map_mixin_default_value
   end
@@ -41,11 +42,14 @@ module Map
     end
   end
 
-  def fetch(k,dflt=nil)
+
+  INTERNAL=Object.new
+
+  def fetch(k,dflt=INTERNAL)
     begin
       get_mapped_value(k)
     rescue IndexError
-      return dflt if dflt
+      return dflt unless dflt==INTERNAL
       return yield(k) if block_given?
       raise
     end
@@ -185,7 +189,20 @@ module Map
 
 
   def ==(other)
-    # TODO
+    unless other.kind_of?(Hash) or other.kind_of?(Map)  # better: include Map in Hash
+      other = other.to_hash  # better (...): to_map
+    end
+    # return false unless self.default==other.default
+    l=0
+    begin
+      self.each do |(k,v)|
+        return false unless other.fetch(k)==v
+        l+=1
+      end
+    rescue IndexError
+      return false
+    end
+    l==other.length
   end
 
 end

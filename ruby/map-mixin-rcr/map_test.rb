@@ -47,6 +47,7 @@ class XmlMappingTest < Test::Unit::TestCase
 
     assert_equal 42, m.fetch("answer")
     assert_raises(IndexError) {m.fetch("notthere")}
+    assert_nil m.fetch("notthere",nil)
     assert_equal "foobar", m.fetch("notthere","foobar")
 
     assert_equal 3, m.size
@@ -107,5 +108,24 @@ class XmlMappingTest < Test::Unit::TestCase
     assert_equal [42, 52, 196], a.sort
 
     assert_equal false, m.empty?
+
+    eq={"age"=>52, "iq"=>196, "answer"=>42}
+    assert_equal eq, m
+    eq.default="DEFAULT2"
+    assert_equal eq, m   # default value doesn't influence ==
+    eq["age"]=53
+    assert_not_equal eq, m
+    eq["age"]=52
+    assert_equal eq, m
+    eq.delete "age"
+    assert_not_equal eq, m
+    eq["age"]=52
+    assert_equal eq, m
+    eq["foo"]="bar"
+    assert_not_equal eq, m
+    eq.delete "foo"
+    assert_equal eq, m
+    eq.delete "iq"
+    assert_not_equal eq, m
   end
 end
