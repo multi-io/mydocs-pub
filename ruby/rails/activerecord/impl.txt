@@ -1,4 +1,4 @@
-$Id: impl.txt,v 1.4 2004/11/11 20:45:51 oklischa Exp $
+$Id: impl.txt,v 1.5 2004/11/20 12:22:15 oklischa Exp $
 
 ActiveRecord::Base:
 
@@ -12,9 +12,9 @@ important internal class methods:
   hold all instances of that class as well as of all classes derived
   from it. In each row of the table, the SQL field "type" (if present)
   will hold the name of the ruby class of the instance saved in that
-  row. If there is no "type" field, the class will be the one on which
-  "instantiate" was called (see "instantiate" below)
-
+  row. If there is no "type" field, the class of created objects will
+  be the one on which the constructor method (find/create) was called
+  (see "instantiate" below)
 
 - primary_key()  # name of PK field in #{table_name}
 
@@ -56,6 +56,9 @@ important class methods:
   find_all(conditions = nil, orderings = nil, limit = nil, joins = nil)
   find_first(conditions = nil, orderings = nil)
 
+      find matching records, call self.instantiate(record) (i.e. call
+       instantiate on the class the find method was called on)
+
 
 - create(attributes = nil)
 
@@ -67,10 +70,6 @@ important class methods:
 important instance methods:
 
 - save()   # save object to db
-
-- ? attributes() / attributes=()    # new in ruby?
-
-- ? instance_variable_set("@attributes", record)    # new in ruby
 
 - read_attribute(name)
 
