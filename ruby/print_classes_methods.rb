@@ -2,7 +2,8 @@
 
 
 def print_module(mod)
-  mod.instance_methods.each {|m|
+
+  (mod.instance_methods - ((mod.ancestors-[mod]).map{|a|a.instance_methods}).flatten).each {|m|
     print "#{mod}.#{m}\n"
   }
   (mod.methods - (mod.ancestors - [mod]).map{|a|a.methods}.flatten).each {|m|
