@@ -1,0 +1,30 @@
+<!-- -*- html -*- -->
+
+<head>
+  <title> <%= $dir->{PATH} %> </title>
+</head>
+
+<body>
+
+  <h1> <%= $dir->{PATH} %> </h1>
+
+    <h2>sub-directories</h2>
+
+    <% foreach my $d (keys %{$dir->{DIRS}}) { %>
+
+  <a href="<%= $dir->{DIRS}->{$d}->{NAME} %>"> <%= $dir->{DIRS}->{$d}->{NAME} %>/ </a> <br/>
+    <% } %>
+
+    <h2>files</h2>
+
+    <% foreach my $f (@{$dir->{FILES}}) { %>
+
+  <a href="<%= $f %>.html"> <%= $f %> </a> <br/>
+    <% } %>
+
+
+<% if ($dir->{PARENT}) { %>
+  <a href=".."> back to <%= $dir->{PARENT}->{NAME} %> </a>
+<% } %>
+
+<body>

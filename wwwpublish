@@ -1,0 +1,169 @@
+#!/usr/bin/perl -w
+
+BEGIN { @INC = ("perl/test", @INC); }
+
+use strict;
+use File::Find;
+
+sub rejected {
+    local ($_) = shift;
+    my $accessible_file = shift;
+    (! -f $accessible_file and ! -d $accessible_file) or
+    (stat($accessible_file))[7] > 100000 or
+    m!/CVS! or
+    m!~$! or
+    m!\.gz$! or
+    m!tgz$! or
+    m!\.bz2$! or
+    m!tbz2$! or
+    m!\.exe$! or
+    m!^./isst! or
+    m!^./isst! or
+    m!^./passwords.txt.asc! or
+    m!aerzte!i or
+    m!\#$! or
+    m!^./wwwpublish!;
+}
+
+
+sub htmlizable {
+    local ($_) = shift;
+    m!bsh$! or
+    m!c$! or
+    m!cc$! or
+    m!cgi$! or
+    m!classpath$! or
+    m!consign$! or
+    m!cs$! or
+    m!css$! or
+    m!dat$! or
+    m!dtd$! or
+    m!edit$! or
+    m!el$! or
+    m!eli$! or
+    m!env$! or
+    m!gplot$! or
+    m!h$! or
+    m!htm$! or
+    m!html$! or
+    m!jad$! or
+    m!java$! or
+    m!jpr$! or
+    m!js$! or
+    m!latex$! or
+    m!li$! or
+    m!local$! or
+    m!log$! or
+    m!ml$! or
+    m!pac$! or
+    m!php3$! or
+    m!pl$! or
+    m!pm$! or
+    m!policy$! or
+    m!project$! or
+    m!py$! or
+    m!rb$! or
+    m!sax2$! or
+    m!show$! or
+    m!sql$! or
+    m!templ$! or
+    m!tex$! or
+    m!txt$! or
+    m!txt,v$! or
+    m!url$! or
+    m!xerces$! or
+    m!xml$!;
+}
+
+our $root = {};
+
+find(sub {
+         return if rejected($File::Find::name,$_);
+         my $currdir = $root;
+         my $currpath = "";
+         foreach my $d (split("/",$File::Find::dir)) {
+             $currpath .= "${d}/";
+             my $parent = $currdir;
+             $currdir = ($currdir->{DIRS}->{$d} ||= {});
+             $currdir->{PARENT} = $parent;
+             $currdir->{NAME} = $d;
+             $currdir->{PATH} = $currpath;
+         }
+         if (-f) {
+             push @{$currdir->{FILES}}, $_;
+         }
+     },
+     ".");
+
+$root = $root->{DIRS}->{'.'};
+$root->{PARENT} = undef;
+
+return unless (__FILE__ eq $0);
+
+
+sub check {
+    our $dir = shift;
+    print STDERR "checking: $dir->{PATH}\n";
+    foreach my $d (keys %{$dir->{DIRS}}) {
+        check($dir->{DIRS}->{$d});
+    }
+}
+
+
+my $PUBHTMLDIR = $ARGV[0] or die "usage: wwwpublish <targetdir>";
+
+#check $root;
+#__END__
+
+
+use Template;
+use File::Copy;
+
+sub publish($);
+
+sub publish($) {
+    # "our" variables are "our" so the template can acces it
+    # we use "my" copies of those variables in this routine because
+    #    using "our" (i.e. dynamically scoped) variables in recursive
+    #    functions tends to be messy
+    my $_dir = shift;
+    our $dir = $_dir;
+    my $targetdir = "${PUBHTMLDIR}/$_dir->{PATH}/";
+    print STDERR "publishing: $targetdir\n";
+    unless (-d $targetdir) {
+        mkdir $targetdir or die "couldn't mkdir $targetdir: $!";
+    }
+    open(IDXHTM, ">$targetdir/index.html");
+    my $_target_templ = "wwwpublish.d/index.templ";
+    our $target_templ = $_target_templ;
+    my $tpl = Template->new("wwwpublish.d/wrapper.templ", *IDXHTM);
+    $tpl->run();
+    close IDXHTM;
+
+    foreach my $f (@{$_dir->{FILES}}) {
+        my $_fqsrcname = "$_dir->{PATH}/$f";
+        our $fqsrcname = $_fqsrcname;
+
+        if (!htmlizable($_fqsrcname)) {
+            copy($_fqsrcname, "${targetdir}/$f");
+            next;
+        }
+
+        local $/=undef;
+        open(F,"<$_fqsrcname") or die "couldn't open $_fqsrcname: $!";
+        my $_text = <F>;
+        our $text = $_text;
+        close F;
+        $target_templ = "wwwpublish.d/file.templ";
+        open(FILEHTM, ">${targetdir}/$f.html");
+        my $tpl = Template->new("wwwpublish.d/wrapper.templ", *FILEHTM);
+        $tpl->run();
+        close FILEHTM;
+    }
+
+    foreach my $d (keys %{$_dir->{DIRS}}) {
+        publish($_dir->{DIRS}->{$d});
+    }
+}
+
+publish $root;
