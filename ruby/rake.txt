@@ -44,6 +44,12 @@ attribute of that task is set to the
 accordingly_named_source_file). Else, if a file named task_name
 exists, return a file(task_name) task. Else, fail.
 
+Rules can only have a single prerequisite :(
+
+e.g.
+rule '.foo' => ['.bar','baz']
+=> RuntimeError: Too many dependents specified in rule .foo: [".bar", "baz"]
+
 
 file(name, &block) calls FileTask.define_task(name,&block).
 
