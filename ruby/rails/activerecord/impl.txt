@@ -8,8 +8,10 @@ important internal class methods:
   derived from the name of the class up the hierarchy from self
   onwards that descends from ActiveRecord directly. This table will
   hold all instances of that class as well as of all classes derived
-  from it. In each row of the table, the SQL field "type" will hold
-  the name of the ruby class of the instance saved in that row
+  from it. In each row of the table, the SQL field "type" (if present)
+  will hold the name of the ruby class of the instance saved in that
+  row. If there is no "type" field, the class will be the one on which
+  "create" was called (see "create" below)
 
 
 - primary_key()  # name of PK field in #{table_name}
@@ -80,8 +82,8 @@ important instance methods:
 
   delegates to write_attribute()/query_attribute()/read_attribute()
   based on whether method_id ends with "=", "?", or nothing special,
-  respectively. So, "p=Person.new(..); p.name = 'Hugo'" would end up
-  calling Person.
+  respectively. So, "p=Person.create(..); p.name = 'Hugo'" would end
+  up calling p.write_attribute("name","Hugo")
 
 
 
