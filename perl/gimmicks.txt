@@ -1,0 +1,18 @@
+do { } kann benutzt werden, um das Ergebnis eines Blocks als Ausdruck zu benutzen (wie `eval'?)
+
+$i=10; print join("\n", do { @res=(1); for (1..$i) { push @res, $res[$_-1] * $_; }; @res })
+
+Ausgabe:
+
+1
+1
+2
+6
+24
+120
+720
+5040
+40320
+362880
+3628800
+

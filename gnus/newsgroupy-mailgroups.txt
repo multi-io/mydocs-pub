@@ -1,0 +1,124 @@
+Problem:
+
+  Meine Followups auf Mails in bestimmten Mailgruppen
+  (einstellbar) sollen -- neben gnus-message-archive-group -- auch
+  noch in diesen Mailgruppen selber gespeichert werden (sodass sich
+  diese Mailgruppen mehr wie richtige Newsgruppen anfühlen).
+
+  Prinzipielles Vorgehen IMHO:
+
+  - Name der Mailgruppe, in der der zu beantwortende Artikel steht,
+    steht in dessen "Xref"-Header (QU: dokumentiert?)
+
+  - von dort muesste er geholt und in der "Gcc"-Header der zu
+    schreibenden Antwortmail kopiert werden
+
+
+relevante Aufrufabfolge beim Antworten auf Mails:
+
+Summary-Buffer, 'R'
+
+[gnus-msg.el]
+==> gnus-summary-reply-with-original (L661)
+
+  ==> gnus-summary-reply (L638)
+
+    ==> gnus-setup-message (L208)
+
+      (add-hook 'message-header-setup-hook
+      ;;         ^^^^^^^^^^^^^^^^^^^^^^^^^
+      ;;      Kopie der gleichnamigen glob. Var.
+                'gnus-inews-insert-archive-gcc)
+
+      Buffer für Antwortmail erstellen, mit dem Quoting befüllen, zum
+      aktuellen Buffer machen
+
+      [message.el]
+      ==> (message-reply nil wide)
+
+        ==> (message-setup ...)
+
+         ==> (run-hooks 'message-header-setup-hook)
+
+           ==> (gnus-inews-insert-archive-gcc) ;; Hookfkt. gerade eingefuegt -- s.o.
+
+             In "gnus-message-archive-group" angeg. Funktion aufrufen
+
+      [gnus-msg.el]
+
+      gnus-message-setup-hook aufrufen (stdmäßig nil)
+
+
+Offenbar gibt es keinen Hook, in dem man auf einfache Weise an den
+Namen der Mailgruppe, aus der der zu beantwortende Artikel stammt,
+herankommt. Alle obigen Hooks (message-header-setup-hook,
+gnus-message-archive-group, gnus-message-setup-hook) werden erst
+aufgerufen, wenn der aktuelle Buffer bereits der Buffer der zu
+schreibenden Nachricht ist. Man bräuchte einen Hook, der aufgerufen
+wird, wenn noch die zu beantwortende Mail akt. Buffer ist, sodass man
+deren "Xref"-Header auslesen könnte (s.o.).
+
+
+Man könnte alle üblichen Tastenkombination für Replies ("r", "R") auf
+eine eigene Funktion verbiegen, dort Xref auslesen und in einer
+Variablen speichern, und diese dann in der über
+"gnus-message-archive-group" definierten Funktion wieder auslesen...
+
+-----
+
+Prinzipiell andere Vorgehensweise:
+
+- mail-send-hook überschreiben (wird aufgerufen, wenn die Mail
+  abgeschickt wird, mit zu schickender Mail als aktuellem Buffer)
+
+- dort Splitting ähnlich zu "nnmail-split-methods" vornehmen, Mail in
+  entspr. Gruppe kopieren
+
+Vorteil: Würde auch bei neu geschriebenen Mails gehen, nicht nur bei
+         Replies.
+
+-----
+
+Noch eine andere Möglichkeit:
+
+| Path: uni-berlin.de!hmbdi6-212-144-208-126.arcor-ip.NET!not-for-mail
+| From: Raymond Scholz <ray-2001@zonix.de>
+| Newsgroups: gnu.emacs.gnus
+| Subject: Re: gcc-self to multiple groups?
+| Date: 11 Feb 2001 19:16:46 +0100
+| Lines: 20
+| Sender: rscholz@mde1.zonix.de
+| Message-ID: <$.874ry1rsoh.fsf@mde1.zonix.de>
+| References: <87k86xktxx.fsf@pooh.honeypot>
+| Reply-To: Raymond Scholz <rscholz@zonix.de>
+| NNTP-Posting-Host: hmbdi6-212-144-208-126.arcor-ip.net (212.144.208.126)
+| Mime-Version: 1.0
+| Content-Type: text/plain; charset=us-ascii
+| X-Trace: fu-berlin.de 981917122 20562048 212.144.208.126 (16 [12894])
+| X-Now-Playing: Blur / Country House (MP3)
+| X-Face: ]O)gWYBDa6]mUo+jd;T+SS:"a9;q430I61MJBsu=]#J@'s0VWK;5#tHP;wj3tQf<522A0>r
+|  Wv|{j<nrld`YOJ4UN<A?~F[~RP}QZJu1jPpZYfb'6bZxK%1|yy2^o8;9?"~/jdcs&%z3+*=Yh
+| User-Agent: Gnus/5.090001 (Oort Gnus v0.01) Emacs/20.7
+| Xref: uni-berlin.de gnu.emacs.gnus:45602
+| 
+| Kirk Strauser <kirk@strauser.com> writes:
+| 
+| > By default, I archive all outgoing mail to
+| > gnus-message-archive-group.  However, their are some mail groups
+| > where I'd like to gcc articles to those groups *in addition to*
+| > the standard location.
+| 
+| Ugly but effective, probably there is a better way to accomplish that:
+| 
+| (setq gnus-message-archive-group nil)
+| (setq message-default-mail-headers "Gcc: nnfolder+archiv:mail")
+| (setq message-default-news-headers "Gcc: nnfolder+archiv:news")
+| 
+| And then put (gcc-self . t) in the Group Parameters for groups you
+| want your own mails appear in.
+| 
+| Cheers,
+|   Ray
+| -- 
+| Join the Gnus Tutorial Project: <http://sourceforge.net/projects/gnus/>
+| 

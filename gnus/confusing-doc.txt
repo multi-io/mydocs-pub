@@ -1,0 +1,79 @@
+Die Gnus-Doku (Info-File) scheint mir sehr unsystematisch und
+"kochrezeptartig" geschrieben zu sein. Die Datenstrukturen und die
+grundlegende Arbeitsweise des Programms werden anscheinend nirgendwo
+richtig erklärt. Bsp.:
+
+- allgemeine Begriffsverwirrung: "server" vs. "backend" vs. "select
+  method" -- scheint alles mehr oder weniger dasselbe zu sein, nämlich
+  ein Backend, das eine Liste von Gruppen enthält, die wiederum
+  Artikel enthalten. Das kann also ein NNTP- oder IMAP-Server sein,
+  aber z.B. auch ein "Mail-Backend", das die Artikel aus einer Datei
+  (pro Gruppe oder pro Artikel) bezieht.
+
+- wie wird das Mail-Splitting gehandhabt? Scheint ziemlich chaotisch
+  zu sein.. "nnmail-split-methods" ist relativ klar (Gnus zieht --
+  genau wann? bei `gnus-group-get-new-news'?[1] -- Mails aus den in
+  "mail-sources" angegebenen Quellen (die haben nix mit dem sonstigen
+  Gnus-System, i.e. mit Backends o.ä., zu tun) und verteilt sie auf
+  die in "nnmail-split-methods" angegebenen Gruppen), aber wie kann
+  man ein Splitting auch in anderen Gruppen realisieren (z.B. in den
+  Archivierungs-Gruppen, i.e. "gnus-message-archive-group")?
+
+  [1] eben gesehen: get-new-new-this-group auf der Inbox des
+      Mail-Backends tut es auch -- wie aber wird die Inbox
+      identifiziert? Geht vielleicht auch jede andere Gruppe des
+      Mail-Backends? Nochmal probieren...
+
+  Problem: bereits in einem Backend vorhandene Artikel neu durch den
+  Splitting-Vorgang schleusen: Artikel auswählen,
+  "gnus-summary-respool-article". -- Was tut diese Funktion genau? Sie
+  fragt nach einem Backend -- also etwas wie "nnml", "nnfolder" oder
+  "nntp" (*), aber nicht nach einem Servernamen (ein Backend kann
+  bel. viele Server bereitstellen). Wie kann allein der Backendname
+  genug Informationen für "gnus-summary-respool-article"
+  bereitstellen? Bezieht gnus-summary-respool-article die in
+  "nnmail-split-methods" angegebenen Gruppennamen auf das angegebene
+  Backend?
+
+  (*) Aha -- also bezeichnet "Backend" offenbar eine "Serverklasse",
+      i.e. ein Codestück, das konkrete Server(?) bereistellen
+      kann. Ein Tupel aus einem Backend- und einem Servernamen
+      (z.B. ("nntp","news.fu-berlin.de")) bezeichnet dann einen
+      konkreten Server ("select method"?), der konkrete Gruppen und
+      Artikel bereitstellt.
+
+- sind Gruppennamen (z.B. "de.comp.lang.c" oder "mail.misc") Gnus-weit
+  oder nur pro Server eindeutig? Vermutlich letzteres, aber warum muss
+  man dann an vielen Stellen in Gnus (z.B. bei den
+  o.a. "nnmail-split-methods" und "gnus-message-archive-group") nur
+  einen Gruppennamen angeben? Wie entscheidet Gnus, welcher Server zu
+  benutzen ist?
+
+- C-h v gnus-message-archive-group sagt: 
+
+  [...]
+  Normally the group names returned by this variable should be
+  unprefixed -- which implicitly means "store on the archive server".
+
+  Was aber ist der "archive server" bzw. wie wird er aus der Liste der
+  definierten Server (gnus-select-method,
+  gnus-secondary-select-methods) herausgesucht? Ist es der Server mit
+  dem Namen "archive"? Beim Herumsuchen habe ich die Variable
+  "gnus-message-archive-method" gefunden -- die scheint den
+  Archivserver zu enthalten (sie enthält bei mir tatsächlich die
+  Methode (aus "gnus-secondary-select-methods"), die den Namen
+  "archive" hat)
+
+- API-Dokumentation: generell scheint eine umfassende Dokumentation
+  der Programmierschnittstellen von Gnus zu fehlen -- falls man in
+  Hook-Funktionen komplexere Dinge tun will oder Gnus mit
+  umfangreicheren Erweiterungen ausstatten will, steht man ziemlich
+  auf dem Schlauch. Nur ein Beispiel: Man will im Group-Buffer ein
+  get-new-news auf einer bestimmten Gruppe machen. Es gibt anscheinend
+  nur "gnus-group-get-new-news" (neue Nachrichten in allen abonnierten
+  Gruppen abholen) und "gnus-group-get-new-news-this-group" (neue
+  Nachrichten in der aktuellen Gruppe abholen), nicht aber eine
+  entsprechende Funktion, der man den oder die Gruppennamen
+  übergibt. Mal auf www.gnus.org nach vernünftigen Programmierer-Dokus
+  suchen...
+

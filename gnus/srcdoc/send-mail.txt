@@ -1,0 +1,81 @@
+Message-Mode => C-c C-c =>
+
+[message.el]
+==>message-send-and-exit
+
+  ==>message-send
+
+    ==>message-fix-before-sending
+
+    (run-hooks 'message-send-hook) ;; stdmäßig nil
+
+    Mittels Infos aus "message-send-method-alist" Nachrichtentyp
+    pruefen (normalerweise News oder Mail) und mittels
+    entspr. Funktion verschicken. "message-send-method-alist" hat als
+    stdwert:
+    ((news message-news-p message-send-via-news)
+     (mail message-mail-p message-send-via-mail))
+    (Jeweils: (Typ, Prädikatfkt. zum Check, Sendefunktion))
+    Impl. von message-news-p message-mail-p s.u.
+    Beim Verschicken einer Mail wird also bspw. aufgerufen:
+
+    ==>message-send-via-mail
+      ==>message-send-mail  (L2253)
+
+        (let ((message-deletable-headers '(Message-ID Date Lines))) 
+        ==>(message-generate-headers message-required-mail-headers)  (L3156)
+
+          ....
+
+        ) ;;let
+
+        (run-hooks 'message-header-hook)  ;;stdmäßig nil
+
+        .... (ab L2272)
+
+    if (Senden erfolgreich)
+
+      ==>message-do-fcc
+
+        Nachricht in allen in "Fcc" - Headern der Nachricht
+        angegebenen Dateien abspeichern (jwls. ein Dateiname pro
+        Fcc-Header). Die Fcc-Header selbst werden entfernt, die
+        Nachricht wird entspr. encoded usw.. Die Fcc-Header können
+        alternativ zu Dateinamen auch Kommandos angeben, in die der
+        Nachrichtentext hineingepiped werden soll. Näheres siehe
+        message-do-fcc - Impl.
+
+      (save-excursion
+	(run-hooks 'message-sent-hook))   ;;stdmäßig nil
+
+
+
+---------------
+Nebeninfo (wg. Übersichtlichkeit hier und nicht in message-send):
+
+==>message-news-p
+
+  true gdw.:
+
+  - Var. "message-this-is-mail" ist nil (nicht-true)
+   und
+  - - Var. "message-this-is-news" ist true
+     oder
+    - Message enthält Header "newsgroups" und enthält nicht den Header
+      "posted-to"
+
+
+==>message-mail-p
+
+  true gdw.:
+
+  - Var. "message-this-is-news" ist nil (nicht-true)
+   und
+  - - Var. "message-this-is-mail" ist true
+     oder
+    - Message enthält mind. einen der  Header "to", "cc", "bcc"
+
+
+d.h. mit "message-this-is-news" bzw. "message-this-is-mail" kann man
+den jwlg. Typ erzwingen, sind diese Variablen nil, werden die Header
+überprüft

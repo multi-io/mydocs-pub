@@ -1,0 +1,15 @@
+
+ Once you have Linux running you can save the boot record with the command:
+  
+   dd if=/dev/hda of=/boot/boot.MBR bs=512 count=1
+  
+ It can then be restored with:
+  
+   dd if=/boot/boot.MBR of=/dev/hda bs=512 count=1
+  
+ or if you do not want/need to overwrite the partition table with: 
+  
+   dd if=/boot/boot.MBR of=/dev/hda bs=446 count=1
+  
+ as the partition table is kept in the last 66 bytes of the MBR.
+  
