@@ -36,8 +36,13 @@ The execute implementation in Task runs all @actions (in order of
 definition). If no actions have been defined, [TODO: rules].
 
 Task.[](task_name): If a task task_name was defined explicitly, return
-it. Else, if a rule matches, return it [TODO: rules]. Else, if a file
-named task_name exists, return a file(task_name) task. Else, fail.
+it. Else, if a rule's pattern (the thing before the "=>" in the
+definition) matches task_name, and an accordingly named source file
+exists, on-the-fly create and return the file task: file task_name =>
+accordingly_named_source_file {<the rule's block>} (the "source"
+attribute of that task is set to the
+accordingly_named_source_file). Else, if a file named task_name
+exists, return a file(task_name) task. Else, fail.
 
 
 file(name, &block) calls FileTask.define_task(name,&block).
