@@ -83,7 +83,7 @@ if __FILE__ == $0
   fapprox = fourier_analysis_reverse((1...8),as,bs,c, 0.0, 8.0)
 
   require "gplotutils"
-  plot = Plot.new
+  plot = Plot.new(ARGV[0] || nil)
   plot.title("fourier analysis")
   plot.xlabel("time")
   plot.ylabel("signal")
