@@ -69,10 +69,23 @@ sub quote_expr {
 sub run {
     no strict 'vars';
     my ($self) = @_;
-    my $callingpkg = caller();
+    our $callingpkg;  # need dynamic scope for this so include()d sub-templates still get the original calling package's variables
+    my $prev_callingpkg = $callingpkg;
+    $callingpkg = caller() unless $callingpkg;
     # print qq[evaling:\n$self->{templ}\n];
     eval qq[package $callingpkg; $self->{templ}];
+    $callingpkg = $prev_callingpkg;
     croak $@ if $@;
+}
+
+
+sub include {
+    my ($self,$filename) = @_;
+    $filename = $self unless $filename;
+    my $result = "";
+    my $subtempl = Template->new($filename, \$result);
+    $subtempl->run();
+    $result;
 }
 
 
