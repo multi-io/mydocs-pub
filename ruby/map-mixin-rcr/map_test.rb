@@ -48,6 +48,9 @@ class XmlMappingTest < Test::Unit::TestCase
     assert_equal 42, m.fetch("answer")
     assert_raises(IndexError) {m.fetch("notthere")}
     assert_nil m.fetch("notthere",nil)
+    o=Object.new; assert_equal o, m.fetch("notthere",o)
+    def o.==(x); true; end
+    assert_equal o, m.fetch("notthere",o)
     assert_equal "foobar", m.fetch("notthere","foobar")
 
     assert_equal 3, m.size

@@ -49,7 +49,7 @@ module Map
     begin
       get_mapped_value(k)
     rescue IndexError
-      return dflt unless dflt==INTERNAL
+      return dflt unless INTERNAL==dflt
       return yield(k) if block_given?
       raise
     end
