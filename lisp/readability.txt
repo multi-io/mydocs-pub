@@ -1,0 +1,24 @@
+;; (Sawfish match-window.jl)
+
+  (define (add-window-matcher prop value #!rest actions)
+    (catch 'out
+      (let
+	  ((pair (cons prop value))
+	   (add-to (lambda (slot)
+		     (mapc (lambda (action)
+			     (let
+				 ((tem (assq (car action) (cdr slot))))
+			       (if tem
+				   (rplacd tem (cdr action))
+				 (rplacd slot (cons action (cdr slot))))))
+			   actions))))
+	;; does the list already contain a (PROP . VALUE) pair?
+	(mapc (lambda (cell)
+		(when (member pair (car cell))
+		  (add-to cell)
+		  (throw 'out t)))
+	      match-window-profile)
+	;; no
+	(setq match-window-profile (cons (list (cons pair nil))
+					 match-window-profile))
+	(add-to (car match-window-profile)))))
