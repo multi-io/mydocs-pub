@@ -1,3 +1,5 @@
+/sbin/ifconfig ppp0 | grepre 'inet addr:(.*?)\s'
+
 swangoose:~# history | grep grepre
  2364  cp /home/olaf/bin/grepre /usr/local/bin/
  2735  ff . 'IBM' '*.c' | grep Copyright | grepre '^(:*?):'
@@ -62,3 +64,5 @@ tack:~# history | grep grepre
   149  cat tmp.txt | grepre '^(.*?):' | sort | uniq | less
   998  history | grep grepre
 tack:~# 
+
+cvs diff 2>/dev/null | grepre '^RCS file: (.*?),v$'
