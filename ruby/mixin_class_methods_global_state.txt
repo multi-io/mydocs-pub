@@ -1,0 +1,178 @@
+23:48 -!- Irssi: Join to #ruby-lang was synced in 1 secs
+
+23:58 < multi_io> what I want is a mixin that provides class methods that share 
+                  some global state
+
+
+module M
+
+  @@cv = 42
+
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def cm2
+      puts @@cv
+    end
+  end
+
+end
+
+
+class C
+  include M
+  cm2  # => should print 42, but:
+       #   in `cm': uninitialized class variable @@cv in M::ClassMethods (NameError)
+end
+
+
+00:01 < shyouhei> what about a cnostant of Array?
+00:01 < shyouhei> CV = [42]
+00:02 < shyouhei> def cv; CV[0]; end
+
+i.e.:
+
+module M
+
+  CV = [42]
+
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def cv
+      CV[0]
+    end
+
+    def cv=(x)
+      CV[0]=x
+    end
+  end
+
+end
+
+
+class C
+  include M
+
+  puts cv  # 42
+  self.cv=23
+  puts cv  # 23
+end
+
+
+class C2
+  include M
+
+  puts self.cv  # 23
+end
+
+
+class C3
+  include M
+end
+
+
+puts C3.cv  # 23
+
+C3.class_eval "self.cv=38"
+
+puts C3.cv  # 38
+puts C.cv   # 38
+
+
+
+00:03 < shyouhei> is a good old trick -- implementation of a class variable on 
+                  ruby 1.4;  before Matz introduced @@cv
+
+
+00:13 < multi_io> thanks
+00:14 < multi_io> yep, that works
+
+
+00:10 < shyouhei> an alternative [use Module.new{block} (>1.8)]
+
+i.e.:
+
+
+module M
+  @@cv = 42
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+ 
+  ClassMethods = Module.new do
+    def cv
+      @@cv
+    end
+
+    def cv=(x)
+      @@cv=x
+    end
+  end
+end
+
+
+class C
+  include M
+
+  puts cv  # 42
+  self.cv=23
+  puts cv  # 23
+end
+
+
+class C2
+  include M
+
+  puts self.cv  # 23
+end
+
+
+class C3
+  include M
+end
+
+
+puts C3.cv  # 23
+
+C3.class_eval "self.cv=38"
+
+puts C3.cv  # 38
+puts C.cv   # 38
+
+
+
+
+0:27 < multi_io> shyouhei: your alternative works too, but I think I don't 
+                  fully understand why...
+00:27 < multi_io> albeit...
+00:27 < multi_io> maybe I do
+00:29 < multi_io> is it because the block is a closure and thus accesses a 
+                  different @@cv?
+00:30 < shyouhei> multi_io: exactly. blocks can "see" variables outside, while 
+                  module statements cannot.
+00:32 < multi_io> shyouhei: are there any other implications when using your 
+                  alternative? I.e. the ClassMethods behaving differently?
+00:34 < shyouhei> No.  The only difference is that @@cv (or any other variables 
+                  if you use) can be seen or not.
+
+(he's right I think -- at least all my unit tests kept working)
+
+00:38 < shyouhei> ,... maybe. Some parts of ruby are difficult than what human 
+                  beging can understand :-)
+
+00:43 < multi_io> hmm.. there appears to be one glitch: when using rdoc to 
+                  generate documentation for this, the ClassMethods's methods 
+                  are documented as if they belonged to the root namespace?C
+00:44 < multi_io> (this appears to be an rdoc problem...)
+00:44 < multi_io> (actually I'm surprised that rdoc generated documentation for 
+                  those methods at all...)
+
+(so I chose the 1st alternative for the time being)
