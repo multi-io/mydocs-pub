@@ -2,6 +2,8 @@ PUBHTMLDIR=$(HOME)/www/mydocs
 
 .PHONY: update-and-publish wwwpublish update
 
+default: wwwpublish-cs
+
 update-and-publish:
 	$(MAKE) update
 	$(MAKE) wwwpublish
