@@ -69,6 +69,14 @@ ist das zu schreibende Image.
 Die SCSI-ID kann alternativ auch in der Umgebungsvariable $CDR_DEVICE
 stehen.
 
+Ein UNIX-mäßiger Gerätetreiberstandard für CD-Brenner scheint nicht zu
+existieren, man muss dauernd direkt im Userspace mit diesen komischen
+SCSI-IDs herumhantieren. Und Brennprogramme (z.B. cdrecord) müssen mit
+UID 0 laufen. cdrecord baut folgerichtig alle Securitychecks, die
+normalerweise der Kernel macht, im Userspace nach (Test, ob die
+Real-UID des cdrecord-Prozesses die Erlaubnis hat, die iso-Files zu
+lesen). Hihi...
+
 Generell: Eine CD enthält einen oder mehrere "Traks". Dies können
 Daten- oder Audio-Tracks sein. Bei handelsüblichen Audio-CDs ist jeder
 Titel ein Audio-Track. Anzeigen des "Inhalsverzeichnisses" (Auflistung
