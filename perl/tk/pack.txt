@@ -1,0 +1,28 @@
+(man Tk::pack)
+
+Widgets (slaves) have a "packing order" in their parent
+("master"). Packing order can be influenced via -before, -after. By
+default, widgets are placed at the end of the packing order.
+
+When laying out the widgets, they are processing in packing order.
+
+At each time, a "cavity" is left in which to place the remaining
+slaves (at the beginning: cavity == the whole master).
+
+A "parcel" is allocated for the widget:
+
+-  parcel laid out inside the cavity according to the -side option
+   (e.g. -side left => parcel height = cavity height, parcel width =
+   requested width of slave plus the -ipadx and -padx options)
+
+- size of slave: requested width/height, -ipadx, -ipady. If -fill is
+  given (may be none(default), x, y, or both): width/height of parcel,
+  minus twice the -pady option
+
+- placement of slave inside the parcel: -anchor, -padx, -pady
+
+- new cavity = old cavity minus parcel
+
+
+- expansion: -expand option (boolean) in comb. with -side left/right
+  or -side top/bottom

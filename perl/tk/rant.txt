@@ -1,0 +1,49 @@
+- Nicht-Orthogonalitaet (z.B. "Scrolled"-Pseudowidget, aber auch
+  Scrollproperties in etlichen Widgets, z.B. Canvas)
+
+- Kompliziertes "configure"-Protokoll
+
+- ($cnv ist ein Canvas)
+
+  DB<17> x $cnv->cget(-scrollregion)
+0  0
+1  0
+2  4375
+3  3540
+  DB<18> x $cnv->cget(-scrollregion)
+  empty array
+
+  ?
+
+- z.T. chaotisch organisierte Manpages (Tk::options, Tk::bind
+  usw.). Wo sind die Events dokumentiert, die ein bestimmtes Widget
+  aussenden kann? Tk::bind dokumentiert offenbar die
+  Tk::Widget-Events...
+
+
+- Scrollables haben kein Event, das anzeigt, dass gerade gescrollt
+  wurde
+
+- keine vernünftige Möglichkeit, eigene Events analog zu den
+  vordefinierten (mit "bind" bindbaren) zu definieren
+
+- pro Event nur ein Binding definierbar???
+
+    $schedCanvas->CanvasBind('<Control-5>', sub {
+                                print "bind1";
+                             });
+    $schedCanvas->CanvasBind('<Control-5>', sub {
+                                print "bind2";
+                             });
+
+  => bind2 überschreibt bind1, nur bind2 wird aufgerufen!!
+
+- manche Events werden überhaupt nicht über "bind"-Listen verbunden,
+  sondern über einzelne Variablen (d.h. nur ein Binding pro
+  Event). Beispiel: Tk::Scrollbar/-command. Ein "Scrollable" verbindet
+  intern die "-command"s seiner Scrollbars. Setzt man die "-command"s
+  um, gibt es "witzige" Effekte...
+
+- "destroy"-Event eines Fensters wird mehrfach aufgerufen, wenn der
+  User das Fenster m.H.des Windowmanagers schließt (offenbar einmal pro
+  Kind des Fensters?) 
