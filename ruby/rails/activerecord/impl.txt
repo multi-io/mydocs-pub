@@ -11,7 +11,7 @@ important internal class methods:
   from it. In each row of the table, the SQL field "type" (if present)
   will hold the name of the ruby class of the instance saved in that
   row. If there is no "type" field, the class will be the one on which
-  "create" was called (see "create" below)
+  "instantiate" was called (see "instantiate" below)
 
 
 - primary_key()  # name of PK field in #{table_name}
@@ -81,9 +81,9 @@ important instance methods:
 - method_missing(method_id, *arguments)
 
   delegates to write_attribute()/query_attribute()/read_attribute()
-  based on whether method_id ends with "=", "?", or nothing special,
-  respectively. So, "p=Person.create(..); p.name = 'Hugo'" would end
-  up calling p.write_attribute("name","Hugo")
+  depending on whether method_id ends with "=", "?", or nothing
+  special, respectively. So, "p=Person.create(..); p.name = 'Hugo'"
+  would end up calling p.write_attribute("name","Hugo")
 
 
 
