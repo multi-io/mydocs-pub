@@ -1,29 +1,38 @@
 <!-- -*- html -*- -->
 
+<% no strict 'refs'; no warnings; %>
+
+<% @parents=(); for ($curr=$dir; $curr; $curr=$curr->{PARENT}) { @parents = ($curr->{NAME}, @parents); } %>
+
 <head>
   <title> <%= $dir->{PATH} %> </title>
 </head>
 
 <body>
 
-  <h1> <%= $dir->{PATH} %> </h1>
+  <h1> <%= $nd=@parents; join("/", map {qq[<a href="${\("../" x ($nd-- -1))}.">$_</a>]} @parents) %> </h1>
 
     <h2>sub-directories</h2>
 
+    <% $sep = (keys %{$dir->{DIRS}}) < 25? "<br/>":"&nbsp;"; %>
+
     <% foreach my $d (keys %{$dir->{DIRS}}) { %>
 
-  <a href="<%= $dir->{DIRS}->{$d}->{NAME} %>"> <%= $dir->{DIRS}->{$d}->{NAME} %>/ </a> <br/>
+  <a href="<%= $dir->{DIRS}->{$d}->{NAME} %>"> <%= $dir->{DIRS}->{$d}->{NAME} %>/ </a> <%=$sep%>
     <% } %>
 
     <h2>files</h2>
 
+    <% $sep = (@{$dir->{FILES}} < 25)? "<br/>":"&nbsp;"; %>
+
     <% foreach my $f (@{$dir->{FILES}}) { %>
 
-  <a href="<%= $f %>.html"> <%= $f %> </a> <br/>
+      <a href="<%= $f %>.html"> <%= $f %> </a> <%= $sep %>
     <% } %>
 
 
 <% if ($dir->{PARENT}) { %>
+   <p/>
   <a href=".."> back to <%= $dir->{PARENT}->{NAME} %> </a>
 <% } %>
 
