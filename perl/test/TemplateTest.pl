@@ -5,11 +5,11 @@ BEGIN { @INC = (".", @INC); }
 use Template;
 
 
-# my $rs = Template->new("rundschreiben.templ", do{open(F,">out.txt"); *F});
-my $rs = Template->new("rundschreiben.templ");
+# my $rs = Template->new("letter.templ", do{open(F,">out.txt"); *F});
+my $rs = Template->new("letter.templ");
 
 my $out = "foo";
-# my $rs = Template->new("rundschreiben.templ", \$out);
+# my $rs = Template->new("letter.templ", \$out);
 
 our @people =
 ( {name=>'Meier', sex=>'m', debt=>4000},
