@@ -29,6 +29,8 @@ class C
 end
 
 
+Day changed to 28 Feb 2005
+
 00:01 < shyouhei> what about a cnostant of Array?
 00:01 < shyouhei> CV = [42]
 00:02 < shyouhei> def cv; CV[0]; end
