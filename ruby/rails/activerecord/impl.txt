@@ -1,3 +1,5 @@
+$Id: impl.txt,v 1.4 2004/11/11 20:45:51 oklischa Exp $
+
 ActiveRecord::Base:
 
 
@@ -37,8 +39,9 @@ important internal class methods:
 
 
 - instantiate(record)   # create instance of self from record (hash of
-                        # (field_name=>field_value) pairs) obtained
-                        # by calling connection.select_..(sqlstring)
+                        # (field_name=>field_value) pairs).
+                        # record should've been obtained by calling
+                        # calling connection.select_..(sqlstring)
           object = record_with_type?(record) ? compute_type(record["type"]).allocate : allocate
           object.instance_variable_set("@attributes", record)
           return object
