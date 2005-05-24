@@ -31,13 +31,14 @@ sub rejected {
          m!^./java/nio! or
          m!^./svn! or
          m!^./gnus! or
+         m!^./mediamaerkte/.*?txt$! or
          m!^./wget! or
          m!^./longhorn! or
          m!^./debian! or
          m!^./emacs! or
          m!^./bluetooth/bluetooth.txt! or
          m!^./bluetooth/rfcomm.txt! or
-         m!^./lisp! or
+         m!^./lisp/! or
          m!^./root! or
          m!^./sane.txt! or
          m!^./cdwriting.txt! or
