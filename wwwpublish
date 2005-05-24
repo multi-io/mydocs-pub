@@ -39,6 +39,17 @@ sub rejected {
          m!^./bluetooth/rfcomm.txt! or
          m!^./lisp! or
          m!^./root! or
+         m!^./sane.txt! or
+         m!^./cdwriting.txt! or
+         m!^./grepre-examples.txt! or
+         m!^./iptables.txt! or
+         m!^./mbrsaverestore.txt! or
+         m!^./printing-hierarchical-websites.txt! or
+         m!^./xgalaga/prizes/prizes.html$! or
+         m!^./xgalaga/prizes/code.txt$! or
+         m!^./xgalaga/prizes/Makefile$! or
+         m!^./xgalaga/prizes/.*?xpm$! or
+         m!^./xgalaga/prizes/.*?png$! or
          m!^./wwwpublish!
         );
 }
@@ -62,8 +73,6 @@ sub htmlizable {
     m!env$! or
     m!gplot$! or
     m!h$! or
-    m!htm$! or
-    m!html$! or
     m!jad$! or
     m!java$! or
     m!jpr$! or
@@ -72,7 +81,7 @@ sub htmlizable {
     m!li$! or
     m!local$! or
     m!log$! or
-    m!ml$! or
+    m!\.ml$! or
     m!pac$! or
     m!php3$! or
     m!pl$! or
@@ -90,6 +99,7 @@ sub htmlizable {
     m!txt,v$! or
     m!url$! or
     m!xerces$! or
+    m!Makefile$! or
     m!xml$!;
 }
 

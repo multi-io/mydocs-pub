@@ -27,7 +27,7 @@
 
     <% foreach my $f (@{$dir->{FILES}}) { %>
 
-      <a href="<%= $f %>.html"> <%= $f %> </a> <%= $sep %>
+      <a href="<%= $f . (htmlizable($f)?".html":"") %>"> <%= $f %> </a> <%= $sep %>
     <% } %>
 
 
