@@ -69,18 +69,18 @@ ist das zu schreibende Image.
 Die SCSI-ID kann alternativ auch in der Umgebungsvariable $CDR_DEVICE
 stehen.
 
-Ein UNIX-mäßiger Gerätetreiberstandard für CD-Brenner scheint nicht zu
-existieren, man muss dauernd direkt im Userspace mit diesen komischen
+Ein *nix-artiger Gerätetreiberstandard für CD-Brenner scheint nicht zu
+existieren; man muss dauernd direkt im Userspace mit diesen komischen
 SCSI-IDs herumhantieren. Und Brennprogramme (z.B. cdrecord) müssen mit
 UID 0 laufen. cdrecord baut folgerichtig alle Securitychecks, die
 normalerweise der Kernel macht, im Userspace nach (Test, ob die
 Real-UID des cdrecord-Prozesses die Erlaubnis hat, die iso-Files zu
-lesen). Hihi...
+lesen).
 
-Generell: Eine CD enthält einen oder mehrere "Traks". Dies können
+Generell: Eine CD enthält einen oder mehrere "Tracks". Dies können
 Daten- oder Audio-Tracks sein. Bei handelsüblichen Audio-CDs ist jeder
-Titel ein Audio-Track. Anzeigen des "Inhalsverzeichnisses" (Auflistung
-der Tracks) einer CD:
+Titel ein Audio-Track. Anzeigen des "Inhaltsverzeichnisses"
+(Auflistung der Tracks) einer CD:
 
 cdrecord -toc dev=0,1,0
 
@@ -184,7 +184,7 @@ Inhalt von in file.iso befindlichem RockRidge-ISO-FS listen
 
 
 ===========
-TODO: cdrdao noch genauer untersuchen...
+TODO: cdrdao
 
 cdrdao disk-info --driver generic-mmc --device 0,1,0
                                       ^^^^^^^^^^^^^^ --device bus,id,lun -- s. /proc/scsi
@@ -199,5 +199,3 @@ cdrdao copy --source-device /dev/dvd.sg --device /dev/cdrw.sg --driver generic-m
 (erzeugt zunächst Imagedatei im aktuellen Verzeichnis, brennt dieses
 dann auf die Ziel-CD. Option "--on-the-fly" piped direkt, ohne
 Imagedatei)
-
-Leider bleibt meine Kiste beim Auslesen des Images fast stehen
