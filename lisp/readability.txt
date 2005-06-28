@@ -1,3 +1,29 @@
+;; This module provides a general mechanism for setting properties on
+;; matched windows as they're created. It removes much of the need for
+;; manually creating functions to put in before-add-window-hook.
+
+;; For example, doing:
+
+;;	(add-window-matcher 'WM_CLASS "Term" '(place-mode . interactive))
+
+;; makes all terminal windows be placed interactively. Or even better:
+
+;;	(add-window-matcher 'WM_CLASS "Netscape/Navigator"
+;;			    '(ignore-program-position . t))
+
+;; makes netscape windows a lot easier to live with.
+
+
+  ;; List of (MATCH-ELTS . ACTION-ELTS)
+  ;; Each MATCH-ELT is (PROP . REGEXP or NUMBER or SYMBOL)
+  ;; Each ACTION-ELT is (PROP . VALUE)
+  (defcustom match-window-profile nil
+    nil
+    :type match-window
+    :group match-window
+    :require sawfish.wm.ext.match-window)
+
+
 ;; (Sawfish match-window.jl)
 
   (define (add-window-matcher prop value #!rest actions)
@@ -22,3 +48,39 @@
 	(setq match-window-profile (cons (list (cons pair nil))
 					 match-window-profile))
 	(add-to (car match-window-profile)))))
+
+
+
+# 1-to-1 translation (admittedly, the structure of the original code's
+#   "match-window-profile" appears to be exceptionally stupid)
+
+%match_window_profile = (
+   [[WM_CLASS, "Term"], [WND_TITLE, "MyApp"]] => [[ignore-program-position, 1], [foo,42]],
+   [[WM_CLASS, "Lalala"]] => [[ignore-program-position, 0]],
+   [[WND_TITLE, "Netscape"], ] => [[sticky,1], [cyclable,0]],
+);
+
+sub add_window_matcher {
+    my ($prop, $value, @actions) = @_;
+    #....
+}
+
+
+################
+
+# sane translation
+
+#%match_window_profile = (
+#   [WM_CLASS, "Term"] => $VAR1={ignore-program-position=>1, foo=>42},
+#   [WND_TITLE, "MyApp"] => $VAR1,
+#   [WM_CLASS, "Lalala"] => {ignore-program-position=>0},
+#   [WND_TITLE, "Netscape"] => {sticky=>1, cyclable=>0},
+#);
+
+sub add_window_matcher {
+    my ($prop, $value, %actions) = @_;
+    foreach my $k (keys %actions) {
+        $match_window_profile{[$prop,$value]}->{$k} = $actions{$k};
+    };
+}
+## doesn't work -- arrays as hash keys don't work...
