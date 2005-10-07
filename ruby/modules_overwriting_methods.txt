@@ -1,0 +1,51 @@
+module M
+  def m
+    puts "M#m"
+    super
+  end
+end
+ 
+ 
+class C
+  def m
+    puts "C#m"
+  end
+ 
+  include M
+end
+ 
+c=C.new
+c.m    # => C#m
+
+
+###############
+
+module M
+  def self.included(mod)
+    mod.module_eval <<-EOS
+      def m
+        puts "M#m"
+        super
+      end
+    EOS
+  end
+end
+
+
+class C
+  def m
+    puts "C#m"
+  end
+
+  include M
+end
+
+c=C.new
+c.m
+
+# =>
+M#m
+NoMethodError: super: no superclass method `m'
+        from (eval):3:in `m'
+        from (irb):22
+        from :0
