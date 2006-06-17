@@ -14,7 +14,7 @@ wwwpublish:
 
 wwwpublish-cs: wwwpublish
 	cd $(PUBHTMLDIR) && \
-	tar cz . | ssh butterfly.cs.tu-berlin.de 'cd www/mydocs; gtar xz'
+	tar cz . | ssh basta.cs.tu-berlin.de 'cd www/mydocs; gtar xz'
 
 
 update:
