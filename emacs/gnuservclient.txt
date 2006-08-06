@@ -1,0 +1,21 @@
+gnuclient
+---------
+
+TCP-Verbindung zu -h <host> | $GNU_HOST | garnicht.
+
+benutzter Port: -p <port> | $GNU_PORT | Servicename "gnuserv" | 21490 + uid
+
+falls (keine TCP-Verbindung) und (UNIX_DOMAIN_SOCKETS beim Compilieren definiert) {
+
+    Unix-Domainsocket;
+
+    - Socketdatei: /tmp/gsrvdir<uid>/gsrv;
+
+    - Zugriffsrecht nur für den User, der gnuserv gestartet hat;
+}
+
+
+
+gnuserv
+-------
+

@@ -1,0 +1,20 @@
+- entering the debugger:
+
+  - var. debug-on-error, fcn. toggle-debug-on-error
+
+  - var. debug-on-signal, fcn. toggle-debug-on-signal  debugs even
+    handled errors
+
+  - (debug-on-entry FCN) (FCN -- symbol)
+    M-x debug-on-entry
+    (cancel-debug-on-entry FCN)
+    M-x cancel-debug-on-entry
+
+  - explicit entry: call (debug) anywhere inside your prog
+    (preferably at a place where the return value is ignored
+
+
+- inside *Backtrace* buffer:
+
+  - most important cmds: "d" (step into), "c" (step over), "e" (eval
+    expression) (TODO: verify)
