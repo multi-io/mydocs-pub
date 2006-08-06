@@ -10,6 +10,7 @@ sub rejected {
     my $accessible_file = shift;
     (! -f $accessible_file and ! -d $accessible_file) or
     (stat($accessible_file))[7] > 100000 or
+    ### things we don't want to publish
     m!/CVS! or
     m!~$! or
     m!\.gz$! or
@@ -20,30 +21,38 @@ sub rejected {
     m!^./isst! or
     m!^./isst! or
     m!^./passwords.txt.asc! or
+    m!scheme/test/dstruct.sc! or
+    m!scheme/test/queens.sc! or
+    m!ruby/rails/actionpack! or
+    m!ruby/rails/problems.txt! or
     m!aerzte!i or
     m!\#$! or
      # m!^./wwwpublish! or
     not (
+         ### things we do want to publish (unless they match the things we don't want to publish)
          m!^.$! or
          m!^./$! or
          m!^./ruby! or
          m!^./perl! or
          m!^./java/nio! or
-         m!^./svn! or
+         # m!^./svn! or
          m!^./gnus! or
-         m!^./mediamaerkte/.*?txt$! or
+         # m!^./mediamaerkte/.*?txt$! or
          m!^./wget! or
+         m!^./linux/requested-modules.txt! or
          m!^./longhorn! or
          m!^./debian! or
          m!^./emacs! or
          m!^./bluetooth/bluetooth.txt! or
          m!^./bluetooth/rfcomm.txt! or
+         m!^./internet! or
+         m!^./lisp! or
          m!^./lisp/! or
          m!^./root! or
+         m!^./internet$! or
          m!^./sane.txt! or
          m!^./cdwriting.txt! or
          m!^./grepre-examples.txt! or
-         m!^./iptables.txt! or
          m!^./mbrsaverestore.txt! or
          m!^./printing-hierarchical-websites.txt! or
          m!^./xgalaga/prizes/prizes.html$! or
