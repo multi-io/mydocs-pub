@@ -1,0 +1,45 @@
+(section numbering from "ECMAScript language specification"
+(Ecma-262.pdf))
+
+Based on prototypes (no classes). I.e. there are only objects, which
+may have prototypes, which are also objects. Objects have named
+properties; property acces is delegated to the prototype
+(recursively), which is how "inheritance" is
+implemented. Specifically, methods are also properties (of type
+"function"), and are inherited just like any other properties.
+
+[8.6]
+
+Objects are unordered sets of properties.
+
+Properties have a name (which is a string), a value (which is an
+object), and a set of attributes out of {ReadOnly, DontEnum,
+DontDelete, Internal}.
+
+Properties with attribute "Internal" ("Internal Properties"):
+
+- have no name (umm...) and aren't directly accessible from
+  JavaScript.
+
+- purely a specification concept (used in the specification (and here)
+  for describing the semantics of the language); whether/how they're
+  implemented is up to the implementation
+
+- defined internal properties: Prototype, Class (that's the "kind" of
+  the object (...), not the class/prototype), Get(name),
+  Put(name,value), CanPut(name), Delete(name), DefaultValue,
+  Construct(...), Call(...)  (only in function objects),
+  HasInstance(value) (only in function objects; determines whether
+  value has or inherits the function, AFAICS), Scope (scope chain, see
+  below), Match(string, index) (for regexes)
+
+
+[10]
+
+Code runs in an /execution context/.
+
+At any time there is a stack of execution contexts that runs up to the
+current execution context (in callstack order).
+
+3 types of executing code: global (toplevel), function code (part of a
+function body), eval code (created by built-in "eval" function)
