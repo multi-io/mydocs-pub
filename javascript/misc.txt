@@ -1,12 +1,16 @@
 (section numbering from "ECMAScript language specification"
 (Ecma-262.pdf))
 
+Strongly and dynamically typed.
+
 Based on prototypes (no classes). I.e. there are only objects, which
 may have prototypes, which are also objects. Objects have named
-properties; property acces is delegated to the prototype
+properties; property access is delegated to the prototype
 (recursively), which is how "inheritance" is
 implemented. Specifically, methods are also properties (of type
 "function"), and are inherited just like any other properties.
+
+Lexic and syntax are Java/C++ - like.
 
 [8.6]
 
@@ -30,16 +34,137 @@ Properties with attribute "Internal" ("Internal Properties"):
   Put(name,value), CanPut(name), Delete(name), DefaultValue,
   Construct(...), Call(...)  (only in function objects),
   HasInstance(value) (only in function objects; determines whether
-  value has or inherits the function, AFAICS), Scope (scope chain, see
-  below), Match(string, index) (for regexes)
+  value has or inherits the function, AFAICS), Scope (only in function
+  objects; contains the scope chain (see below) of the function),
+  Match(string, index) (for regexes)
+
+Property access in the source code generally works using either dot
+notation (obj.property) or "indexed" access (obj["property"]). In the
+latter case, the property name is given as a string, which may be
+runtime-determined. obj may be either an identifier (which is resolved
+using the current /scope chain/ (see below)), or an expression that
+returns an object. More below.
+
+The Delete(name) function, which deletes property name from the
+object, is invoked in the source via "delete obj.name". It deletes the
+property and returns true iff the property was present.
+
+[8.7]
+
+"Reference" type
+
+- purely a specification concept (used in the specification (and here)
+  for explaining operators like delete, typeof and such); whether/how
+  they're implemented is up to the implementation
+
+- represents a readable/writable reference to a property of an object
+
+- encompasses: the object ("base object"), and the name of the
+  property
+
+- operations: GetBase(Ref), GetPropertyName(Ref), GetValue(V) (returns
+  V if V is not a Reference, else, returns the value of the property),
+  PutValue(Ref, Value)
+
+For example, a property access expression (obj.property or
+obj["property"]) returns a Reference with obj as the base object and
+"property" as the property. Since a Reference is returned, this
+expression may be used on the right side as well as on the left side
+of an assignment operator (=), i.e. it may be used for reading and
+writing the property.
 
 
 [10]
 
 Code runs in an /execution context/.
 
+Every function and constructor call enters a new execution context,
+even if a function is calling itself recursively.
+
 At any time there is a stack of execution contexts that runs up to the
 current execution context (in callstack order).
 
-3 types of executing code: global (toplevel), function code (part of a
-function body), eval code (created by built-in "eval" function)
+An execution context is associated with a /variable object/, which
+contains:
+
+- local variable declarations (they're added to variable object as the
+  variables are declared)
+
+For function code, the variable object additionally contains:
+
+- the parameters given in the call to the function (with formal
+  parameter names as the names of the properties)
+
+- an "arguments" property which holds
+
+  - the parameters given in the call to the function (just as the
+    variable object does)
+
+  - a "length" property that contains the number of actual parameters
+    given
+
+  - a "callee" property that contains the function being executed
+    (this is so anonymous functions can call themselves recursively)
+
+
+An execution context is also associated with a /scope chain/, which is
+a stack of objects that is used to resolve identifiers. The scope
+chain generally contains the variable objects of the current stack of
+execution contexts in callstack order, but see below for
+details. "with" and "catch" blocks also push an object onto the scope
+chain.
+
+Additionally, an execution context has a /this/ value, which depends
+on the caller (see below).
+
+
+3 types of executing code/execution contexts:
+
+- global (toplevel)
+
+  - variable object = "this" value = the "global object" (a special
+    object that is created when the JavaScript VM starts and is never
+    deleted)
+
+  - scope chain contains the global object only
+  
+- function code (part of a function definition body, or given as a
+  string to the "Function" constructor)
+
+  - scope chain = the variable object, followed by chain contained in
+    the "Scope" property of the function object
+
+  - "this" value provided by caller (see below)
+
+- eval code (created by built-in "eval" function)
+
+  - scope chain and "this" value are the ones from the calling
+    execution context
+
+
+[11]
+
+Major expressions with no real equivalent in Java/C++:
+
+("ref" refers to an expression that returns a Reference (see [8.7]
+above))
+
+- array literal: [exp,exp,exp...]
+
+  - creates new array as if by "new Array()" (for "new" expressions
+    see ...)
+
+  - no exp (i.e. just ,,) places the numeric value 1 at that position
+    (TODO: verify; Execute JS extension in Mozilla suggests otherwise)
+
+- delete ref
+
+  - deletes the property of ref, i.e. calls Delete(propname) on the
+    base object of ref, and returns true iff the property was present
+    before
+
+  - most common usage: delete obj.property
+
+- void UnaryExpression
+  
+  - evaluates UnaryExpression, ignores result, returns undefined
