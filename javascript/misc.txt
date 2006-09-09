@@ -10,7 +10,16 @@ properties; property access is delegated to the prototype
 implemented. Specifically, methods are also properties (of type
 "function"), and are inherited just like any other properties.
 
-Lexic and syntax are Java/C++ - like.
+Lexic and syntax are Java/C++ - like. Input to the lexer is a sequence
+of Unicode codepoints; Java-like \uxxxx codes are supported.
+
+Built-in Types: Undefined, Null, Boolean, Number, String, Object
+
+For each non-object type except Undefined and Null, there is a
+corresponding (native) object type, instances of which will be
+automatically created when a value of the corresponding primitive type
+is used like an object (autoboxing).
+
 
 [8.6]
 
@@ -18,7 +27,7 @@ Objects are unordered sets of properties.
 
 Properties have a name (which is a string), a value (which is an
 object), and a set of attributes out of {ReadOnly, DontEnum,
-DontDelete, Internal}.
+ontDelete, Internal}.
 
 Properties with attribute "Internal" ("Internal Properties"):
 
@@ -97,14 +106,23 @@ For function code, the variable object additionally contains:
 
 - an "arguments" property which holds
 
-  - the parameters given in the call to the function (just as the
-    variable object does)
-
   - a "length" property that contains the number of actual parameters
     given
 
+  - for the nth (0-based) parameter, an "n" property that contains the
+    value of the parameter
+
   - a "callee" property that contains the function being executed
     (this is so anonymous functions can call themselves recursively)
+
+  for example, the print statements in the following function all
+  print the value of the formal parameter b:
+
+  function myf(a,b,c) {
+    print(b);
+    //print(arguments.1);   //should work in priciple, but confuses the lexer 
+    print(arguments[1]);
+  }
 
 
 An execution context is also associated with a /scope chain/, which is
@@ -112,7 +130,8 @@ a stack of objects that is used to resolve identifiers. The scope
 chain generally contains the variable objects of the current stack of
 execution contexts in callstack order, but see below for
 details. "with" and "catch" blocks also push an object onto the scope
-chain.
+chain. (there are also blocks ({....}), but they don't create a new
+scope.
 
 Additionally, an execution context has a /this/ value, which depends
 on the caller (see below).
@@ -144,7 +163,8 @@ on the caller (see below).
 
 [11]
 
-Major expressions with no real equivalent in Java/C++:
+Expressions with no real equivalent or different meaning [than] in
+Java/C++:
 
 ("ref" refers to an expression that returns a Reference (see [8.7]
 above))
@@ -165,6 +185,83 @@ above))
 
   - most common usage: delete obj.property
 
-- void UnaryExpression
+- void expr
   
-  - evaluates UnaryExpression, ignores result, returns undefined
+  - evaluates expr, ignores result, returns undefined
+
+- typeof expr
+
+  - returns a string describing the type of expr: for an object type
+    that's callable (implements Call), return "function" , for an
+    object type that's not callable, return "object", for primitive
+    types return "undefined", "object" (for type Null), "boolean",
+    "number", or "string", respectively. For host objects, the result
+    is implementation-defined (TODO: elaborate, verify)
+
+    E.g. typeof(42) => "number", typeof(new Number(42)) => "object"
+
+- + expr
+
+  - calls ToNumber [9.3] on result of expr, i.e. converts result of
+    expr to a number
+
+- lhs >>> count
+
+  - unsigned right shift, e.g. -2>>>1 => 2147483647, -2>>1 => -1
+
+  (there's no "unsigned left shift")
+
+- addition (+)  [11.6.1]
+
+  - if both operands are numbers, adds them; else, converts to String
+    and concatenates
+
+- relational operators (<, >, <=, >=)  [11.8.5]
+
+  - if any operand is a number, compares them numerically (returns
+    undefined if one couldn't be converted to number [TODO: Firefox
+    appears to return false in such a case; verify!]); else, converts
+    to String and compares using string compare
+
+- comparison operator (==, !=)  [11.9.3]
+
+  - for objects, test for identity (like Java); for other types,
+    *including String*, test for equality, including some type
+    coercions, e.g. 42=="42", true==1, false==0, true!=42
+
+- strict equals operator (===, !==)  [11.9.6]
+
+  - like ==, but without the type coercions. e.g. 42!=="42"
+
+
+- obj instanceof func  [11.8.6]
+
+  - true if obj delegates behaviour to func (func must be an object,
+    not a primitive)
+
+- prop in obj  [11.8.7]
+
+  - test for presence of prop in obj
+
+
+[12]
+
+Statements with no real equivalent or different meaning [than] in
+Java/C++:
+
+- var v1[=v1v][,v2[=v2v]...]
+
+  - variable declaration. defines and optionally initializes
+    variables. They're added as properties to the variable object of
+    the current execution scope.
+
+
+---
+
+TODO: don't forget:
+
+  - for each prop in obj
+
+  - Date, Regexp, ...
+
+  - ...
