@@ -177,6 +177,11 @@ above))
   - no exp (i.e. just ,,) places the numeric value 1 at that position
     (TODO: verify; Execute JS extension in Mozilla suggests otherwise)
 
+- object literal:
+
+  TODO
+
+
 - delete ref
 
   - deletes the property of ref, i.e. calls Delete(propname) on the
@@ -246,6 +251,18 @@ above))
 
 [12]
 
+(for the semantics of statements:
+ 
+The Completion type is used to explain the behaviour of statements
+(break, continue, return and throw) that perform nonlocal transfers of
+control. Values of the Completion type are triples of the form (type,
+value, target), where type is one of normal, break, continue, return,
+or throw, value is any ECMAScript value or empty, and target is any
+ECMAScript identifier or empty.
+
+)
+
+
 Statements with no real equivalent or different meaning [than] in
 Java/C++:
 
@@ -255,12 +272,81 @@ Java/C++:
     variables. They're added as properties to the variable object of
     the current execution scope.
 
+- for (lhs in obj) statement
+
+  run statement for each property (not having attribute DontEnum) in
+  obj and its prototype chain (obj may be any expression), assigning
+  the value of the property to lhs each time.
+
+- for (var v in obj) statement
+
+  run statement for each property (not having attribute DontEnum) in
+  obj and its prototype chain (obj may be any expression), assigning
+  the value of the property to the variable v each time. v ist
+  declared just like in a variable definition outside a loop; no new
+  variable object is created, i.e. the variable is added to the
+  variable object of the enclosing execution context (this implies
+  that the variable continues to exist after the loop ends).
+
+- switch (expr) { case caseexp : statement; [...] [default: statement;] }
+
+  any expressions are allowed for expr and the caseexps; they are
+  compared via === to decide which clause to start executing.
+
+- throw expr
+
+  any value may be thrown, not just instances of (some subclass of)
+  some "exception type".
+
+
+[13]
+
+functions, objects, prototypes, constructors
+
+
+- function identifier (args) { body }
+
+  set property "identifier" of the current variable object to a
+  function object F such that:
+
+  - F.length == number of args
+
+  - F.scope == scope chain of execution context that created the
+    function context
+
+  - PT=new Object(); F.prototype == PT; PT.constructor == F
+
+  - when calling F, execute its code in a new execution context, with
+    scope = (a variable object containing args and the "this" provided
+    by the caller) + F.scope
+
+    In a function call obj.func(args), obj will become the "this".
+
+    In a function call func(args), the top of the scope chain will
+    become the "this". For functions defined in the scope of an
+    object definition, this will be that object
+
+- new fcn(args)
+
+  (fcn must be any function object)
+
+  - does the following:
+
+    newobj = new Object()
+    newobj.[[prototype]] = fcn.prototype [or Object.prototype if
+                                          fcn.prototype is undefined)
+    call fcn(args) with this == newobj
+    return newobj [or the return value of the call, if it was an object]
+
+  - so the prototype of obj = new fcn(args) is *not* fcn, but the
+    *prototype of fcn*. This means that properties of fcn cannot be
+    accessed via obj. In practice, this is used for "private"
+    variables/functions
+
 
 ---
 
 TODO: don't forget:
-
-  - for each prop in obj
 
   - Date, Regexp, ...
 
