@@ -6,8 +6,15 @@
 
 
     <script type="text/javascript">
+
       var mainCanvas
       var freehandCtx
+
+      //Zugriffsmethoden für Mauskoordinaten eines Events relativ zum
+      //Container, auf dem es auftrat, zu "Event"-Klasse hinzufuegen
+      //TODO: Browserabhängigkeiten in Methoden kapseln (z.B. target ist srcElement in IE)
+      Event.prototype.canvasX = function() { return this.clientX - this.target.offsetLeft }
+      Event.prototype.canvasY = function() { return this.clientY - this.target.offsetTop }
 
       function onLoad(){
         mainCanvas = document.getElementById('mainCanvas')
@@ -17,34 +24,31 @@
         mainCanvas.onmousemove = onDrawPoint
 
         freehandCtx = mainCanvas.getContext('2d')
-
-        //freehandCtx.beginPath()
-        freehandCtx.moveTo(200,40)
-        freehandCtx.lineTo(250,380)
-        freehandCtx.lineTo(150,380)
-        freehandCtx.stroke()
-
-        //freehandCtx.beginPath()
-        freehandCtx.moveTo(20,40)
-        freehandCtx.lineTo(250,480)
-        freehandCtx.lineTo(100,280)
-        freehandCtx.closePath()
-        freehandCtx.stroke()
-
       }
+
+      var drawing = false
 
       function onDrawStart(evt) {
         //freehandCtx.beginPath()
-        freehandCtx.moveTo(100,240)
-        freehandCtx.lineTo(250,280)
+        freehandCtx.moveTo(evt.canvasX(), evt.canvasY())
         freehandCtx.stroke()
-      }
-
-      function onDrawEnd(evt) {
+        drawing = true
       }
 
       function onDrawPoint(evt) {
+        if (drawing) {
+          freehandCtx.lineTo(evt.canvasX(), evt.canvasY())
+          freehandCtx.stroke()
+        }
       }
+
+      function onDrawEnd(evt) {
+        freehandCtx.lineTo(evt.canvasX(), evt.canvasY())
+        freehandCtx.closePath()
+        freehandCtx.stroke()
+        drawing = false
+      }
+
     </script>
 
 
@@ -53,7 +57,7 @@
     </style>
 
   <body onLoad="onLoad();">
-    <h1>Drawing</h1>
+    <h1 id="headline">Drawing</h1>
 
     <canvas id="mainCanvas" width="300" height="500">
       Ihr Browser wird nicht unterstützt.
@@ -63,7 +67,7 @@
     <address><a href="mailto:olaf@tack">Olaf Klischat</a></address>
 <!-- Created: Thu Sep 14 02:35:45 CEST 2006 -->
 <!-- hhmts start -->
-Last modified: Thu Sep 14 04:47:16 CEST 2006
+Last modified: Thu Sep 14 06:38:21 CEST 2006
 <!-- hhmts end -->
   </body>
 </html>
