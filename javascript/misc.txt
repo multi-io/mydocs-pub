@@ -276,17 +276,17 @@ Java/C++:
 
   run statement for each property (not having attribute DontEnum) in
   obj and its prototype chain (obj may be any expression), assigning
-  the value of the property to lhs each time.
+  the name of the property to lhs each time.
 
 - for (var v in obj) statement
 
   run statement for each property (not having attribute DontEnum) in
   obj and its prototype chain (obj may be any expression), assigning
-  the value of the property to the variable v each time. v ist
-  declared just like in a variable definition outside a loop; no new
-  variable object is created, i.e. the variable is added to the
-  variable object of the enclosing execution context (this implies
-  that the variable continues to exist after the loop ends).
+  the name of the property to the variable v each time. v ist declared
+  just like in a variable definition outside a loop; no new variable
+  object is created, i.e. the variable is added to the variable object
+  of the enclosing execution context (this implies that the variable
+  continues to exist after the loop ends).
 
 - switch (expr) { case caseexp : statement; [...] [default: statement;] }
 
