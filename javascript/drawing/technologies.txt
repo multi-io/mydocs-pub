@@ -1,0 +1,19 @@
+Canvas
+------
+
+- verfügbar in Firefox, Safari, via http://excanvas.sourceforge.net/
+  auch in IE (ungetestet)
+
+- keine Textausgabemöglichkeit (d.h. wir müssten Fonts pixelweise
+  rendern)
+
+- spürbar langsamer
+
+
+
+SVG
+---
+
+- verfügbar in Firefox >=1.5 (nativ), Rest (über Adobe-SVG-Plugin)
+
+- 
