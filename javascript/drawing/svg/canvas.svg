@@ -1,0 +1,53 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg xmlns="http://www.w3.org/2000/svg"  onload="onLoad()">
+
+    <script type="text/ecmascript">
+    <![CDATA[
+      var mainCanvas
+
+      //Zugriffsmethoden für Mauskoordinaten eines Events relativ zum
+      //Container, auf dem es auftrat, zu "Event"-Klasse hinzufuegen
+      //TODO: Browserabhängigkeiten in Methoden kapseln (z.B. target ist srcElement in IE)
+      Event.prototype.canvasX = function() { return this.clientX /*- this.target.offsetLeft2*/ }
+      Event.prototype.canvasY = function() { return this.clientY /*- this.target.offsetTop*/ }
+
+      function onLoad(){
+        mainCanvas = document.getElementById('mainCanvas')
+
+        mainCanvas.onmousedown = onDrawStart
+        mainCanvas.onmouseup = onDrawEnd
+        mainCanvas.onmousemove = onDrawPoint
+      }
+
+      var currPath
+
+      function onDrawStart(evt) {
+        currPath = document.createElementNS("http://www.w3.org/2000/svg","path")
+	currPath.setAttribute("d", "M "+evt.canvasX()+" "+evt.canvasY());
+	currPath.setAttribute("stroke","black");
+	currPath.setAttribute("fill","none");
+        mainCanvas.appendChild(currPath)
+      }
+
+      function onDrawPoint(evt) {
+        if (currPath) {
+          currPath.setAttribute("d", currPath.getAttribute("d")
+                                     + " L "+evt.canvasX()+" "+evt.canvasY())
+        }
+      }
+
+      function onDrawEnd(evt) {
+        currPath.setAttribute("d", currPath.getAttribute("d")
+                                   + " L "+evt.canvasX()+" "+evt.canvasY()+" z")
+        currPath = null
+      }
+    ]]>
+    </script>
+
+  <g id="mainCanvas">
+    <rect width="300" height="500" fill="lightgrey"/>
+    <!-- <path d="M 50 50 L 180 300 L 100 350 z" stroke="black" fill="none"/> -->
+  </g>
+</svg>

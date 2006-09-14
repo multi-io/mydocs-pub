@@ -1,0 +1,19 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>SVG Drawing</title>
+  </head>
+
+
+  <body>
+    <h1 id="headline">SVG Drawing</h1>
+
+    <embed width="300" height="500" src="canvas.svg" type="image/svg+xml" />
+
+    <hr/>
+    <address><a href="mailto:olaf@tack">Olaf Klischat</a></address>
+<!-- Created: Thu Sep 14 02:35:45 CEST 2006 -->
+<!-- hhmts start -->
+Last modified: Thu Sep 14 07:51:29 CEST 2006
+<!-- hhmts end -->
+  </body>
+</html>
