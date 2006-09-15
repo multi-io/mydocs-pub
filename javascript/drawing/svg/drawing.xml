@@ -4,10 +4,70 @@
   </head>
 
 
-  <body>
+    <script type="text/ecmascript">
+    <![CDATA[
+      var svgRoot, mainCanvas
+
+      //Methode zu Event hinzufuegen die clientX/Y als SVGPoint zurueckgibt
+      Event.prototype.getClientCoords = function() {
+         var result = svgRoot.createSVGPoint()
+         result.x = this.clientX
+         result.y = this.clientY
+         return result
+      }
+
+
+      function onLoad(){
+        svgRoot = document.getElementById('svgRoot')
+
+        mainCanvas = document.getElementById('mainCanvas')
+
+        mainCanvas.onmousedown = drawStart
+        mainCanvas.onmousemove = drawPoint
+        mainCanvas.onmouseup = drawEnd
+      }
+
+      var screenToCanvasTM
+      var currPath
+
+      function drawStart(evt) {
+        //TM nur einmal am Anfang jedes Pfads berechnen (Performance)
+        screenToCanvasTM = mainCanvas.getScreenCTM().inverse()
+
+        var canvasCoords = evt.getClientCoords().matrixTransform(screenToCanvasTM)
+        currPath = document.createElementNS("http://www.w3.org/2000/svg","path")
+	currPath.setAttribute("d", "M "+canvasCoords.x+" "+canvasCoords.y);
+	currPath.setAttribute("stroke","black");
+	currPath.setAttribute("fill","none");
+        mainCanvas.appendChild(currPath)
+      }
+
+      function drawPoint(evt) {
+        if (currPath) {
+          var canvasCoords = evt.getClientCoords().matrixTransform(screenToCanvasTM)
+          currPath.setAttribute("d", currPath.getAttribute("d")
+                                     + " L "+canvasCoords.x+" "+canvasCoords.y)
+        }
+      }
+
+      function drawEnd(evt) {
+        var canvasCoords = evt.getClientCoords().matrixTransform(screenToCanvasTM)
+        currPath.setAttribute("d", currPath.getAttribute("d")
+                                   + " L "+canvasCoords.x+" "+canvasCoords.y+" z")
+        currPath = null
+      }
+
+    ]]>
+    </script>
+
+  <body onload="onLoad()">
     <h1 id="headline">SVG Drawing</h1>
 
-    <embed width="300" height="500" src="canvas.svg" type="image/svg+xml" />
+    <svg id="svgRoot" width="300" height="500" xmlns="http://www.w3.org/2000/svg">
+      <g id="mainCanvas">
+        <rect stroke="black" fill="white" width="300" height="500"/>
+      </g>
+    </svg>
 
     <hr/>
     <address><a href="mailto:olaf@tack">Olaf Klischat</a></address>
