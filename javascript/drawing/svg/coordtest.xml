@@ -1,0 +1,87 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>SVG coordinate systems</title>
+  </head>
+
+    <script type="text/ecmascript">
+    <![CDATA[
+      var mainCanvas, clientXText, clientYText
+
+      //Zugriffsmethoden für Mauskoordinaten eines Events relativ zum
+      //Container, auf dem es auftrat, zu "Event"-Klasse hinzufuegen
+      //TODO: Browserabhängigkeiten in Methoden kapseln (z.B. target ist srcElement in IE)
+      Event.prototype.canvasX = function() { return this.clientX /*- this.target.offsetLeft2*/ }
+      Event.prototype.canvasY = function() { return this.clientY /*- this.target.offsetTop*/ }
+
+      function onLoad(){
+        mainCanvas = document.getElementById('mainCanvas')
+
+        mainCanvas.onmousedown = printCoords
+        mainCanvas.onmouseup = printCoords
+        mainCanvas.onmousemove = printCoords
+
+        function initTextSpan(id, initialValue) {
+          if (!initialValue) { initialValue = "" }
+          var span = document.getElementById(id)
+          var text = span.childNodes[0]
+          if (!text || !(text instanceof Text)) {
+            text = span.appendChild(document.createTextNode(initialValue))
+          }
+          return text
+        }
+
+        clientXText = initTextSpan('clientXText')
+        clientYText = initTextSpan('clientYText')
+      }
+
+      var currPath
+
+      function onDrawStart(evt) {
+        currPath = document.createElementNS("http://www.w3.org/2000/svg","path")
+	currPath.setAttribute("d", "M "+evt.canvasX()+" "+evt.canvasY());
+	currPath.setAttribute("stroke","black");
+	currPath.setAttribute("fill","none");
+        mainCanvas.appendChild(currPath)
+      }
+
+      function onDrawPoint(evt) {
+        if (currPath) {
+          currPath.setAttribute("d", currPath.getAttribute("d")
+                                     + " L "+evt.canvasX()+" "+evt.canvasY())
+        }
+      }
+
+      function onDrawEnd(evt) {
+        currPath.setAttribute("d", currPath.getAttribute("d")
+                                   + " L "+evt.canvasX()+" "+evt.canvasY()+" z")
+        currPath = null
+      }
+
+      function printCoords(evt) {
+         clientXText.data = "clientX: "+evt.clientX
+         clientYText.data = "clientY: "+evt.clientY
+      }
+
+    ]]>
+    </script>
+
+  <body onload="onLoad()">
+    <h1 id="headline">SVG coordinate systems</h1>
+
+    <svg width="300" height="500" xmlns="http://www.w3.org/2000/svg">
+      <g id="mainCanvas">
+        <rect stroke="black" fill="white" width="300" height="500"/>
+      </g>
+    </svg>
+
+    <span id="clientXText"/>
+    <span id="clientYText"/>
+
+    <hr/>
+    <address><a href="mailto:olaf@tack">Olaf Klischat</a></address>
+<!-- Created: Thu Sep 14 02:35:45 CEST 2006 -->
+<!-- hhmts start -->
+Last modified: Thu Sep 14 07:51:29 CEST 2006
+<!-- hhmts end -->
+  </body>
+</html>
