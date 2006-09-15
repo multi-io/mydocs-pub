@@ -5,7 +5,7 @@
 
     <script type="text/ecmascript">
     <![CDATA[
-      var mainCanvas, clientXText, clientYText
+      var svgRoot, mainCanvas, clientXText, clientYText, canvasXText, canvasYText
 
       //Zugriffsmethoden für Mauskoordinaten eines Events relativ zum
       //Container, auf dem es auftrat, zu "Event"-Klasse hinzufuegen
@@ -14,6 +14,8 @@
       Event.prototype.canvasY = function() { return this.clientY /*- this.target.offsetTop*/ }
 
       function onLoad(){
+        svgRoot = document.getElementById('svgRoot')
+
         mainCanvas = document.getElementById('mainCanvas')
 
         mainCanvas.onmousedown = printCoords
@@ -32,6 +34,8 @@
 
         clientXText = initTextSpan('clientXText')
         clientYText = initTextSpan('clientYText')
+        canvasXText = initTextSpan('canvasXText')
+        canvasYText = initTextSpan('canvasYText')
       }
 
       var currPath
@@ -58,8 +62,17 @@
       }
 
       function printCoords(evt) {
-         clientXText.data = "clientX: "+evt.clientX
-         clientYText.data = "clientY: "+evt.clientY
+         var clientCoords = svgRoot.createSVGPoint()
+         clientCoords.x = evt.clientX
+         clientCoords.y = evt.clientY
+
+         clientXText.data = "clientX: "+clientCoords.x
+         clientYText.data = "clientY: "+clientCoords.y
+
+         var screenToCanvasTM = mainCanvas.getScreenCTM().inverse()
+         var canvasCoords = clientCoords.matrixTransform(screenToCanvasTM)
+         canvasXText.data = "canvasX: "+canvasCoords.x
+         canvasYText.data = "canvasY: "+canvasCoords.y
       }
 
     ]]>
@@ -68,14 +81,18 @@
   <body onload="onLoad()">
     <h1 id="headline">SVG coordinate systems</h1>
 
-    <svg width="300" height="500" xmlns="http://www.w3.org/2000/svg">
+    <svg id="svgRoot" width="300" height="500" xmlns="http://www.w3.org/2000/svg">
       <g id="mainCanvas">
         <rect stroke="black" fill="white" width="300" height="500"/>
       </g>
     </svg>
 
+    <br/>
     <span id="clientXText"/>
     <span id="clientYText"/>
+    <br/>
+    <span id="canvasXText"/>
+    <span id="canvasYText"/>
 
     <hr/>
     <address><a href="mailto:olaf@tack">Olaf Klischat</a></address>
