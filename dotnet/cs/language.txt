@@ -1,0 +1,142 @@
+C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.pdf
+
+- reference/value types, boxing, unboxing, ref parameters, out
+  parameters
+
+  - classes, delegates, arrays are reference types; structs and enums
+    are value types
+
+  - "object" base type of all types, even value types
+
+- variable parameter lists: void foo(T1 p1, params T2[] t2s);
+
+- implicit and explicit type conversations: e.g. byte->int is
+  implicit, int->byte is explicit (requires a cast)
+
+  - can be defined on user-def'd classes/structs using
+    [implicit|explicit] operator OtherType() {....}
+
+- Java's "super" is called "base"
+
+- a "delegate" is a method pointer type
+
+  - e.g. delegate void MyEventType(int arg1, double arg2)
+
+  - the class of the method the method pointer points to is not part
+    of the delegate
+
+  - instances point to a method, i.e. they hold object+method (if they
+    point to instance methods) or just method (if they
+    point to class methods)
+
+  - actually, a delegate is a subclass of System.Delegate
+
+  - an instance of a delegate is called a "delegate instance"
+
+  - e.g. (with the "MyEventType" declaration above)
+
+    public void handler(int arg1, double arg2) {...}  //fcn definition
+
+    //define instance of the delegate, point it to handler
+    MyEventType methPointer = new MyEventType(handler);
+    //call it
+    methPointer(100,33.332);
+
+  - a delegate instance can also be defined to point to an anynymous,
+    inline-defined function, e.g.
+
+    MyEventType methPointer = delegate(int i, double d) {....}
+
+    the block is a closure, i.e. it captures all variables accessible
+    at the definition point (exceptions: ref and out parameters,
+    "this" in struct methods)
+
+  - QU: shouldn't there really be a generic, instantiatable "delegate"
+    type? e.g. Delegate<int,double> d = handler; d(100,33.332);
+        
+
+- an "event" is a field that's parameterized with a delegate and holds
+  a list of instances of the delegate (i.e. a list of method pointers)
+  which are called when the event is called
+
+  - e.g. (with the "MyEventType" and "handler" from above)
+
+    public event MyEventType myevt;  //definition of the event
+    ...
+    myevt += new MyEventType(handler);  //add delegates to the event
+    myevt += new MyEventType(someobj.handler);
+
+    myevt(42, 23.55); //call the event (calls all delegates in turn)
+
+- explicit interface members... (see ecma-334, §8.9)
+
+- type and namespace aliases:
+
+  - e.g.
+
+    using MyNS = some.namespace;
+    using MyType = SomeType;
+    using MyType = some.namespace.SomeType;
+
+- methods can be explicitly declared to override or hide a method of
+  the same name in a base class
+
+  - overriding:
+
+    public override void method(...) {...}
+
+  - hiding:
+
+    public new void method(...) {...}
+
+  this helps the compiler find typos, and also facilitates binary
+  compatibility (in cases where name clashes might arise when new
+  methods are later added to the base class)
+
+- "extern aliases" set up separate namespace roots. I.e. there can be
+  more than one namespace hierarchy in the same program. This helps
+  for resolving conflicts that would arise if want to use several
+  disjunct types from separate assemblies, and all those types have
+  the same fuilly-qualified name
+
+  e.g.
+
+   extern alias X;  
+   extern alias Y;  
+
+   X::some.ns.Type t1;  //or X.some.ns.Type t1;
+   Y::some.ns.Type t2;  //dito
+
+  at link time, the aliases ("X", "Y") are bound to specific
+  assemblies, e.g.
+
+   csc /r:X=a1.dll /r:Y=a2.dll test.cs
+
+- generics (types (and methods) parameterized with types)
+
+  - syntax roughly like templates in C++
+
+  - "constraints" may be declared which the parameter types must
+    comply to
+
+    - e.g. "must implement interface I":
+
+      class MyType<T> where T: I { .... }
+
+      compiler only accepts operations on T that can be statically
+      proven to work with all possible instantiations of T (i.e. there
+      is no "static polymorphy" in the C++ sense -- you can't do "T t;
+      t.SomeMethod();" unless "SomeMethod" is defined in I (or
+      object))
+
+    - compromise: bloat vs. performance:
+
+      the compiler only generates one real implementation of "MyType"
+      for all instantiations of MyType<T> with reference types T (it
+      can easily do this because of the mentioned absence of static
+      polymorphy). However, a separate, optimized implementation of
+      "MyType" *is* generated for each instantiation of MyType<T> with
+      a value type T.
+
+    - possible kinds of constraints: only "must implement
+      interface/class", specified separately for each type parameter
