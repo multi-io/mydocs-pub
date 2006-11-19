@@ -4,6 +4,9 @@ C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.
 
 - distinguishes between statements and expressions
 
+- preprocessor similar to the one in C/C++, but without parameterized
+  macros (simple #defines are supported)
+
 - reference/value types, boxing, unboxing, ref parameters, out
   parameters
 
@@ -12,7 +15,27 @@ C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.
 
   - "object" base type of all types, even value types
 
+- "decimal" type (28 decimal digits represented without rounding
+  errors)
+
+- range exceedance on integral types may be handled by either throwing
+  an exception or overflowing, depending on the current "overflow
+  checking context", which is set by the "checked"/"unchecked"
+  statement and expression
+
+   int i=9999999;
+   [un]checked { i*=i; }  //statement
+   i = [un]checked ( i*i );  //expression
+
 - only unchecked exceptions (which is probably a good thing)
+
+  - resource managament / implicit finalization with
+
+     using (ClassImplementingIDisposable o = ...)  { doSomething();... }
+       //always calls o.Dispose() when exiting
+       // (locally or nonlocally) the block
+
+- goto is supported :-)
 
 - classes (single inheritance) and interfaces (multiple inheritance),
   as in Java
@@ -21,11 +44,20 @@ C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.
 
      static class C { ... }
 
-- like in Java and C++, classes and methods are not first-class
+- like in Java and C++, classes and methods are not real first-class
   citizens...
 
   - "new" is still a predefined (and non-overridable) operator, not a
-    method of the class object
+    method of the class object as it should be[tm]
+
+- compile-time constants (fields or in block-local scope) defined
+  using "const"
+
+  - no C++ - like "const" methods
+
+- initialization-time constants defined using "readonly" (similar to
+  "final" in Java). Not supported for local variables, parameters or
+  return values :-\
 
 - variable parameter lists: void foo(T1 p1, params T2[] t2s);
 
