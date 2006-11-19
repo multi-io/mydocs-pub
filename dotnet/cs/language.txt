@@ -302,3 +302,20 @@ C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.
     operands are null (which apparently means that these operations
     are no longer ordering relations on nullable types -- is that a
     problem?)
+
+  - null coalescing operator "??": provides a kind of lazy-evaluated
+    "or" for nullable and reference types. The expression "a ?? b",
+    where a has a nullable or reference type and A is the type of a
+    and B is the type of B, evaluates to a if a is non-null, and to b
+    otherwise. The type of the expression is A\null (i.e. the
+    "un-nulled" type of a) -- there must be an implicit conversion
+    from B to A\null. This operator may be used to provide a default
+    value in case the left operand is null.
+
+    E.g.
+
+     int? a = ...;
+     int x = a ?? 42;  //same as int x = a.HasValue? (int)a : 42;
+
+    ?? is right-associative, i.e. e1 ?? e2 ?? ... ?? en evaluates to
+    the first ex that is not null (or to null if all ex are null)
