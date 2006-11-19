@@ -1,4 +1,4 @@
-default: hello.exe staticpoly.exe gctest.exe
+default: hello.exe staticpoly.exe gctest.exe misc_tests.exe
 
 %.exe: %.cs
 	gmcs $< -out:$@
