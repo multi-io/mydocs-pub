@@ -300,22 +300,22 @@ C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.
     which are "null-propagating" (the result is null if the input was
     null), and an explicit conversion S?->T which requires a cast and
     throws a runtime exception if the input was null. Similarly, the
-    compiler generates "lifted", null-propagating of non-comparison
-    operators (+, - etc.). Comparison operators (==,!=,>,<,<=,>=) are
-    defined such that null is equal to null and unequal to any
-    non-null value. Also, <,>,<=,>= return false if one or both
-    operands are null (which apparently means that these operations
-    are no longer ordering relations on nullable types -- is that a
-    problem?)
+    compiler generates "lifted", null-propagating versions of
+    non-comparison operators (+, - etc.). Comparison operators
+    (==,!=,>,<,<=,>=) are defined such that null is equal to null and
+    unequal to any non-null value. Also, <,>,<=,>= return false if one
+    or both operands are null (which apparently means that these
+    operations are no longer ordering relations on nullable types --
+    is that a problem?)
 
-  - null coalescing operator "??": provides a kind of lazy-evaluated
-    "or" for nullable and reference types. The expression "a ?? b",
-    where a has a nullable or reference type and A is the type of a
-    and B is the type of B, evaluates to a if a is non-null, and to b
-    otherwise. The type of the expression is A\null (i.e. the
-    "un-nulled" type of a) -- there must be an implicit conversion
-    from B to A\null. This operator may be used to provide a default
-    value in case the left operand is null.
+  - null coalescing operator "??": provides a kind of
+    shortcut-evaluated "or" for nullable and reference types. The
+    expression "a ?? b", where a has a nullable or reference type and
+    A is the type of a and B is the type of B, evaluates to a if a is
+    non-null, and to b otherwise. The type of the expression is A\null
+    (i.e. the "un-nulled" type of a) -- there must be an implicit
+    conversion from B to A\null. This operator may be used to provide
+    a default value in case the left operand is null.
 
     E.g.
 
