@@ -250,6 +250,11 @@ C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.
       t=...; t.SomeMethod();" unless "SomeMethod" is defined in I (or
       object))
 
+      - this also applies when there is no explicit constraint
+        definition (e.g. just class MyType<T> {...}), i.e. in this
+        case you can only perform operations on instances of T that
+        are allowed on any objects
+
     - compromise: bloat vs. performance:
 
       the compiler only generates one real implementation of "MyType"
