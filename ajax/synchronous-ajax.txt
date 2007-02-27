@@ -1,0 +1,61 @@
+19:29 < multi_io> am I right in assuming that there's no way to implement a JS function that fetches and
+                  returns a web page using Ajax? (because XMLHttpRequest can only be used asynchronously, and
+                  the JS engine is single-threaded)
+19:29 < phpboy> multi_io: it is possible
+19:30 < phpboy> VERY possible... lemme paste you a link to help.. hang 10...
+19:30 < multi_io> well, it can be used synchronously, but on some browsers the synchronous call appears to
+                  return before the request is complete
+19:30 < phpboy> multi_io: http://prototype.conio.net/ <--- that should get you started, if I understand what
+                you wanna do correctly
+19:34 < multi_io> phpboy: after skimming http://www.prototypejs.org/learn/introduction-to-ajax , I'd say that
+                  that library only has an an asynchronous programming model, so it wouldn't get around the
+                  problem
+
+
+19:44 < multi_io> there's no sleep() function in JS that allows events to be processed while it blocks, is
+                  there?
+
+
+19:46 < chupacabra2> multi_io: setTimeout. Create an anonymous function that would finish your processing job,
+                     and setTimeout it for whatever amount of time you want
+19:46 < CommandPrompt> Gud:  can't find it, the easiest way will be, to use some object in the Body and stick
+                       it in there from vbs, and have js pick it up from there
+19:47 < Gud> CommandPrompt: Apparently all you have to do use ise the variable declared in vbscript
+19:47 < Gud> dim name="lalala"
+19:47 < artaxerxes> I tried to do: element.name = null, element.name = undefined, delete element.name, to no
+                    avail
+19:47 < Gud> document.write(name;
+19:47 < Gud> )
+19:47 < philc> When I move an iframe around in the DOM, its contents are completely lost. The contents are
+               built with javascript. Is it possible to avoid this? Here's a test case -
+               http://jjot.com:8000/main/test
+19:47 < multi_io> chupacabra2: I know setTimeout, but that's not what I want, because it's asynchronous
+19:48 < chupacabra2> multi_io: but how can you have synchronous and "allow events to be processed"?
+19:48 < chupacabra2> multi_io: "allow events to be processed" is asynchronous by definition :)
+19:48 < multi_io> not necessarily
+19:48 < multi_io> it could switch stacks internally
+19:49 < chupacabra2> multi_io: Please elaborate on what result you want to get :)
+19:49 < multi_io> think of functions like messageBox() or getMessage() in GUI APIs, if you've ever used those
+19:50 < chupacabra2> Ah - they fire away, your main execution flow is blocked, but other stuff may happen.
+                     Whenever "something" occurs, your main execution flow takes place again. Like that?
+19:50 < multi_io> messageBox("Hello!") displays the box and blocks until the user has clicked OK, but still,
+                  events are processed while the box is displayed
+19:51 < multi_io> there are different strategies to implement that, even when using only a single thread
+19:51 < chupacabra2> Yea, doing that right now. Lots of callbacks ;)
+19:52 < multi_io> one would be that messageBox() again polls the event queue internally and runs your event
+                  handlers (so they're executed on the same call stack as the messageBox() call)
+19:52 < chupacabra2> But how does one apply that to sleep()? (which does not need to return a result, and
+                     which should sleep for some fixed time and does not react to anything happening)
+19:53 < Gud> hahahahahaha WHAT!!
+19:53 < Gud> it only works if the page is hosted locally
+19:53 < multi_io> stop polling the event queue when the sleep time has run out
+19:54 < chupacabra2> So setTimeout is not acceptable, since things might come out of setTimeout in wrong order?19:54 < multi_io> setTimeout is acceptable, but it'S more inconvenient to use
+19:54 < multi_io> asynchronous programming is inconvenient
+19:54 < fatbrain> javascript is synchronous by nature
+19:55 < multi_io> it's essentially impossible to implement something like
+                  pageContent=fetchPage("http://myhost.com/x/y")
+19:56 < chupacabra2> multi_io: you can, if they ship their data as JS file
+19:56 < chupacabra2> otherwise, xss will stop you
+19:56 < multi_io> you'd always have a programming model like asyncFetchPage("http://myhost.com/x/y",
+                  function(pageContent){.....})
+19:57 < chupacabra2> multi_io: yea
