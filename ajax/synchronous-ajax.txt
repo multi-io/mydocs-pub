@@ -18,17 +18,6 @@
 
 19:46 < chupacabra2> multi_io: setTimeout. Create an anonymous function that would finish your processing job,
                      and setTimeout it for whatever amount of time you want
-19:46 < CommandPrompt> Gud:  can't find it, the easiest way will be, to use some object in the Body and stick
-                       it in there from vbs, and have js pick it up from there
-19:47 < Gud> CommandPrompt: Apparently all you have to do use ise the variable declared in vbscript
-19:47 < Gud> dim name="lalala"
-19:47 < artaxerxes> I tried to do: element.name = null, element.name = undefined, delete element.name, to no
-                    avail
-19:47 < Gud> document.write(name;
-19:47 < Gud> )
-19:47 < philc> When I move an iframe around in the DOM, its contents are completely lost. The contents are
-               built with javascript. Is it possible to avoid this? Here's a test case -
-               http://jjot.com:8000/main/test
 19:47 < multi_io> chupacabra2: I know setTimeout, but that's not what I want, because it's asynchronous
 19:48 < chupacabra2> multi_io: but how can you have synchronous and "allow events to be processed"?
 19:48 < chupacabra2> multi_io: "allow events to be processed" is asynchronous by definition :)
@@ -46,10 +35,10 @@
                   handlers (so they're executed on the same call stack as the messageBox() call)
 19:52 < chupacabra2> But how does one apply that to sleep()? (which does not need to return a result, and
                      which should sleep for some fixed time and does not react to anything happening)
-19:53 < Gud> hahahahahaha WHAT!!
-19:53 < Gud> it only works if the page is hosted locally
 19:53 < multi_io> stop polling the event queue when the sleep time has run out
-19:54 < chupacabra2> So setTimeout is not acceptable, since things might come out of setTimeout in wrong order?19:54 < multi_io> setTimeout is acceptable, but it'S more inconvenient to use
+19:54 < chupacabra2> So setTimeout is not acceptable, since things
+                     might come out of setTimeout in wrong order?
+19:54 < multi_io> setTimeout is acceptable, but it'S more inconvenient to use
 19:54 < multi_io> asynchronous programming is inconvenient
 19:54 < fatbrain> javascript is synchronous by nature
 19:55 < multi_io> it's essentially impossible to implement something like
