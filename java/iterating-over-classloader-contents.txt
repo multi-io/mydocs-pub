@@ -1,0 +1,88 @@
+(Sep 10 2004)
+
+23:06 < multi_io> is it possible to iterate over all resources inside a given package/"directory" in a given classloader?
+23:06 < Epesh> multi_io: yes, but not trivially
+23:07 < multi_io> Epesh: how?
+23:07 < Epesh> multi_io: write your own classloader
+23:08 < multi_io> that a nonsolution I'm afraid :)
+23:08 < multi_io> that's
+23:08 < ernimril> multi_io: you can not do it for any classloader, there may be a classloader that creates random resources 
+                  upon request...
+23:09 < ernimril> multi_io: but you can look at the classpath and find out which jar/zip files is in that and then check 
+                  them all manually...
+23:09 < multi_io> well, it would be okay to define it as an "optional operation", much like similar approaches in the 
+                  collections library
+23:09 < ernimril> multi_io: but that will not handle classes/resources that are loaded from the net...
+23:10 < slava> multi_io, why don't you store the list of resources in another resource with a known name?
+23:10 < multi_io> Blackwell: access resources in the system CL using file I/O APIs. Type of system CL is not known until 
+                  runtime
+23:10 < Epesh> multi_io: you don't need to know the type
+23:11 < Blackwell> multi_io: i don't understand the description.
+23:11 < Epesh> anyway, I'm off for home - have a good weekend, everyone
+23:12 < multi_io> Blackwell: I'm trying to open files in the system classloader using file I/O (e.g. FileInputStream)
+23:12 < multi_io> so I want to copy them to a tempdir first
+23:12 < slava> multi_io, use resource streams
+23:12 < slava> wtf
+23:12 < slava> you've got it all wrong
+23:12 < multi_io> I cannot change the code that uses the file APIs
+23:12 < multi_io> it's not mine
+23:12 < slava> then you're fucked i guess
+23:13 < Blackwell> multi_io: i don't understand "to open files in the system classloader"
+23:15 < multi_io> the system CL (like any CL) defines a hierarchy of named piles of bytes, much like a filesystem, right?
+23:15 < Blackwell> what does "CL" mean?
+23:15 < multi_io> I want to access that using Java file APIs...
+23:16 < multi_io> classloader
+23:16 < Blackwell> aha
+23:16 < multi_io> :)
+23:16 < Blackwell> you want to access .class files?
+23:16 < multi_io> no, text files
+23:16 < multi_io> .jsp, .txt etc
+23:18 < multi_io> I know that the files are not loaded from the net
+23:19 < multi_io> in fact, I think I can assume that they come from either the filesystem or a Jar file
+23:19 < Blackwell> multi_io: i can't say am able to follow much of what you say. maybe i am too tired.
+23:20 < multi_io> maybe my English sucks :)
+23:20 < multi_io> too much
+23:21 < multi_io> I'm writing unit tests
+23:21 < ernimril> multi_io: get the classpath then: for each file in the classpath, try to open it as a jar-file, if that 
+                  open succeds iterator over all entries and check if it is a wanted resource
+23:21 < ernimril> multi_io: what is hard about that?
+23:21 < multi_io> they need some resources from text files
+23:22 < multi_io> and they use that special unmidifiable API mentioned above for accessing them
+23:22 < ernimril> they?
+23:22 < ernimril> who are they?
+23:22 < multi_io> the unit tests
+23:23 < ernimril> what special api?
+23:23 < multi_io> the API that uses Java's File APIs (FileInputStream etc.) to access those files
+23:23 < multi_io> I cannot modify it
+23:24 < multi_io> I can only tell it the filesystem path where the files reside
+23:24 < ernimril> why do you need to modify a resource? you read resources for images and/or texts....
+23:24 < multi_io> so I thought I'd copy the whole hierarchy from the classloader to a tempdir
+23:25 < multi_io> I cannot modify the API (that uses Java's File APIs (FileInputStream etc.) to access those files)
+23:25 < multi_io> :)
+23:26 < ernimril> multi_io: you are not making sense. Try to think about what you need, then write a good explanation about 
+                  the problem
+23:29 < multi_io> "you're not making sense" is a bit unspecific :)
+23:30 < multi_io> to be a bit more specific, the "unmodifiable API" is a templating engine. Much like a JSP container.
+23:30 < multi_io> The templates are text files in the filesystem
+23:31 < multi_io> I tell the templatign engine the location of the templates (as a filesystem path+name), and it expands them
+23:32 < multi_io> I'm writing unit tests for that templating engine
+23:32 < multi_io> so I have some test templates
+23:33 < multi_io> On the system where the tests are finally run, I can only use the System Classloader to access any kind of 
+                  resources (e.g. text files)
+23:33  * Blackwell looks left, right
+23:33 < multi_io> I cannot change that
+23:34 < multi_io> So I have to put the test templates in the System Classloader, and at runtime, copy them to a tempdir and 
+                  point the templating engine to that
+23:35 < multi_io> If that wasn't specific enough, I'm out of luck
+23:36 < Blackwell> multi_io: maybe this is related, i don't know: http://javafaq.mine.nu/lookup?145
+23:37 < ernimril> multi_io: ok, the system classloader uses the classpath, so my question about reading that....  is still 
+                  valid.
+23:37 < Blackwell> multi_io: i don't understand your description. why you are doing all these things, etc. pp. you may be 
+                   assuming too much knowledge
+23:37 < Blackwell> +by the readers in here
+23:41 < multi_io> ernimril: what question about reading what?
+23:41 < multi_io> I dont't want to modify the resources, only read them
+23:42 < ernimril> multi_io: get the classpath then: for each file in the classpath, try to open it as a jar-file, if that 
+                  open succeds iterator over all entries and check if it is a wanted resource
+23:42 < multi_io> This should have become clear by now :)
+23:43 < multi_io> ernimril: OK, I think that'll do. Thanks.
