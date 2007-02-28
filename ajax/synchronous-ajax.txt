@@ -1,3 +1,12 @@
+12:30 -!- multi_io [n=olaf@rosa.physik-pool.TU-Berlin.DE]
+12:30 -!-  ircname  : Olaf Klischat
+12:30 -!-  channels : #xorg-devel #math #emacs ##javascript #physics
+12:30 -!-  server   : brown.freenode.net [Madison, WI, US]
+12:30 -!-           : is identified to services
+12:30 -!-  idle     : 0 days 16 hours 34 mins 15 secs [signon: Sat Feb 24 11:44:00 2007]
+12:30 -!- End of WHOIS
+
+
 19:29 < multi_io> am I right in assuming that there's no way to implement a JS function that fetches and
                   returns a web page using Ajax? (because XMLHttpRequest can only be used asynchronously, and
                   the JS engine is single-threaded)
