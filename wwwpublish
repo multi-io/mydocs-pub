@@ -32,6 +32,7 @@ sub rejected {
          ### things we do want to publish (unless they match the things we don't want to publish)
          m!^.$! or
          m!^./$! or
+         m!^./ajax/! or
          m!^./ruby! or
          m!^./perl! or
          m!^./Makefile! or
