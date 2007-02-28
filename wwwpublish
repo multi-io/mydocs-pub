@@ -34,19 +34,21 @@ sub rejected {
          m!^./$! or
          m!^./ruby! or
          m!^./perl! or
+         m!^./Makefile! or
          m!^./java/nio! or
          # m!^./svn! or
-         m!^./gnus! or
+         m!^./gnus/! or
          # m!^./mediamaerkte/.*?txt$! or
          m!^./wget! or
          m!^./linux/requested-modules.txt! or
          m!^./longhorn! or
+         m!^./dotnet/cs/language.txt! or
          m!^./debian! or
-         m!^./emacs! or
+         m!^./apt/apt-build.txt! or
+         m!^./emacs/! or
          m!^./bluetooth/bluetooth.txt! or
          m!^./bluetooth/rfcomm.txt! or
          m!^./internet! or
-         m!^./lisp! or
          m!^./lisp/! or
          m!^./root! or
          m!^./internet$! or
