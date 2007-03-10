@@ -1,0 +1,275 @@
+OOP in JavaScript using closures
+--------------------------------
+
+A function is a closure, i.e. it captures all lexically scoped ("var")
+variables that are visible in the function's definition and, if
+necessary, extends their life span for at least as long as the
+function lives.
+
+Example:
+
+var newAdder = function() {
+   var start = 5;
+   return function() {
+       return start++;
+   }
+}
+
+var a1=newAdder();
+a1()  //=>5
+a1()  //=>6
+a1()  //=>7
+a1()  //=>8
+var a2=newAdder();
+a2()  //=>5
+a2()  //=>6
+a1()  //=>9
+a1()  //=>10
+a1()  //=>11
+a1()  //=>12
+a2()  //=>7
+a2()  //=>8
+
+
+=> the returned function captures "start" and extends its life span
+   beyond the termination of newAdder(). If newAdder() is called
+   multiple times, each returned function gets it own, seperate
+   "start".
+
+   After newAdder() has returned, "start" is only visible for the
+   returned function. This way we can implement private variables.
+
+   If we don't just return a single function, but an object with
+   functions as properties, we have a form of object-oriented
+   programming with private variables:
+
+
+function newAdder(startValue) {
+    var self = {};
+
+    var value = startValue;
+
+    self.increment = function() { value++; }
+    self.decrement = function() { value--; }
+    self.getValue = function() { return value; }
+    self.setValue = function(v) { value = v; }
+
+    return self;
+}
+
+
+var a1 = newAdder(10);
+a1.getValue();  //=>10
+a1.increment();
+a1.increment();
+a1.getValue();  //=>12
+a1.setValue(5);
+a1.decrement();
+a1.getValue();  //=>4
+
+var a2 = newAdder(20);
+a2.decrement();
+a2.getValue();  //=>19
+
+a1.decrement();
+a1.getValue();  //=>3
+
+
+newAdder can be thought of as a constructor for a "class" Adder. We'll
+stick to this naming convention: The constructor for a class ClassName
+is called newClassName. The "this" or "current" object in stored in
+the variable "self" ("this" is already reserved in JS).
+
+note: in the above example, the "value" variable isn't really
+necessary; "startValue" could be use in its place because parameters
+are "captured" just as local variables are.
+
+Inheritance can be achieved if we have the constructor create the
+"self" variable by calling the "superclass"'s constructor:
+
+function newEnhancedAdder(startValue) {
+    var self = newAdder(startValue);
+
+    self.incrementBy = function(amount) {
+        self.setValue(self.getValue() + amount);
+    }
+
+    return self;
+}
+
+
+var a = newEnhancedAdder(20);
+a.increment();
+a.increment();
+a.incrementBy(10);
+a.getValue();  //=>32
+
+
+
+//advanced techniques (inner classes, super etc.):
+
+function newSomeClass(startValue) {
+    var self = newAdder(startValue);
+
+    self..... ...
+
+    //private methods (callable only from within this class)
+    // work just like other private members
+    var privateMethod = function(..) {....}
+
+    //private inner class
+    var newPrivateInnerClass = function(...) {
+        var innerSelf = newSomeSuperClass();
+
+        innerSelf.... (Methodendefinitionen etc., genau wie bei
+                      äußeren Klassen, nur dass "innerSelf" das innere
+                      und "self" das äußere Objekt ist)
+
+        return innerSelf;
+    }
+
+    //instantiating
+    var someObject1 = newPrivateInnerClass(...);
+    var someObject2 = newPrivateInnerClass(...);
+
+    //public inner class
+    self.newPublicInnerClass = function(...) {
+        var innerSelf = newSomeSuperClass();
+
+        innerSelf.somefcn = function(...) {...}
+        innerSelf.....
+
+        return innerSelf;
+    }
+
+    //instantiating
+
+      //privately
+    var po1 = newPublicInnerClass(...)
+      //publicly
+    self.po2 = newPublicInnerClass(...)
+
+
+    //"anonymous inner class" as in Java (i.e. no class name
+    //introduced)
+
+    //   private
+    var somePrivateInnerObject = function(...) {
+        var innerSelf = newSomeSuperClass();
+
+        innerSelf.somefcn = function(...) {...}
+        innerSelf.....
+
+        return innerSelf;
+    }();
+   //^^ constructor function called immediately after definition!
+
+    //   public
+    self.somePublicInnerObject = function(...) {
+        var innerSelf = newSomeSuperClass();
+
+        innerSelf.somefcn = function(...) {...}
+        innerSelf.....
+
+        return innerSelf;
+    }();
+
+
+    //"super" calls
+
+    //JavaScript does not have a "super" kayword. But you can build
+    //yourself one:
+
+      //for a single method
+      //()
+    var superSomeMethod = self.someMethod;
+
+    self.someMethod = function(..) {
+        ....
+        superSomeMethod(...);
+        ....
+    }
+
+      //for everything at once (untested)
+    var super = shallowCopy(self);   //with an appropriate "shallowCopy" implementation
+
+    self.someMethod = function(..) {
+        ....
+        super.someMethod(...);
+        ....
+    }
+
+
+    return self;
+}
+
+
+//creating instances of public inner classes
+var obj = newSomeClass(...);
+var innerObj = obj.newPublicInnerClass(...);
+innerObj.somefcn(...)
+
+//using public anonymous inner class instances
+obj.somePublicInnerObject.somefcn(..);
+
+
+
+//Mixins
+
+Generally, a mixin is a set of members (fields, methods) which can be
+added to any existing classes or objects. Thus, mixins are a
+form of multiple implementation inheritance.
+
+Implementation in JavaScript: Simply a function that gets passed the
+object to be extended, and adds the members to it.
+
+Example:
+
+//simple class
+function newValueHolder() {
+    var self = {};
+
+    var value = 0;
+
+    self.getValue = function() { return value; }
+    self.setValue = function(v) { value=v; }
+    self.increment = function() { self.setValue(self.getValue()+1); }
+
+    return self;
+}
+
+
+//Mixin that extends the method "setValue" of target such that no
+//values greater than maxValue can be set.
+function addUpperBoundMixinTo(target, maxValue) {
+    var origSetValue = target.setValue;
+
+    target.setValue = function(v) {
+        if (v>maxValue) { throw "value too large ("+v+">"+maxValue+")"; }
+        origSetValue(v);
+    }
+}
+
+
+//usage
+var o = newValueHolder();
+addUpperBoundMixinTo(o, 10);
+o.setValue(7);
+o.increment();
+o.increment();
+o.getValue();  //=>9
+o.increment();
+o.increment();  // exception: value too large (11>10)
+
+o.getValue();  //=>10
+
+
+Of course the mixin function is a closure (like any function), which
+means it can define variables at will; those variables will then be
+created once per call of the mixin function (i.e. once per target) and
+thus effectively become part of the state of target. In the example,
+this is the case for the "maxValue" parameter.
+
+If the mixin is intended to be used for all instances of ValueHolder
+here, it can of course be added in the constructor function
+newValueHolder() ("addUpperBoundMixinTo(self, 10);")
