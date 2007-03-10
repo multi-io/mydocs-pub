@@ -121,9 +121,9 @@ function newSomeClass(startValue) {
     var newPrivateInnerClass = function(...) {
         var innerSelf = newSomeSuperClass();
 
-        innerSelf.... (Methodendefinitionen etc., genau wie bei
-                      äußeren Klassen, nur dass "innerSelf" das innere
-                      und "self" das äußere Objekt ist)
+        innerSelf.... (method definitions etc. just like in "outer"
+                       classes, except that "innerSelf" is the inner
+                       and "self" is the outer object)
 
         return innerSelf;
     }
