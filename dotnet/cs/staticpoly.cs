@@ -14,8 +14,8 @@ namespace oklischat.cstest {
         }
     }
 
-    public class FooCaller<T> where T: FooHoster {  //ohne das Constraint (where T: FooHoster) compilierts net
-                                                    //(error CS0117: `T' does not contain a definition for `foo')
+    public class FooCaller<T> where T: FooHoster, new() {  //ohne das Constraint (where T: FooHoster) compilierts net
+                                                           //(error CS0117: `T' does not contain a definition for `foo')
         private T t;
 
         public FooCaller(T t) {
@@ -25,6 +25,10 @@ namespace oklischat.cstest {
         public void callfoo() {
             t.foo();
         }
+
+        public T createT() {
+            return new T();
+        }
     }
 
     public class StaticPoly {
@@ -32,6 +36,7 @@ namespace oklischat.cstest {
             FooHosterImpl1 fh = new FooHosterImpl1();
             FooCaller<FooHosterImpl1> fc = new FooCaller<FooHosterImpl1>(fh);
             fc.callfoo();
+            fc.createT().foo();
         }
     }
 }

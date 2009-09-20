@@ -1,5 +1,5 @@
 1 download linux-x.x.x.tar.bz2 from kernel.org, unpack under
-  /usr/src/, symlink to /usr/src/linux
+  /usr/src/, (optionally) symlink to /usr/src/linux
 
 2 for each separatetely distributed kernel module (e.g. alsa, nvidia
   driver, lirc):
@@ -25,6 +25,15 @@
 
 7 make-kpkg --us --uc buildpackage modules_image
 
+  additional option "--added-patches foo" adds patch in
+  kernel-patches/all/<kernelversion>/apply/foo. For the debian kernel
+  patches, foo=debian. More than one foo can be provided by seperating
+  them with commas.
+
+  TODO: decipher make-kpkg manpage documentation for --added-patches
+  :\
+
+
 8 (creates ../kernel-{image,source,headers,doc}-x.x.x....deb as well
   as a deb for each module unpacked above, name like
   <module>-<kernelversion>.deb
@@ -32,3 +41,17 @@
 9 cd ..
 
 10 dpkg -i <just created packages>
+
+
+
+To use a different gcc when compiling, use
+
+MAKEFLAGS="CC=gcc-2.95" make-kpgg ...
+
+(see manpage for make-kpkg)
+
+
+
+
+if make-kppg doesn't do anything, maybe rm stamp* in the source
+directory or, as a last resort, rm -rf stamp* debian  will help.

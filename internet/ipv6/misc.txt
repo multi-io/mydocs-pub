@@ -9,7 +9,6 @@
                 route after a router advert is received :/
 02:08 < multi_io> so all global unicast host IPs ever assigned will be in 2000::/3 ?
 02:08 < Simon-> no, there's another 6 /3s after that that will be assigned when that one runs out
-02:10 < multi_io> aha
 
 (111 in the first 3 bits belongs to the mentioned ff00::/8 multicast
 address space, so 2^3-2=6 /3 networks are still unassigned)

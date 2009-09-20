@@ -122,10 +122,9 @@ perltie)
 
 local $/ = undef
 
-$/ in aktuellem Scope umdefinieren, beim Verlassen des Scope
-vorherigen Wert restaurieren. TODO: Allg. Infos zu local QU: Was bei
-Multithreading?
-
+$/ im akt. Stackframe und alle aufgerufenen Frames (dynamisches
+Scoping) umdefinieren. Alte Belegung wird automatisch restauriert,
+wenn dieses Frame zerstoert wird (durch Raussprung)
 
 -----
 

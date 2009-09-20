@@ -7,8 +7,6 @@ into modprobe, but may be overridden in modules.conf (so, when
 modules.conf defines an alias for block-major-8, sd_mod won't be
 loaded anymore unless explicitly configured).
 
-=> indeed. See "modprobe -c".
-
 modprobe is called by the kernel (kernel/kmod.c).
 
 
@@ -26,9 +24,9 @@ modprobe is called by the kernel (kernel/kmod.c).
 
 -----
 
-Now, I want to load the whole USB storage stack (usb-storage,
+Now, you want to load the whole USB storage stack (usb-storage,
 usb-uhci, usbcore, sd_mod, scsi_mod) on (e.g.) "mount -t vfat /dev/sda
-/mnt/usbs". I use this configuration:
+/mnt/usbs":
 
 # "hardware abstraction layer"
 alias usb_host_controller usb-uhci
@@ -39,7 +37,7 @@ below usb-storage usb_host_controller
 below block-major-8 usb-storage
 
 
-I now have to call the mount command *twice* to make it work. On the
+You now have to call the mount command *twice* to make it work. On the
 1st call, all modules are loaded:
 
 
@@ -90,7 +88,7 @@ fat                    29304   0  (autoclean) [vfat]
 
 
 
-But only on the 2nd call, the partition is actually mounted:
+But only on the 2nd call the partition is actually mounted:
 
 $ mount -t vfat /dev/sda /mnt/usbs
 $
@@ -104,8 +102,7 @@ This is apparently caused by the asynchronous nature of kmod.c's
 operation...
 
 
-(the "kmod: requesting module: <bla>" outputs are caused by my small
-patch[1]).
+(the "kmod: requesting module: <bla>" outputs are caused by [1]).
 
 
 [1]

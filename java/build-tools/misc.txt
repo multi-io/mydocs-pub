@@ -1,0 +1,52 @@
+14:47 -!- multi_io [n=olaf@port-87-193-172-154.static.qsc.de] has joined ##java
+
+15:56 < multi_io> the ant people rightly saw that Unix make has portability issues, then wrongly decided that XML was 
+                  the best way to solve them
+15:56 -!- hrehf [n=fsljif@dslb-092-073-082-069.pools.arcor-ip.net] has quit [Read error: 110 (Connection timed out)]
+15:56 -!- hrehf_ is now known as hrehf
+15:57 < multi_io> essentially, they wrongly identified make's scriptability as being the root of the portability issues
+15:57 < multi_io> which is of course wrong. The underlying shell's portability issues are the root of the problem
+15:58 < waz> nothing in makefiles format make them non crossplatform
+15:58 < multi_io> so, the right way would have been to standardize the scripting layer, maybe by using something 
+                  Java-based for it (BeanShell or jpython or something similar comes to mind)
+15:58  * tazle doesn't understand "make's scriptability"
+15:59 < tazle> it just runs shell commands, how is that "scriptable"?
+15:59 < multi_io> Ant is essentially a wrong solution for a correctly identified problem :P
+15:59 -!- robyonrails [n=robyonra@host51-121-dynamic.51-82-r.retail.telecomitalia.it] has quit ["Leaving"]
+15:59 < bearded_oneder> multi_io ->  as well as the limitations of some unnamed platforms' shell environment (cough, 
+                        cough)
+15:59 < multi_io> yeah, and the shell commands aren't too portable
+15:59 < multi_io> as well as the shell itself
+15:59 < basicer> If Ant is the solution to your problem, and you like it: use it.  If you dont like it, or it is not 
+                 the solution to your problem: use or create something else you like.
+15:59 < multi_io> "it's easier to port a shell than a shell script" :-P
+16:00 < waz> maven does the job for us
+16:01 < RenatoSilva> bearded_oneder: isn't Java human readable?
+16:01 < multi_io> tazle: "make's scriptability" = make's ability to easily write (shell) code in it (the code that 
+                  executes the build tasks)
+16:02 < multi_io> maven isn't scriptable enough imho
+16:02 < multi_io> it's too declarative, as far as I can see
+16:03 < waz> Java is a LOT more readable than xml
+16:03 < multi_io> so.. maven is another wrong solution to a correctly identified problem :P
+16:03 < bearded_oneder> RenatoSilva ->  still think it is ill advised to mingle the build executor (whether that be an 
+                        executable, script, or java class) with the build descriptoe.
+16:03 < waz> multi_io: I can build a massive code base across 28 project by typing mvn install
+16:04 < waz> pontificate all you like, it works
+16:04 < bearded_oneder> descriptor*
+16:04 < waz> every time
+16:04 < basicer> multi_io -> Id like to see an example build file (in ant) that has problems because its not scritable 
+                 enough, and the proposed "java" syntax to compile that same ant script.
+16:04 < defendguin> basicer: how can i easily tell then
+16:06 -!- Absolute0 [n=ramin@ool-182e4b01.dyn.optonline.net] has joined ##java
+16:06 < basicer> System.err.prntln(System.getProperty("java.runtime.version")); at the beggining of main should tell 
+                 you
+16:06 < multi_io> the right way would have been to standardize the scripting layer as said before, and then implement 
+                  an equivalent to maven's automatic dependency resolver as a portable library on top of that 
+                  scripting layer
+16:06 < bearded_oneder> RenatoSilva ->  waz had a valid point that the problem with ant was choosing XML as the 
+                        descriptor format, rather than the problem being  the separation of the descriptor from the 
+                        executor.
+16:09 < multi_io> basicer: it's just not hackable enough. As soon as you want to do something trivial that's not 
+                  directly supported, like automatically generating some text file that'll be needed at runtime, you 
+                  have to switch to Java and write a specific "Ant task" for that
+16:10 < multi_io> that's the opposite of hackability

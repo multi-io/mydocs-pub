@@ -1,0 +1,60 @@
+- Der Drucker wird vom Kernel als normales Ausgabegerät behandelt, an das
+man Bytes schicken kann. Die Geraetedatei ist (meistens) /dev/lp1. root kann
+auch tatsaechlich direkt Bytes in dieses Geraet schreiben
+(z.B. mit echo hallo >/dev/lp1). Das sind dann 1:1 die Bytes, die auch der
+Drucker abbekommt. Wenn ein Drucker nun z.B. eine Grafik drucken soll, muss
+er dazu meistens einige rel. komplizierte (und HW-abhaengige)
+Bytekombinationen geschickt bekommen, die ihm sagen, dass er z.B. den
+Grafikmodus anschalten und bestimmte Pixel ausgeben soll.
+
+Daraus ergibt sich das Problem, dass der Drucker nur "Schrott" drucken wuerde,
+wenn man normale (geraeteunabhaengige) Daten (z.B. .bmp - Dateien) direkt an
+den Drucker schicken wuerde. Man braucht also ein Hilfsprogramm, das zwischen
+die .BMP - Datei und /dev/lp1 geschaltet wird und die Umsetzung zwischen den
+HW-unabhaengigen und den HW-abhaengigen Daten vornimmt. Diese Programme
+heissen unter Unix "Filter". Sie nehmen die HW-unabh. Daten ueber stdin
+entgegen und geben die druckerspezifischen Bytes ueber stdout aus.
+
+Ein weiteres Problem ist, dass unter Unix mehrere User gleichzeitig
+eingeloggt sein koennen. Wenn nun 2 User zur selben Zeit Daten an den
+Drucker schicken wuerden, wuerde ein ziemliches Chaos entstehen.
+Aus all diesen Gruenden ist es normalen Benutzern verboten, Daten direkt an
+/dev/lp1 zu senden.
+
+Statt dessen laeuft unter Linux der Daemon "lpd" ("Line Printer Daemon")
+staendig im Hintergrund mit (er wird normalerweise beim Systemstart
+gestartet). Wenn nun ein User eine Datei drucken moechte, so schickt er sie
+(mit dem Hilfprogramm lpr) an den lpd. Der lpd nimmt die Datei entgegen,
+schickt sie durch das korrekte Filterprogramm (s.o.) und anschliessend zum
+Drucker. Wenn im Moment gerade ein anderer Benutzer auf demselben Drucker
+druckt, reiht lpd den neuen Druckauftrag in eine Warteschlange ein und
+schickt sie erst zum Drucker, wenn dieser wieder "frei" ist.
+
+Der lpd wird ueber die Datei /etc/printcap konfiguriert. In diese Datei traegt 
+der Admin (root) die Drucker ein, die den Benutzern zum Drucken zur Verfügung
+stehen sollen. Ein Eintrag koennte z.B. so aussehen:
+
+lp|bj|bubblejet:\
+        :sd=/var/spool/lpd/bj:\
+        :mx#0:\
+        :sh:\
+        :lp=/dev/lp1:\
+        :if=/var/spool/lpd/bj/filter:
+
+Das bezeichnet einen Drucker, der unter den Namen "lp", "bj" oder
+"bubblejet" angesprochen werden kann. Die Ausgabeschnittstelle ist
+/dev/lp1 und das Filterprogramm, durch das alle zu druckenden Dateien
+geschickt werden, heisst /var/spool/lpd/bj/filter. Das "Spoolverzeichnis"
+(das Verzeichnis, in dem lpd Druckauftraege zwischenspeichert, wenn der
+Drucker gerade besetzt ist), lautet /var/spool/lpd/bj.
+
+Wenn ein Anwender nun z.B. die Postscript-Datei test.ps drucken will, geht
+das mit
+
+lpr -P bj test.ps
+
+Das Programm lpr nimmt Verbindung mit dem laufenden lpd auf und sagt ihm,
+dass der Anwender die Datei "test.ps" auf dem Drucker "bj" drucken moechte.
+lpd durchsucht daraufhin die /etc/printcap nach einem Drucker mit dem Namen
+"bj". Wenn er einen passenden Eintrag findet, benutzt er die dort vermerkten
+Eintellungen (Filter, Spoolverzecihnis usw.), um den Drucker anzusprechen.

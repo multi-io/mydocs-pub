@@ -1,0 +1,47 @@
+Problem:
+------------------------------------------
+Newsgroups: de.comp.os.unix.apps.misc
+Subject: [wget] -I funktioniert nicht
+From: Olaf Klischat <olaf.klischat@isst.fhg.de>
+Date: Mon, 01 Mar 2004 18:08:59 +0100
+Message-ID: <871xocmr4k.fsf@swangoose.isst.fhg.de>
+
+olaf@swangoose:/tmp$ wget -r -Ihttp://java.sun.com/docs/books/tutorial/security1.2 http://java.sun.com/docs/books/tutorial/security1.2/index.html
+--18:04:47--  http://java.sun.com/docs/books/tutorial/security1.2/index.html
+           => `java.sun.com/docs/books/tutorial/security1.2/index.html'
+Auflösen des Hostnamen »www-cache.isst.fhg.de«.... 192.102.158.90
+Verbindungsaufbau zu www-cache.isst.fhg.de[192.102.158.90]:8000... verbunden.
+Proxy Anforderung gesendet, warte auf Antwort... 200 OK
+Länge: nicht spezifiziert [text/html]
+
+    [  <=>                                ] 11,934        32.65K/s             
+
+18:04:48 (32.56 KB/s) - »java.sun.com/docs/books/tutorial/security1.2/index.html« gespeichert [11934]
+
+
+BEENDET --18:04:48--
+Geholt: 11,934 Bytes in 1 Dateien
+olaf@swangoose:/tmp$ 
+
+Wieso zieht er nicht die in der index.html (relativ) verlinkten
+Unterseiten? Ohne die -I-Option oder mit "-np" statt der -I-Option
+geht es wie erwartet. GNU Wget 1.9.1.
+
+Olaf
+------------------------------------------
+
+
+
+Optionen (ob von der Kommandozeile oder aus .wgetrc) werden abgelegt
+in der Struktur struct options opt im Modul main.c (Deklaration in
+options.h).
+
+Die Liste der -I - Verzeichnisse landet in
+options.includes (ein char **). 
+
+-r oder nicht -r landet in opt.recursive (Boolean). Gleichzeitig wird
+opt.dirstruct (entspr. Option -x, i.e. "create directory structure")
+auf true gesetzt, falls nicht -nd angegeben wurde.
+
+Die angegebenen URLs landem in char **url, Anzahl nurl (beide
+Variablen sind lokal in main.c::main)

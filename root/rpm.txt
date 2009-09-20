@@ -1,0 +1,23 @@
+rpm -qa
+alle installierten Packages auflisten
+
+rpm -qlp <pkgfile>
+In der Package-Dateie pkgfile enthaltene Dateien auflisten
+
+rpm -qip <pkgfile>
+Infos zum Package pkgfile anzeigen
+
+rpm -qRp <pkgfile>
+Abhaengigkeiten anzeigen
+
+
+entsprechend:
+rpm -ql <pkg>
+Bereits installiertes Package pkg auflisten
+
+entsprechend rpm -qi <pkg>, rpm -qR <pkg>
+ 
+
+rpm -i <pkgfile>
+pkgfile installieren
+

@@ -1,0 +1,291 @@
+Detailed description (see also: http://rubyforge.org/tracker/index.php?func=detail&aid=1413&group_id=126&atid=575):
+
+tack:~# gem --version
+0.8.4
+tack:~# gem list actionpack
+
+*** LOCAL GEMS ***
+
+actionpack (1.4.0, 1.0.1)
+Web-flow and rendering framework putting the VC in MVC.
+tack:~#
+tack:~# gem uninstall actionpack --version '= 1.4.0'
+Attempting to uninstall gem 'actionpack'
+You have requested to uninstall the gem:
+actionpack-1.0.1
+actionpack-1.4.0
+[...]
+tack:~# gem uninstall actionpack --version '>= 1.4.0'
+Attempting to uninstall gem 'actionpack'
+You have requested to uninstall the gem:
+actionpack-1.0.1
+actionpack-1.4.0
+[...]
+tack:~# gem uninstall actionpack --version '> 1.3.0'
+Attempting to uninstall gem 'actionpack'
+You have requested to uninstall the gem:
+actionpack-1.0.1
+actionpack-1.4.0
+
+==> ???
+
+-------------
+
+irb(main):175:0> Gem.source_index.each do |name,gem|
+irb(main):176:1*   print "#{name}\n"
+irb(main):177:1> end
+rake-0.4.15
+rails-0.9.1
+activerecord-1.2.0
+rubygems-update-0.8.4
+sources-0.0.1
+activerecord-1.6.0
+actionpack-1.0.1
+rake-0.4.12
+actionpack-1.4.0
+actionmailer-0.5.0
+
+ap10=Gem.source_index.to_a[6][1]; nil
+ap14=Gem.source_index.to_a[8][1]; nil
+
+
+uninstaller = Gem::Uninstaller.new('actionpack','= 1.4.0')
+
+uninstaller.uninstall  (installer.rb:467)
+
+  =>
+  uninstaller.remove(ap14,..)  (installer.rb:543)
+
+    =>
+    uninstaller.has_dependents?(ap14)   (installer.rb:557)
+
+      =>
+      ap14.dependent_gems    (specification.rb:564)
+
+---
+Gem.source_index.each do |name,gem|
+  gem.dependencies.each do |dep|
+    if ap14.satisfies_requirement?(dep) then
+      print "ap14 satisfies_requirement? #{dep} of gem #{gem}\n"
+    end
+  end
+end; nil
+
+ap14 satisfies_requirement? actionpack (>= 1.0.1) of gem #<Gem::Specification name=rails version=0.9.1>
+ap14 satisfies_requirement? actionpack (>= 0.9.5) of gem #<Gem::Specification name=actionmailer version=0.5.0>
+=> nil
+
+
+Gem.source_index.each do |name,gem|
+  gem.dependencies.each do |dep|
+    if ap14.satisfies_requirement?(dep) then
+      print "ap14 satisfies_requirement? #{dep} of gem #{gem}\n"
+
+      Gem.source_index.each do |name,gem|
+        if(gem.satisfies_requirement?(dep)) then
+          print "  this requirement/dependency ist also satisfied by gem #{gem}\n"
+        end
+      end
+
+    end
+  end
+end; nil
+
+ap14 satisfies_requirement? actionpack (>= 1.0.1) of gem #<Gem::Specification name=rails version=0.9.1>
+  this requirement/dependency ist also satisfied by gem #<Gem::Specification name=actionpack version=1.0.1>
+  this requirement/dependency ist also satisfied by gem #<Gem::Specification name=actionpack version=1.4.0>
+ap14 satisfies_requirement? actionpack (>= 0.9.5) of gem #<Gem::Specification name=actionmailer version=0.5.0>
+  this requirement/dependency ist also satisfied by gem #<Gem::Specification name=actionpack version=1.0.1>
+  this requirement/dependency ist also satisfied by gem #<Gem::Specification name=actionpack version=1.4.0>
+=> nil
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+olaf@swangoose:~$ memusage-snapshot 
+TIME: 01/31/05 13:33:10 (1107174790)
+Unknown HZ value! (88) Assume 100.
+  PID -   VSZ COMMAND
+ 4119 - 361204 galeon-bin
+  349 - 212376 XFree86
+ 4014 - 38240 xemacs
+  590 - 35592 xmms
+  600 - 17128 wish
+  588 - 11608 panel
+  362 - 10440 gnome-session
+  720 - 10396 tasklist_applet
+  724 - 10372 deskguide_apple
+  727 - 10244 multiload_apple
+  326 - 10196 xfs
+  732 - 10140 mixer_applet
+  730 - 10104 penguineyes
+  572 -  9772 sawfish
+ 2903 -  9336 irssi
+18870 -  8736 smbd
+18888 -  8616 smbd
+  896 -  8556 xterm
+ 1248 -  8508 xterm
+ 1    Unknown HZ value! (88) Assume 100.
+             total       used       free     shared    buffers     cached
+Mem:        517956     514668       3288          0        124       4188
+-/+ buffers/cache:     510356       7600
+Swap:       779112     529772     249340
+11.29 9.50 8.24 1/103 18895
+olaf@swangoose:~$ 
+
+
+
+$ top -n1; ps ax -o pid,size,vsz,comm --sort -size | head -20; free
+ 13:29:31 up 2 days, 22:06, 13 users,  load average: 9.69, 8.31, 7.66
+95 processes: 92 sleeping, 2 running, 1 zombie, 0 stopped
+CPU states:  12.3% user,   5.0% system,   5.0% nice,  77.7% idle
+Mem:    517956K total,   513932K used,     4024K free,       68K buffers
+Swap:   779112K total,   529420K used,   249692K free,     3048K cached
+
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT %CPU %MEM   TIME COMMAND
+    8 root      16   0     0    0     0 SW    1.5  0.0   1:59 kswapd0
+    5 root       5 -10     0    0     0 SW<   0.5  0.0   0:48 kblockd/0
+ 4014 olaf      15   0 38240 1056 12964 D     0.5  0.2   4:10 xemacs
+18859 olaf      17   0  2060  872  1848 R     0.5  0.1   0:00 top
+    1 root      16   0  1520   72  1368 S     0.0  0.0   0:01 init
+    2 root      34  19     0    0     0 SWN   0.0  0.0   0:00 ksoftirqd/0
+    3 root       5 -10     0    0     0 SW<   0.0  0.0   0:00 events/0
+    4 root       5 -10     0    0     0 SW<   0.0  0.0   0:00 khelper
+    9 root      15 -10     0    0     0 SW<   0.0  0.0   0:00 aio/0
+   10 root      15   0     0    0     0 SW    0.0  0.0   0:00 kseriod
+   56 root      16   0     0    0     0 SW    0.0  0.0   0:00 khubd
+  145 daemon    16   0  1600    4  1432 S     0.0  0.0   0:00 portmap
+  150 root      17   0  5400   16  4132 S     0.0  0.0   0:00 mount.smbfs
+  154 root      15   0     0    0     0 SW    0.0  0.0   0:00 smbiod
+  156 root      15   0  5400   16  4132 S     0.0  0.0   0:00 mount.smbfs
+  159 root      15   0  5380   16  4116 S     0.0  0.0   0:00 mount.smbfs
+  217 root      15   0  1576   48  1408 S     0.0  0.0   0:00 syslogd
+  220 root      17   0  2404   16  1360 S     0.0  0.0   0:00 klogd
+  253 mail      15   0  3728   24  3364 S     0.0  0.0   0:00 exim
+  267 root      18   0  1560   16  1400 S     0.0  0.0   0:00 inetd
+  277 root      15   0  2492  104  2404 S     0.0  0.0   0:02 memusagelogd
+  313 root      15   0  5404  380  4288 S     0.0  0.0   0:18 nmbd
+  315 root      18   0  8344   52  6808 S     0.0  0.0   0:00 smbd
+  321 root      18   0  8216   16  6808 S     0.0  0.0   0:00 smbd
+  322 root      17   0  2928   36  2712 S     0.0  0.0   0:01 sshd
+  326 root      15   0 10196   32  1956 S     0.0  0.0   0:04 xfs
+  329 daemon    17   0  1708   20  1544 S     0.0  0.0   0:00 atd
+  332 root      15   0  1780   68  1596 S     0.0  0.0   0:00 cron
+  335 root      15   0  3176   12  2404 S     0.0  0.0   0:00 bash
+  336 root      17   0  1520   16  1352 S     0.0  0.0   0:00 getty
+  337 root      16   0  1520   16  1352 S     0.0  0.0   0:00 getty
+  338 root      16   0  1520   16  1352 S     0.0  0.0   0:00 getty
+  339 root      16   0  1520   16  1352 S     0.0  0.0   0:00 getty
+  340 root      16   0  1520   16  1352 S     0.0  0.0   0:00 getty
+  347 root      16   0  6624   16  6428 S     0.0  0.0   0:00 gdm
+  348 root      17   0  6984   16  6556 S     0.0  0.0   0:00 gdm
+  349 root       5 -10  207M  828 51316 D <   0.0  0.1 331:16 XFree86
+  362 olaf      15   0 10440   16  9728 S     0.0  0.0   0:00 gnome-session
+  556 olaf      15   0  2492   84  2308 S     0.0  0.0   0:00 ssh-agent
+  PID -   VSZ COMMAND
+ 4119 - 361204 galeon-bin
+  349 - 212376 XFree86
+ 4014 - 38240 xemacs
+  590 - 35592 xmms
+  600 - 17128 wish
+  588 - 11608 panel
+  362 - 10440 gnome-session
+  720 - 10396 tasklist_applet
+  724 - 10372 deskguide_apple
+  727 - 10244 multiload_apple
+  326 - 10196 xfs
+  732 - 10140 mixer_applet
+  730 - 10104 penguineyes
+  572 -  9772 sawfish
+ 2903 -  9336 irssi
+  896 -  8556 xterm
+ 1248 -  8508 xterm
+  741 -  8500 xterm
+  960 -  8500 xterm
+Unknown HZ value! (88) Assume 100.
+             total       used       free     shared    buffers     cached
+Mem:        517956     514964       2992          0        132       3568
+-/+ buffers/cache:     511264       6692
+Swap:       779112     528808     250304
+
+
+
+
+
+
+
+
+Diskrepanz %user +  %system <=> summe(%CPU)
+
+ 13:58:58 up 2 days, 22:36, 13 users,  load average: 4.25, 5.54, 6.97
+100 processes: 99 sleeping, 1 running, 0 zombie, 0 stopped
+CPU states:  16.7% user,  83.3% system,   0.0% nice,   0.0% idle
+Mem:    517956K total,   513508K used,     4448K free,      120K buffers
+Swap:   779112K total,   262368K used,   516744K free,     2324K cached
+
+  PID USER     PRI  NI  SIZE  RSS SHARE STAT %CPU %MEM   TIME COMMAND
+19307 root      17   0  2060  500  1848 R     0.3  0.0   0:00 top
+    8 root      15   0     0    0     0 DW    0.2  0.0   2:05 kswapd0
+  349 root       5 -10  199M 1964 50716 D <   0.1  0.3 331:19 XFree86
+  556 olaf      15   0  2492   88  2308 S     0.1  0.0   0:01 ssh-agent
+19283 root      15   0 19356  536 19164 D     0.1  0.1   0:01 apt-get
+    1 root      16   0  1520   72  1368 S     0.0  0.0   0:01 init
+    2 root      34  19     0    0     0 SWN   0.0  0.0   0:00 ksoftirqd/0
+    3 root       5 -10     0    0     0 SW<   0.0  0.0   0:00 events/0
+    4 root       5 -10     0    0     0 SW<   0.0  0.0   0:00 khelper
+    5 root       5 -10     0    0     0 SW<   0.0  0.0   0:49 kblockd/0
+    9 root      15 -10     0    0     0 SW<   0.0  0.0   0:00 aio/0
+   10 root      15   0     0    0     0 SW    0.0  0.0   0:00 kseriod
+   56 root      16   0     0    0     0 SW    0.0  0.0   0:00 khubd
+  145 daemon    16   0  1600    0  1432 SW    0.0  0.0   0:00 portmap
+  150 root      17   0  5400   12  4132 S     0.0  0.0   0:00 mount.smbfs
+  154 root      15   0     0    0     0 SW    0.0  0.0   0:00 smbiod
+  156 root      15   0  5400   12  4132 S     0.0  0.0   0:00 mount.smbfs
+  159 root      15   0  5380   12  4116 S     0.0  0.0   0:00 mount.smbfs
+  217 root      15   0  1576   32  1408 S     0.0  0.0   0:01 syslogd
+  220 root      17   0  2404   12  1360 S     0.0  0.0   0:00 klogd
+  253 mail      16   0  3728   20  3364 S     0.0  0.0   0:00 exim
+  267 root      18   0  1560   12  1400 S     0.0  0.0   0:00 inetd
+  277 root      15   0  2492   20  2404 S     0.0  0.0   0:02 memusagelogd
+  313 root      15   0  5404  400  4288 S     0.0  0.0   0:18 nmbd
+  315 root      17   0  8344   32  6808 S     0.0  0.0   0:00 smbd
+  321 root      18   0  8216   12  6808 S     0.0  0.0   0:00 smbd
+  322 root      17   0  2928   28  2712 S     0.0  0.0   0:01 sshd
+  326 root      15   0 10196   28  1956 S     0.0  0.0   0:04 xfs
+  329 daemon    17   0  1708   16  1544 S     0.0  0.0   0:00 atd
+  332 root      15   0  1780   56  1596 S     0.0  0.0   0:00 cron
+  335 root      15   0  3176    8  2404 S     0.0  0.0   0:00 bash
+  336 root      17   0  1520   12  1352 S     0.0  0.0   0:00 getty
+  337 root      16   0  1520   12  1352 S     0.0  0.0   0:00 getty
+  338 root      16   0  1520   12  1352 S     0.0  0.0   0:00 getty
+  339 root      16   0  1520   12  1352 S     0.0  0.0   0:00 getty
+  340 root      16   0  1520   12  1352 S     0.0  0.0   0:00 getty
+  347 root      16   0  6624   12  6428 S     0.0  0.0   0:00 gdm
+  348 root      17   0  6984   12  6556 S     0.0  0.0   0:00 gdm
+  362 olaf      15   0 10440   96  9728 S     0.0  0.0   0:00 gnome-session
+  560 olaf      15   0  6852   52  6628 S     0.0  0.0   0:05 gnome-smproxy
+  572 olaf      15   0  9772   56  7980 S     0.0  0.0   0:38 sawfish
+  574 olaf      15   0  4520   12  1772 S     0.0  0.0   0:12 esd
+  576 olaf      15   0  3664   64  3108 S     0.0  0.0   0:08 xscreensaver
+  588 olaf      15   0 11608  108 10412 S     0.0  0.0   0:31 panel
+  590 olaf      15   0 35592  420 17472 S     0.0  0.0   3:10 xmms
+  596 olaf      16   0  4700   12  4512 S     0.0  0.0   0:00 gnome-name-serv
+  600 olaf      15   0 17128   52  5924 S     0.0  0.0   0:03 wish
+  720 olaf      15   0 10396  108  9820 S     0.0  0.0   0:08 tasklist_applet
+  724 olaf      15   0 10372  108  9800 S     0.0  0.0   0:07 deskguide_apple
+  727 olaf      15   0 10244  104  9760 S     0.0  0.0   2:12 multiload_apple
+  730 olaf      15   0 10104  104  9620 S     0.0  0.0   1:31 penguineyes
+  732 olaf      15   0 10140  212  9656 S     0.0  0.0   0:05 mixer_applet
+  741 olaf      15   0  8500   12  6284 S     0.0  0.0   0:00 xterm
+
+

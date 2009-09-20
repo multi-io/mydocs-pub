@@ -31,11 +31,11 @@ def fourier_analysis(f, t0, t1, ns, nsteps=10000)
   c=2.0/t*numint(f,t0,t1)
   as = ns.map{|n|
     2.0/t * numint(proc{|x|f.call(x)*sin(2*PI*n*(x-t0)/(t1-t0))},
-                   t0,t1)
+                   t0,t1,nsteps)
   }
   bs = ns.map{|n|
     2.0/t * numint(proc{|x|f.call(x)*cos(2*PI*n*(x-t0)/(t1-t0))},
-                   t0,t1)
+                   t0,t1,nsteps)
   }
   [as,bs,c]
 end
@@ -78,9 +78,11 @@ if __FILE__ == $0
     end
   }
 
-  as,bs,c = fourier_analysis(f, 0.0, 8.0, (1..15))
+  as,bs,c = fourier_analysis(f, 0.0, 8.0, (1...40))
 
-  fapprox = fourier_analysis_reverse((1...8),as,bs,c, 0.0, 8.0)
+  fapprox8 = fourier_analysis_reverse((1...8),as,bs,c, 0.0, 8.0)
+  fapprox20 = fourier_analysis_reverse((1...20),as,bs,c, 0.0, 8.0)
+  fapprox40 = fourier_analysis_reverse((1...40),as,bs,c, 0.0, 8.0)
 
   require "gplotutils"
   plot = Plot.new(ARGV[0] || nil)
@@ -88,6 +90,8 @@ if __FILE__ == $0
   plot.xlabel("time")
   plot.ylabel("signal")
   plot.draw(RealFunction.new(f,0.0,8.0,"title"=>"f"),
-            RealFunction.new(fapprox,0.0,8.0,"title"=>"fapprox"))
+            RealFunction.new(fapprox8,0.0,8.0,"title"=>"fapprox8"),
+            RealFunction.new(fapprox20,0.0,8.0,"title"=>"fapprox20"),
+            RealFunction.new(fapprox40,0.0,8.0,"title"=>"fapprox40"))
   readline
 end

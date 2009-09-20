@@ -1,0 +1,6 @@
+13:28 < multi_io> does Emacs support linefeeds in replacements texts, e.g. in query-replace-regexp?
+13:29 < e1f> yes
+13:29 < e1f> c-q c-j
+13:30 < multi_io> e1f: thanks :-P
+13:31 < multi_io> does it support them in the pattern too, by any chance?
+

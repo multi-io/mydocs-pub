@@ -20,48 +20,17 @@ Regular expressions can be used as "first-class-citizens"
 qr// precopiles its argument as a regular expression. See perlop for
 details.
 
-Unfortunately, the options strings apparently has to be fixed at
-compile time:
-
-  DB<1> x $pat = 'ath.*?in'
-0  'ath.*?in'
-  DB<2> x $opts = 'i'
-0  'i'
-  DB<3> x $regexp=qr{$pat}$opts
-Scalar found where operator expected at (eval 14)[/usr/share/perl/5.8/perl5db.pl:619] line 2, near "qr{$pat}$opts"
-        eval '($@, $!, $^E, $,, $/, $\\, $^W) = @saved;package main; $^D = $^D | $DB::db_stop;
-  $regexp=qr{$pat}$opts;
-
-;' called at /usr/share/perl/5.8/perl5db.pl line 619
-        DB::eval called at /usr/share/perl/5.8/perl5db.pl line 3320
-        DB::DB called at -e line 1
-syntax error at (eval 14)[/usr/share/perl/5.8/perl5db.pl:619] line 2, near "qr{$pat}$opts"
-  DB<4> x $regexp=qr{$pat}i    
-0  (?i-xsm:ath.*?in)
-   -> qr/(?i-xsm:ath.*?in)/
-  DB<5> 
+For also choosing the options string at runtime, the syntax
+"qr/(?$opts:$pat)/" appears to work:
 
 
-  DB<9> x grep /$regexp/$opts, <F>
-Scalar found where operator expected at (eval 31)[/usr/share/perl/5.8/perl5db.pl:619] line 2, near "/$regexp/$opts"
-        eval '($@, $!, $^E, $,, $/, $\\, $^W) = @saved;package main; $^D = $^D | $DB::db_stop;
-  grep /$regexp/$opts, <F>;
+  DB<148> $pat = 'ath.*?in'; $opts = 'i'
 
-;' called at /usr/share/perl/5.8/perl5db.pl line 619
-        DB::eval called at /usr/share/perl/5.8/perl5db.pl line 3320
-        DB::DB called at -e line 1
-        (Missing operator before $opts?)
-        eval '($@, $!, $^E, $,, $/, $\\, $^W) = @saved;package main; $^D = $^D | $DB::db_stop;
-  grep /$regexp/$opts, <F>;
+  DB<152> x $regexp=qr/(?$opts:$pat)/
+0  (?-xism:(?i:ath.*?in))
+   -> qr/(?-xism:(?i:ath.*?in))/
+  DB<153> x 'ATHABCDIN' =~ /$regexp/
+0  1
+  DB<154> 
 
-;' called at /usr/share/perl/5.8/perl5db.pl line 619
-        DB::eval called at /usr/share/perl/5.8/perl5db.pl line 3320
-        DB::DB called at -e line 1
-syntax error at (eval 31)[/usr/share/perl/5.8/perl5db.pl:619] line 2, near "/$regexp/$opts"
-  DB<10> 
-
-  DB<10> 
-
-  DB<10> x grep /$regexp/, <F>     
-  empty array
-  DB<11> 
+This is (somewhat) documented in perlre.

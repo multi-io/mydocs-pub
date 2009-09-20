@@ -1,0 +1,23 @@
+- normally, Spring beans are just POJOs, but they may implement
+  special framework interfaces e.g. to learn their own name in the
+  container, to be notified when they've been inserted into their
+  container or when their properties have been set, whenever any bean
+  has been inserted into the container (so they can do some processing
+  for all the beans in there, e.g. for evaluating annotations -- this
+  is how @Autowired is processed in
+  org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor)
+  etc.
+
+- for example, the latter implements this interface:
+
+  public interface   org.springframework.beans.factory.config.BeanPostProcessor {
+      Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
+
+      Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
+
+  }
+
+  The callbacks are called for each bean in the container. The
+  implementation must return the bean that's really to be inserted. So
+  this enables you to automatically e.g. generate some kind of proxy
+  here for the real bean.

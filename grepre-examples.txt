@@ -35,6 +35,9 @@ swangoose:~#
  1001  history | grep grepre
 [root@tick ~]# 
 
+cat /var/log/messages | grepre 'DPT=(.*?) ' | sort | uniq -c | sort
+-rn
+
 olaf@tack:~$ history | grep grepre
   501  find . -path '*org/apache/*java' | grepre '^(.*?)/org/apache'
   502  find . -path '*org/apache/*java' | grepre '^(.*?)/org/apache' | sort | uniq
@@ -66,3 +69,11 @@ tack:~# history | grep grepre
 tack:~# 
 
 cvs diff 2>/dev/null | grepre '^RCS file: (.*?),v$'
+
+grepre 'PATH=(.*?)\0' </proc/23663/environ 
+
+cdrecord -scanbus 2>/dev/null | grep DVDRAM | grepre '^\s*(\S+)'
+
+
+apt-get install --yes --force-yes --print-uris gnome >uris.txt
+<uris.txt grepre "^'(.*?)'" | xargs -l ncftpget

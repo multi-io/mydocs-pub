@@ -1,0 +1,195 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.1'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      3347,        126]*)
+(*NotebookOutlinePosition[      3978,        148]*)
+(*  CellTagsIndexPosition[      3934,        144]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+Cell[BoxData[
+    \(f[r_] := \(G\ M\ m\)\/r\^2\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(epot[h_] = 
+      Assuming[r0 > 0\  && \ h > 0, 
+        Integrate[f[r], {r, r0, r0 + h}]]\)], "Input"],
+
+Cell[BoxData[
+    \(\(G\ h\ m\ M\)\/\(r0\ \((h + r0)\)\)\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(consts = {G \[Rule] 6.67*^-11, M \[Rule] 5.975*^24, 
+        r0 \[Rule] 6371000}\)], "Input"],
+
+Cell[BoxData[
+    \({G \[Rule] 6.67`*^-11, M \[Rule] 5.975`*^24, 
+      r0 \[Rule] 6371000}\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(vorbit[h_] = 
+      v\  /. \ \(Solve[\(m\ v\^2\)\/\(r0 + h\) \[Equal] f[r0 + h], 
+            v]\)[\([2]\)]\)], "Input"],
+
+Cell[BoxData[
+    \(\(\@G\ \@M\)\/\@\(h + r0\)\)], "Output"]
+}, Open  ]],
+
+Cell[BoxData[
+    \(ekin[h_] := \(m\/2\) vorbit[h]\^2\)], "Input"],
+
+Cell[BoxData[
+    \(eorbit[h_] := epot[h] + ekin[h]\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Das Shuttle kann einen Orbit in H\[ODoubleDot]he h0 erreichen. \
+Welche H\[ODoubleDot]he hmax hoch k\[ODoubleDot]nnte es bei einem Flug \
+senkrecht nach oben erreichen?\
+\>", "Subsection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(hmax[h0_] = 
+      h\  /. \ \(Solve[eorbit[h0] \[Equal] epot[h], h]\)[\([1]\)]\)], "Input"],
+
+Cell[BoxData[
+    \(2\ h0 + r0\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["z.B. f\[UDoubleDot]r h0=500 km:", "Subsubsection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(hmax[500000]\  /. \ consts\)], "Input"],
+
+Cell[BoxData[
+    \(7371000\)], "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+FrontEndVersion->"5.1 for X",
+ScreenRectangle->{{0, 1280}, {0, 1024}},
+WindowSize->{520, 600},
+WindowMargins->{{256, Automatic}, {Automatic, 64}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+Cell[1754, 51, 59, 1, 44, "Input"],
+
+Cell[CellGroupData[{
+Cell[1838, 56, 123, 3, 43, "Input"],
+Cell[1964, 61, 70, 1, 47, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[2071, 67, 113, 2, 27, "Input"],
+Cell[2187, 71, 105, 2, 32, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[2329, 78, 140, 3, 48, "Input"],
+Cell[2472, 83, 60, 1, 52, "Output"]
+}, Open  ]],
+Cell[2547, 87, 66, 1, 42, "Input"],
+Cell[2616, 90, 64, 1, 27, "Input"],
+
+Cell[CellGroupData[{
+Cell[2705, 95, 198, 4, 74, "Subsection"],
+
+Cell[CellGroupData[{
+Cell[2928, 103, 111, 2, 27, "Input"],
+Cell[3042, 107, 44, 1, 27, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[3123, 113, 56, 0, 28, "Subsubsection"],
+
+Cell[CellGroupData[{
+Cell[3204, 117, 59, 1, 27, "Input"],
+Cell[3266, 120, 41, 1, 27, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

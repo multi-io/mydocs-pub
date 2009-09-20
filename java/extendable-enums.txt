@@ -1,0 +1,26 @@
+05:18 < multi_io> I have another feature request: make enums extendable :-P
+05:18 < ojacobson> multi_io: er.  no.  ew.  don't do that.
+05:19 < r0bby> multi_io: People are going to think you're on crack.
+05:19 < multi_io> why?
+05:19 < Woflborg> multi_io: since you do not bow down and worship the javaness 
+                  as it is!
+05:19 < Woflborg> multi_io: gods by definition are perfect.
+05:19 < ojacobson> switch (someEnum) that satisfies all possible values of 
+                   someEnum's direct class may not satisfy all (or even most) 
+                   values of someEnum's class's descendants
+05:19 < ojacobson> that's an important part of "being an enumeration"
+05:21 < ojacobson> If I wanted a reference type that could have values I don't 
+                   know about I wouldn't have created an enumeration.
+05:21 < multi_io> you have an EventBase class with a method EventBase.Kind 
+                  getKind() where EventBase.King is an enum { foo, bar }, and 
+                  then sub-event classes that want to define additional kinds 
+                  of events...
+05:21 < multi_io> ojacobson: ok, point taken
+05:22 < ojacobson> (I might have used the old "typesafe enum" pattern with a 
+                   protected c'tor and heavy documentation.)
+05:22 < ojacobson> (Or I might just have used a class or interface. :)
+05:22 < multi_io> ojacobson: I did just that
+05:22 < multi_io> there's no other way, basically
+05:29 < ojacobson> (Personally I think enum itself is a little bit of a wart, 
+                   but then, I don't use it much.  I think I've written three 
+                   of them.)

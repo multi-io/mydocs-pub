@@ -1,0 +1,120 @@
+categories: windows, longhorn, winfs, .net, relational-databases, \
+            object-relational-binding, language-en
+
+(information extracted from
+http://msdn.microsoft.com/longhorn/default.aspx?pull=/msdnmag/issues/04/01/WinFS/default.aspx)
+
+
+WinFS -- new, database-like filesystem in Windows Longhorn
+
+- currently applies only to "documents and settings" folder, the rest
+  of the filesystem (%systemroot%, "Program Files" etc.) will still be
+  pure NTFS
+
+- tightly integrated with .NET (namespace System.Storage)
+
+
+User's View
+-----------
+
+- structure:
+
+  - apparently there is exactly one "WinFS store" per machine
+    (comparable to the Unix VFS tree rooted at "/"). The
+    WinFS store contains all WinFS-stored data on that machine.
+
+  - a WinFS store contains *items*.
+
+  - (items roughly correspond to traditional files/directories; for
+    example, a photo, an mp3 file or a contact address would probably
+    be stored as one item)
+
+  - items are represented in the .NET CLR as objects whose classes
+    implement System.Storage.Item
+
+  - items have a *type* (their .NET class), a set of named and typed
+    *properties* (the .NET type's properties) and a set of
+    *categories* (see below)
+
+    - Longhorn provides several predefined item types, e.g. images,
+      contacts etc.
+
+  - apparently, properties may refer to other (persisted) items. QU:
+    lifecycle management in this case? Simple reference counter?
+
+  - an item has a set of 0..* categories (accessible in .NET via the
+    specific property "Categories" of the Item interface)
+
+    - categories are essentially known names attached to an item
+      (e.g. "home", "work", "vacation", "music", "video" etc.)
+
+  - there is a special item type, *folder*
+    (System.Storage.Folder). Folders are items that contain 0..* other
+    items. Since folders are items, folders may contain other folders.
+
+  - an item may exist in more than one folder
+
+  - each item is contained in at least one folder. There is one
+    exception: A special folder, the *root folder* (obtainable via
+    Folder.GetRootFolder()) is not contained in any other folder.
+
+  - folders affect the lifecycle of their contained items: As soon as
+    an item would not be a member of any folder (because it was
+    removed from all its folders or because all its folders were
+    deleted), it is deleted
+
+  - QU: folders just a special case of "properties may refer to other
+    (persisted) items" (see above)?
+
+
+- access:
+
+  - a WinFS store is accessed through a .NET API (managed API),
+    implemented in the System.Storage namespace/assembly
+
+  - the user may enumerate all items contained in a given folder (and,
+    optionally, its subfolders?), or may query for all items in a
+    given folder (and, optionally, its subfolders?) having specific
+    property values and/or specific categories. A special query
+    language (WinFS OPath) is provided for the latter purpose. WinFS
+    OPath expressions are similar in spirit to JDOQL expressions or
+    SQL "WHERE" expressions.
+
+  - write access to a WinFS storage is *transactional*. The user may
+    enclose any number of write operations in a transaction.
+
+  - *WinFS notifications*: user code may register to be notified when
+    a specified item changes
+
+
+
+Implementation View/implementation questions
+--------------------------------------------
+
+- items persisted via .NET object serialization of the .NET item
+  object? Or is the .NET item object a facade for internal database
+  tables etc.? Probably the latter.
+
+- performance -- queries over property values or categories: linear or
+  logarithmic complexity? (Automatic?) index generation for properties
+  and/or categories?
+
+- similar to JDO, database identity of items is *not* mapped to .NET CLR
+  object identity of the corresponding Item objects. That is, there
+  may be several .NET Item objects that all refer to the same item in
+  the WinFS store. An item has a special ItemID_Key property which
+  provides identity for the WinFS item.
+
+
+Backwards compatibility to Win32 filesystem layer
+-------------------------------------------------
+
+Each item has a file representation, Win32 apps may seamlessly access
+the items in a WinFS storage as files.
+
+Win32 file types (determined by filename extension?) may have
+associated *metadata handlers* which extract WinFS metadata
+(properties) from the Win32 file. For example, the metadata handler
+for W0rd documents may extract the document's OLE properties (visible
+in the file's property pages) and convert them to properties of the
+corresponding WinFS item.

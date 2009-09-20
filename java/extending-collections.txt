@@ -1,0 +1,39 @@
+05:03 < multi_io> hmm, a class with only private constructors is not only not 
+                  instantiatable, it's also not extendable, right?
+05:03 < ojacobson> multi_io: true
+05:04 < ojacobson> Not quite non-instantiable, methods (even static ones) in 
+                   the same class can create them.
+05:04 < ojacobson> But close enough for gov't work.
+05:04 < multi_io> I wanted to "add" my own utility methods to 
+                  java.util.Collections by deriving myproject.Collections from 
+                  it and adding the methods to that
+05:05 < multi_io> it feels stupid to write a completely disjoint class 
+                  MyCollections
+05:05 < ojacobson> multi_io: what would you gain by inheriting from Collections?
+05:06 < multi_io> ...and then always having to remember whether a given method 
+                  is defined in java.util.Collections or myproject.MyCollections
+05:06 < ojacobson> Anyways, Collections is not (afaik) final
+05:06 < multi_io> ojacobson: as I say, I just want to "add" some methods to it 
+                  that were "forgotten"
+05:06 < ojacobson> You can derive from it, you just can't instantiate your 
+                   derived class.
+05:07 < ojacobson> ...wait, I might be lying furiously.
+05:07 < multi_io> I can'T.
+05:07 < multi_io> compiler complains b/c the construictor can't call super()
+05:07 < ojacobson> right, because the default constructor would have to invoke 
+                   the parent class's () constructor, even if you provide one.
+05:08 < multi_io> well, this sucks
+05:09 < ojacobson> In that you might have to remember what methods you 
+                   implemented, yes
+05:09 < ojacobson> I have to admit, I'm not seeing the huge burden
+05:09 < r0bby> nice.
+05:10 < multi_io> it appears I'm gathering a bunch of feature requests for Sun 
+                  here
+05:10 < multi_io> make for() able to use Iterators, make j.util.Collections's 
+                  constructor protected
+05:11 < ojacobson> I guarantee you both will be closed nearly immediately
+05:11 < ojacobson> the former "duplicate" the latter "won't fix"
+
+
+http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6588768
+

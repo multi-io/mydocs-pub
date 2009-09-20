@@ -1,0 +1,44 @@
+- is it possible to create & execute select queries for which the SQL
+  is supplied at runtime rather than in the mapping XML, while still
+  retaining all the other features that queries can have (associated
+  cache model, result map, etc.). In addition, is it possible to also
+  determine the return type at runtime rather than in the XML?
+
+  (this is needed in IseeR for implementing Collection<ModelNode>
+  Repository#query(BooleanQuery), and maybe also for implementing some
+  hypthetical new query methods like Collection<ModelNode>
+  ModelNode#get(String generalizedPropName) where
+  "generalizedPropName" may be either a simple property name or
+  something like "studies.imageStacks.series")
+
+  TODO: check out the $...$ (as opposed to #...#) syntax for
+  specifying the SQL in XML. It appears that you can supply any part
+  of the SQL there, not just single values. Unfortunately you have to
+  do all the SQL quoting yourself because the supplied value must be a
+  string (there's apparently no class for PreparedStatement-like
+  "structured" query fragments)
+
+  ("Dynamic Mapped Statements" are probably insufficient)
+
+  - alternatively, get current connection (see below) and generate &
+    execute the SQL on that, but then still use iBATIS to map the
+    ResultStream to objects?
+
+- is it possible to write a query that doesn't do any JDBC operations,
+  but still uses an iBATIS-supplied cache model?
+
+  (this would be the easiest way to implement a transparent query
+  cache on the client in IseeR)
+
+- are cache models in iBATIS (the ones that you can specify for each
+  select statement in the mapping XML) simple query caches? I guess it
+  would be nice if they cached by primary key (which would imply that
+  you'd have to tell iBATIS what that key is first ... is that
+  possible?)
+
+- does the $...$ expansion happen before or after the #propname# parsing?
+
+- access the underlying java.sql.Connection of an SqlMapClient for the
+  calling thread? #getCurrentConnection() probably?
+
+  see http://opensource.atlassian.com/confluence/oss/pages/viewpage.action?pageId=15597591

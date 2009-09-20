@@ -20,6 +20,7 @@ sub rejected {
     m!\.exe$! or
     m!^./isst! or
     m!^./isst! or
+    m!^./java/test! or
     m!^./passwords.txt.asc! or
     m!scheme/test/dstruct.sc! or
     m!scheme/test/queens.sc! or
@@ -37,6 +38,8 @@ sub rejected {
          m!^./perl! or
          m!^./Makefile! or
          m!^./java/nio! or
+         m!^./java/.*?txt$! or
+         m!^./java/build-tools! or
          # m!^./svn! or
          m!^./gnus/! or
          # m!^./mediamaerkte/.*?txt$! or
@@ -50,6 +53,8 @@ sub rejected {
          m!^./bluetooth/bluetooth.txt! or
          m!^./bluetooth/rfcomm.txt! or
          m!^./internet! or
+         m!^./javascript/closure-based-oop.txt$! or
+         m!^./javascript/misc.txt$! or
          m!^./lisp/! or
          m!^./root! or
          m!^./internet$! or

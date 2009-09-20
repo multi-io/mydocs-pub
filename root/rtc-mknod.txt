@@ -1,0 +1,27 @@
+Aus der Doku zu make (menu)config:
+
+ If you enable this option and create a character special file
+x
+  x /dev/rtc with major number 10 and minor number 135 using mknod ("man
+x
+  x mknod"), you will get access to the real time clock built into your
+x
+  x computer. Every PC has such a clock built in. It can be used to
+x
+  x generate signals from as low as 1Hz up to 8192Hz, and can also be
+x
+  x used as a 24 hour alarm.  It reports status information via the file
+x
+  x /proc/rtc and its behaviour is set by various ioctls on
+x
+  x /dev/rtc. People running SMP (= multiprocessor) versions of Linux
+x
+  x should enable this option to read and set the RTC clock in a SMP
+x
+  x compatible fashion. If you think you have a use for such a device
+x
+  x (such as periodic data sampling), then say Y here, and go read the
+x
+  x file Documentation/rtc.txt for details. 
+x
+  x                                                                            

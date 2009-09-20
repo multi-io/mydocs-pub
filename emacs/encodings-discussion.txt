@@ -1,0 +1,106 @@
+08:47 < multi_io> what kind of encoding is this: utf-8, with each multi-byte
+                  sequence preceded by c2 81?
+08:51 < dalias> wtf
+08:51 < dalias> c2 81 = U+0081
+08:51 < dalias> which is a control character
+08:51 < multi_io> yeah, Emacs saved the file that way
+08:52 < dys`> maybe an utf-8 multi-byte sequence interpreted as latin-1 and
+              then encoded in utf-8 a second time?
+08:52 < dalias> dys`, nope, shouldn't cause that
+08:52 < dalias> multi_io, can you give a better description / more context?
+08:52 < dalias> if you described it slightly wrong dys` might be correct
+08:54 < multi_io> I don't know the exact circumstances, unfortunately
+08:55 < dalias> i mean just show me some more bytes of context around the
+                corrupt data
+08:56 < multi_io> well, the locale was en_US.UTF-8, the file was only ever
+                  edited with Emacs, no other tools, and I didn't do anything
+                  unusual [tm]
+08:56 < multi_io> dalias: wait
+08:56 < multi_io> dalias: can you read German?
+08:56 < dalias> i can't tell the meaning, but i can examine the characters..
+08:57 < dalias> and i might could guess the meaning
+09:02 < multi_io> well, dys` is prolly right somewhat
+09:03 < dalias> if he's right then repairing it is not so hard
+09:03 < dalias> but i could tell you better if i could see an excerpt
+09:03 < multi_io> the word is "Einflussgrößen" ("influencing variables"), the
+                  sequence is 45 69 6e 66 6c 75 73 73 67 72 c2 81 c3 b6 c2 81
+                  c3 9f 65 6e
+09:03 < multi_io> without the two c2 81's that would be the correct
+                  utf-8 AFAICT
+09:04 < dalias> hmm it looks like your system is NOT utf-8
+09:04 < dalias> because the text you sent over irc was latin1..
+09:04 < multi_io> um yeah, I typed it manually
+09:04 < dalias> ?
+09:05 < multi_io> oh, that you mean
+09:05 < dalias> ya
+09:05 < multi_io> nah, the IRC client runs on a FreeBSD with locale
+                  de_DE.ISO8859-15
+09:05 < multi_io> but that's not where the Emacs runs
+09:05 < dalias> ah
+09:07 < multi_io> I think I did this: I copied the word from a file that
+                  already looked broken in Emacs into a new buffer to "examine
+                  it seperately"! When saving that new buffer, the c2 81's
+                  appeared
+09:07 < dalias> ah
+09:08 < dalias> well what are you trying to do now?
+09:08 < dalias> just discover what happened?
+09:08 < dalias> or fix important data?
+09:09 < multi_io> in the original file, the word was encoded as 45 69 6e 66 6c
+                  75 73 73 67 72 81 f6 81 df 65 6e
+09:09 < multi_io> which is totally bogus, AFAICS
+09:10 < multi_io> it's not legal UTF-8 according to
+http://software.hixie.ch/utilities/cgi/unicode-decoder/utf8-decoder
+09:10 < dalias> that has nothing to do with utf-8
+09:10 < dalias> it's latin-1 with bogus 0x81 characters inserted
+09:12 < multi_io> I copied the file from another system (on which it looks good
+                  in Emacs), then opened it here in Emacs, and the word is
+                  displayed as Einflussgr\201ö\201ßen
+09:12 < multi_io> it's not important data, it'S just an annoyance :-P
+09:15 < dys`> i get the above byte sequence by yanking "Einflussgrößen" into a
+              new buffer and saving it with C-x RET c emacs-mule RET C-x C-s
+09:16 < dalias> multi_io, bleh send utf-8 on irc not latin-1 :P
+09:16 < dalias> anyway
+09:16 < dalias> i figured out what the encoding is
+09:16 < dalias> 0x81 is the C1 control code for "high octet present"
+09:17 < dalias> that is, in a (nasty broken legacy) environment where bit 8
+                means meta, 0x81 is the meta-control code indicating that the
+                next byte should be interpreted as a character with the high
+                bit set, and not as meta+lowchar
+09:18 < multi_io> dys`: thanks, I can reproduce that
+09:19 < dalias> ah does emacs-mule encoding use that nastiness?
+09:19 < dys`> dalias: looks like it
+09:19 < multi_io> dalias: thanks. Does that mean that "emacs-mule" is a "nasty
+                  broken legacy environment" ? :-P
+09:19 < dalias> yes
+09:19 < dalias> very much so
+09:25 < multi_io> alright then, thanks. Now, could I convert that file from
+                  emacs-mule to UTF-8?
+09:32 < dalias> multi_io, sure i don't see why not
+09:32 < dalias> as long as you make sure emacs _loads_ it as emacs-mule encoding
+09:33 < dalias> and not as latin-1
+09:33 < dalias> if emacs loads it as latin-1, then 0x81 is just U+0081
+09:34 < dalias> and it will get saved like that when you save as utf-8
+09:35 < multi_io> heh, opening it with C-x RET c emacs-mule C-x C-f filename
+                  works
+09:35 < dalias> :)
+09:35 < dalias> and please, let's let emacs-mule encoding die... :) we have
+                utf-8 for a reason
+09:36 < multi_io> well, I never requested it!  I use a UTF-8 locale like a good
+                  boy :-P
+09:36 < dalias> heh
+09:37 < dalias> the history of character encoding is really a nasty matter
+09:38 < dalias> back around the beginning of the 90's there were two equally
+                idiotic philosophies
+09:38 < dalias> the iso-2022/mule/etc. one of using escape codes and stateful
+                encoding to "switch" between different national character sets
+09:39 < dalias> that was also the ucs(iso10646) philosophy at the time
+09:40 < dalias> and the unicode philosophy, of throwing away the whole internet
+                and unix and whatnot and redefining "char" to be 16bit
+09:41 < dalias> all it took to fix the idiocy of both was the brilliance of ken
+                thompson
+09:41 < dalias> but both continued to fight against sanity and simplicity for
+                the next ~10 years...
+09:42 < dalias> it's a real shame. had they realized back then, linux would
+                have been all-utf-8 from day one
+09:42 < dalias> oh i'm sorry, day 365 or so
+09:43 < dalias> linux is about a year older than utf-8

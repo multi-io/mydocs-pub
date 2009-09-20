@@ -1,0 +1,37 @@
+Tasten im info-Browser ('info'):
+---------------------------------
+
+n,p - Weiterschalten zum nächsten/vorherigen Node
+      (entspr. ">>" / "<<" in der Windows-Hilfe)
+
+l -   Zurück zum vorher gesehenen Node (entspr. "Back" in Windows)
+
+u -   Eins höher in der Baumstruktur der Info-Hierarchie (info-tree)
+
+m -   Eins tiefer in der Baumstruktur.
+      Jeder Node hat ein "Menü", in dem alle von diesem Node aus 
+      weiter nach "unten" führenden "Zweige" der Baumstruktur aufgeführt
+      sind.
+      'm' aktiviert die Kommandozeile des Info-Viewers (Anzeige in der
+      untersten Zeile des Schirms). Dort kann man am Prompt ("Menu item:")
+      den Namen des gewünschten Menüpunkts eingeben. Die Tab-Taste (autom.
+      Vervollständigung) wird unterstützt.
+
+      Mit Strg+g kann man die Kommandozeile unverrichteter Dinge wieder
+      verlassen.
+
+      Menüpunkte sind auch im Text gekennzeichnet; man kann einen Menüpunkt
+      auch aufrufen, indem amn den Cursor auf ihn bewegt und <Enter> drückt.
+
+f -   Cross - Referenz aufrufen.
+      Jeder Knoten kann "Cross references" auf einen beliebige
+      andere Knoten enthalten, die sich ganz woanders in der Hierarchie
+      befinden können (entspr. Hyperlink im WWW).
+      Mit 'f' kann man in der Kommandozeile eine solche Crossref. aufrufen
+      (auch hier mit Tab-Taste).
+      Die CRs sind im Text durch so etwas wie *Note Name: Page
+      gekennzeichnet, man kann die Referenz auch aufrufen, indem man
+      den Cursor auf diese Markierung setzt und <Enter> drückt.
+
+g -   Zu beliebigem Knoten gehen (Eingabe des Knotens am Prompt)
+

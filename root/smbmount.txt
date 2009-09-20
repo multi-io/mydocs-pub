@@ -1,0 +1,1 @@
+/usr/sbin/smbmount //phoenix/public /mnt/smb -I phoenix.heim7.tu-clausthal.de -c stan
