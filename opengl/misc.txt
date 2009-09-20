@@ -1,0 +1,16 @@
+00:36 < multi_io> just starting to learn OpenGL, reading the reference docs
+00:37 < Jupp3> multi_io: Then discard immediate mode (glBegin() etc.) as soon as possible
+00:37 < Jupp3> It's no use learning it really
+00:40 < multi_io> ...using display lists instead?
+00:43 < Jupp3> no, vertex arrays / vbo
+00:43 < multi_io> ah, yeah, that I meant
+00:43 < Jupp3> multi_io: if you didn't notice, display lists use glBegin() etc. aswell (well usually... if you use them for geometry)
+00:44 < multi_io> still learning the terminology :)
+00:44 < Jupp3> There are just way too many immediate-mode-only tutorials around, so it's too easy to get stuck with it
+00:45 < multi_io> no, wait...
+00:45 < multi_io> reading the red book here
+00:45 < multi_io> they talk about display lists too in the beginning
+00:50 < Jupp3> Yes, display lists exist too, different concept
+00:51 < Jupp3> multi_io: Basically you "record sequences of immediate mode calls" and playback them later
+00:51 < Jupp3> multi_io: But they also share at least 2 of immediate modes biggest weaknesses (incompatible with OpenGL ES and deprecated from OpenGL 3) 
+               and introduce new one (once you create display list, you cannot modify its contents)

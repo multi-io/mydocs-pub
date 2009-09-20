@@ -1,0 +1,296 @@
+The 3D coordinate system in OpenGL is generally assumed to be
+right-handed, i.e. +x to the right, +y to the top, +z towards the
+viewer. I assume that this does't really need to be coded anywhere in
+the OpenGL implementation, though.
+
+
+Transformations in general:
+===========================
+
+object coords --(modelview matrix)---> eye coords --(projection matrix)--> device coords.[1] --(viewport params)--> 2D viewport (pixel) coords
+
+Here, object coordinates are the original object coordinates set via
+glVertex* etc. calls, eye coordinates are corresponding coordinates in
+an orthogonal coordinate system whose origin is located in the
+viewer's eye (hence the name I assume) and whose axes are somehow
+parallel resp. perpendicular to the viewing direction or
+similar. Device coordinates should generally fall within a cube of
+side length 2 around the origin, but otherwise already correspond to
+viewport (i.e. 2D output window) coordinates, which means they will
+already include the projection and thus account for things like a
+perspective or parallel projection. Finally, the viewport coordinates
+will be the actual output window (x,y) coordinates, with the z
+component corresponding to depth buffer depth values.
+
+
+Viewport Parameters
+===================
+
+viewport parameters are x, y, width, height, nearVal, farVal. They're
+set via:
+
+void glViewport(GLint x,
+ 	            GLint y,
+ 	            GLsizei width,
+ 	            GLsizei height);
+
+and
+
+void glDepthRange(GLclampd nearVal, GLclampd farVal);  // both parameters are clamped to [0,1]
+
+
+x, y, width, height specify the viewport (window) extent in the
+viewport coordinate system. nearVal, farVal must lie within [0,1] and
+specify the z location of near and far clipping planes. (...which
+apparently determine which portion of the implementation's depth
+buffer is used. nearVal==0, farVal==1 means full utilization of the
+depth buffer. TODO: elaborate)
+
+These two functions set the device -> window - transformation such
+that normalized device coordinates
+
+(xnd, ynd, znd)
+
+are transformed into window coordinates
+
+(xw, yw, zw) = ( (xnd+1)*w/2 + x, (ynd+1)*h/2 + y, nearVal + (farVal-nearVal)*(znd+1)/2 ) .
+
+i.e.
+
+device coords (xnd, ynd, znd)   ======>    window coords (xw, yw, zw)
+
+([-1...1], [-1...1], [-1...1])  ======>    ([x...x+w], [y...y+h], [nearVal...farVal])
+
+x,y will often be 0,0.
+
+So, the viewport transformation essentially transforms the cube of
+side length 2 around the origin in the device coordinate system to the
+viewport which covers [x...x+w], [y...y+h] , [nearVal...farVal].
+
+
+[1]
+
+To be precise, device coordinates are not 3, but 4 coordinates
+(xd,yd,zd,wd). These are converted to *normalized* device coordinates
+(xnd,ynd,znd) := (xd/wd, yd/wd, zd/wd), and these go into the viewport
+transformation. The wd will almost always be 1 (but not really always;
+see glFrustum() below), so (xnd,ynd,znd)=(xd,yd,zd,wd).
+
+
+
+Projection Matrix Specification
+===============================
+
+As mentioned above, the projection matrix is used to transform eye
+coordinates (i.e. coordinates relative to the viewer's eye) to device
+coordinates (i.e. coordinates which, up to simple linear viewport
+transformations, already correspond to viewport coordinates).
+
+Thus, the projection matrix will do things like parallel (orthogonal)
+or perspective projections.
+
+To set up a parallel projection, you'd normally set the projection
+matrix using the function
+
+void glOrtho(	GLdouble  	left,
+ 	GLdouble  	right,
+ 	GLdouble  	bottom,
+ 	GLdouble  	top,
+ 	GLdouble  	nearVal,
+ 	GLdouble  	farVal) .
+
+(you'd normally call glMatrixMode(GL_PROJECTION); glLoadIdentity();
+first as glOrtho() actually multiplies the current (top-of-the-stack)
+projection matrix with the one specified by the six parameters)
+
+The projection matrix specified by this glOrtho call is (with
+abbreviations l, r, b, t, n, f for the parameters):
+
+      /                                         \
+      | 2/(r-l)    0          0    -(r+l)/(r-l) |
+      |                                         |
+      | 0       2/(t-b)       0    -(t+b)/(t-b) |
+P =   |                                         |
+      | 0          0     -2/(f-n)  -(f+n)/(f-n) |
+      |                                         |
+      | 0          0          0          1      |
+      \                                         /
+
+
+..and as explained before, the device coordinates (xd,yd,zd) will then
+be calculated from the eye coordinates (xe,ye,ze) as
+
+(xd,yd,zd,1)^T = P * (xe,ye,ze,1)^T
+
+This will essentially transform
+
+eye coords (xe, ye, ze)        ======>    device coords (xd, yd, zd)
+
+([l...r], [b...t], [-n...-f])  ======>    ([-1...1], [-1...1], [-1...1])
+
+(for example, the x coordinate transformation (1st line of the matrix
+multiplication):
+
+intuitively: xd = -1 + 2 (xe-l)/(r-l)
+
+             = (2(xe-l)-r+l) / (r-l) = 1st line
+
+)
+
+
+So, e.g. the point (l,b,-n) in eye coordinates will be transformed
+into (-1,-1,-1) in device coordinates (and ultimately to (x,y,nearVal)
+in the viewport, i.e. the lower-left corner of the viewport).
+
+---
+
+To set up a perspective projection, you'd normally set the projection
+matrix using the function
+
+void glFrustum(	GLdouble  	left,
+ 	GLdouble  	right,
+ 	GLdouble  	bottom,
+ 	GLdouble  	top,
+ 	GLdouble  	nearVal,
+ 	GLdouble  	farVal) .
+
+(as with glOrtho above, you'd normally call glMatrixMode(GL_PROJECTION); glLoadIdentity();
+first)
+
+The projection matrix specified by this glFrustum call is (with
+abbreviations l, r, b, t, n, f for the parameters):
+
+      /                                           \
+      | 2n/(r-l)   0      (r+l)/(r-l)      0      |
+      |                                           |
+      | 0       2n/(t-b)  (t+b)/(t-b)      0      |
+P =   |                                           |
+      | 0          0     -(f+n)/(f-n)  -2fn/(f-n) |
+      |                                           |
+      | 0          0         -1            0      |
+      \                                           /
+
+
+..and as explained before, the device coordinates (xd,yd,zd) will then
+be calculated from the eye coordinates (xe,ye,ze) as
+
+(xd,yd,zd,wd)^T = P * (xe,ye,ze,1)^T
+
+In this case, wd will actually turn out to be unequal to 1, so the
+normalized device coordinates (xnd,ynd,znd)=(xd/wd, yd/wd, zd/wd) will
+be different from the non-normalized coordinates (xd,yd,zd). Also, the
+wd won't be constant, but wd=-ze, such that non-constant components of
+xnd and ynd will be anti-proportional to ze, which is what actually
+produces the perspective projection.
+
+In more detail:
+
+(3rd line of above matrix equation)
+
+wd = -ze
+
+(1st line of above matrix equation)
+
+xd = xe 2 n / (r-l) + ze (r+l)/(r-l)
+
+==>
+
+xdn = xd/wd = - 2 n / (r-l) xe/ze + (r+l)/(r-l)
+
+This will map e.g. (xe=l, ze=-n) to xdn=-1 and (xe = l f/n, ze=-f)
+also to xdn=-1. xdn=-1 defines the left border of the
+viewport. Analogously, the right border of the viewport (xdn=1) will
+be mapped to xe=-l at ze=-n (near clipping plane) and to xe=-lf/n at
+ze=-f (far clipping plane). Thus, all in all, this projection will
+essentially set up the viewport to be a "window" that views, in the
+eye coordinate space, a frustum that's defined in the (xe,ze) plane
+like this:
+
+
+                                                                                (i.e. right border of viewport)
+                                                                            xdn=1
+                  xe                                                   where   /--
+                  X                                                  plane /---
+                 /|\                                      eye coord.  /---
+                  |                                             | /---
+            rf/n -+---------------------------------------------+----
+                  |                                       /---  |
+                  |                                   /---      |
+                  |                                /--          |
+                  |                            /---             |
+                  |                   |    /---                 |
+                  |                   |/---                     |
+               r -+-------------------+                         |
+                  |             /---  |                         |
+                  |         /---      |                         |
+                  |     /---          |                         |
+    /             | /---              |                         |
+ze X -----viewer->--------------------+-------------------------+---------
+    \             | \---             -n                        -f
+                  |     \---          |                         |
+                  |         \---      |                         |
+                  |             \---  |                         |
+               l -+-------------------+                         |
+                  |                   |\---                     |
+                  |                   |    \---                 |
+                  |                   |        \---             |
+                  |                                \--          |
+                  |                                   \---      |
+                  |                                       \---  |
+            lf/n -+---------------------------------------------+-
+                  |                                             | \---
+                  |                                      eye coord.   \---
+                  |                                             | plane   \---
+                  |                                             |    where    \--
+                                                                         xdn=-1
+                                                                            (i.e. left border of viewport)
+
+
+(the frustum is bordered by the xdn=-1 and xdn=1 planes as well as the
+ze=-n and ze=-f planes)
+
+As described above, xdn=-1 will be mapped by the glViewport function
+to the left border of the viewport, and xdn=1 will be mapped to the
+right border of the viewport.
+
+
+Analogously, in the (ye,ze) plane, the frustum is defined like this:
+
+
+                                                                                (i.e. top border of viewport)
+                                                                            ydn=1
+                  ye                                                   where   /--
+                  X                                                  plane /---
+                 /|\                                      eye coord.  /---
+                  |                                             | /---
+            tf/n -+---------------------------------------------+----
+                  |                                       /---  |
+                  |                                   /---      |
+                  |                                /--          |
+                  |                            /---             |
+                  |                   |    /---                 |
+                  |                   |/---                     |
+               t -+-------------------+                         |
+                  |             /---  |                         |
+                  |         /---      |                         |
+                  |     /---          |                         |
+    /             | /---              |                         |
+ze X -----viewer->--------------------+-------------------------+---------
+    \             | \---             -n                        -f
+                  |     \---          |                         |
+                  |         \---      |                         |
+                  |             \---  |                         |
+               b -+-------------------+                         |
+                  |                   |\---                     |
+                  |                   |    \---                 |
+                  |                   |        \---             |
+                  |                                \--          |
+                  |                                   \---      |
+                  |                                       \---  |
+            bf/n -+---------------------------------------------+-
+                  |                                             | \---
+                  |                                      eye coord.   \---
+                  |                                             | plane   \---
+                  |                                             |    where    \--
+                                                                         ydn=-1
+                                                                            (i.e. bottom border of viewport)

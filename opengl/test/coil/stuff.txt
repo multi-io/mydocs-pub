@@ -1,0 +1,10 @@
+
+x(ah,aw) = coil_radius * cos(ah) + wire_radius * cos(aw) * cos(ah)
+
+
+
+y(ah,aw) = coil_bottom + coil_dh * mesh_h + wire_radius * sin(aw)
+
+
+
+z(ah,aw) = coil_radius * sin(ah) + wire_radius * cos(aw) * sin(ah)
