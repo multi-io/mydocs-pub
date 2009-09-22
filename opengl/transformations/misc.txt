@@ -1,6 +1,6 @@
 The 3D coordinate system in OpenGL is generally assumed to be
 right-handed, i.e. +x to the right, +y to the top, +z towards the
-viewer. I assume that this does't really need to be coded anywhere in
+viewer. I assume that this doesn't really need to be coded anywhere in
 the OpenGL implementation, though.
 
 
@@ -12,15 +12,16 @@ object coords --(modelview matrix)---> eye coords --(projection matrix)--> devic
 Here, object coordinates are the original object coordinates set via
 glVertex* etc. calls, eye coordinates are corresponding coordinates in
 an orthogonal coordinate system whose origin is located in the
-viewer's eye (hence the name I assume) and whose axes are somehow
-parallel resp. perpendicular to the viewing direction or
-similar. Device coordinates should generally fall within a cube of
-side length 2 around the origin, but otherwise already correspond to
-viewport (i.e. 2D output window) coordinates, which means they will
-already include the projection and thus account for things like a
-perspective or parallel projection. Finally, the viewport coordinates
-will be the actual output window (x,y) coordinates, with the z
-component corresponding to depth buffer depth values.
+viewer's eye (hence the name I assume), whose x axis points to the
+right, y axis to the top, z axis towards the viewer (so the viewing
+direction is "down the z axis", i.e. in -z direction). Device
+coordinates should generally fall within a cube of side length 2
+around the origin, but otherwise already correspond to viewport
+(i.e. 2D output window) coordinates, which means they will already
+include the projection and thus account for things like a perspective
+or parallel projection. Finally, the viewport coordinates will be the
+actual output window (x,y) coordinates, with the z component
+corresponding to depth buffer depth values.
 
 
 Viewport Parameters
@@ -294,3 +295,75 @@ ze X -----viewer->--------------------+-------------------------+---------
                   |                                             |    where    \--
                                                                          ydn=-1
                                                                             (i.e. bottom border of viewport)
+
+
+Matrix algebra, OGL matrix manipulation APIs
+============================================
+
+generally, with M1 and M2 matrices and x a point, the following holds:
+
+M1*(M2*x) = (M1*M2)*x     [1]
+
+..which means that if a transformation M1 is to be executed after a
+transformation M2, M1 must be multiplied with M2 from the left to get
+the combined transformation.
+
+the Matrix operations in OGL (manipulate the top-of-the-matrix-stack
+matrix of the currently set matrix mode) all multiply the new matrix
+from the left.
+
+glMultMatrix(M)
+
+==> TopOfStack := TopOfStack * M
+
+glTranslate(), glRotate() etc. are all based on glMultMatrix().
+
+
+conventions
+===========
+
+(as used in my coil example app)
+
+coordinate systems:
+
+- object coordinate system
+
+  - system relative to a specific 3D object, regardless of where that
+    object is located in the world coordinate system (see
+    below). E.g. for a sphere, the origin of this system would
+    normally always be in the center
+
+  - the one in which vertices given to glVertex etc. live. You would
+    not normally want to issue these in world coordinates because
+    you'd then have to transform every vertex yourself rather than
+    letting OGL do that
+
+  - TODO: sub-objects
+
+- world coordinate system
+
+  - as the name suggests. Non-moving objects have time-constant
+    coordinates here
+
+
+- eye coordinate system
+
+  - see beginning of this document. coordinates relative to the
+    eye/camera location and viewing direction. So, if the viewer
+    changes his viewing direction, the vertices of non-moving (in
+    world coordinates) objects would all change accordingly
+
+
+When drawing objects (glVertex() etc.), the complete object->eye
+coordinate transformation should be loaded in the GL_MODELVIEW
+matrix. This one can be calculated as:
+
+T_{object->eye} = T_{world->eye} * T_{object->world}
+
+Because of [1], this means that we first convert object->world and
+then world->eye, which is correct.
+
+For programming this, because of [2], you would normally first push
+T_{world->eye} (i.e. "camera position transformation") onto the
+GL_MODELVIEW stack, and then, for each object, push the
+T_{object->world}, draw the object, and pop the last matrix again.

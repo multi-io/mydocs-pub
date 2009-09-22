@@ -52,7 +52,19 @@ static void initCoilsAndViewer() {
 static const GLdouble vpWidthInWorldCoords = 100;
 
 // in perspective (glFrustum) projection: angular width of viewport in radiants
-static const GLdouble vpWidthInRadiants = 1.1;
+/*
+05:31 < multi_io> what angular resolution (angle per pixel) do you usually choose for perspective (glFrustum) projections?
+05:32 < multi_io> or do you choose a specific angular width and height of the viewport?
+05:41 < SolraBizna> the latter
+05:50 < multi_io> ok
+05:51 < multi_io> what would be a common value for that? Are there any conventions/standards?
+05:51 < SolraBizna> at least one OpenGL reference recommends calculating the actual angular width of the window from the perspective of the person using 
+                    the computer
+05:52 < SolraBizna> in practice, values between 30 and 60 work pretty well
+
+(0.9 rad = 51.... degrees)
+ */
+static const GLdouble vpWidthInRadiants = 0.9;
 
 static void setupEye2ViewportTransformation() {
     glMatrixMode(GL_PROJECTION);
