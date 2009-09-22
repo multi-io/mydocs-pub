@@ -2,33 +2,92 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <vector>
+
 #include <GL/gl.h>   // OpenGL itself.
 #include <GL/glu.h>  // GLU support library.
 #include <GL/glut.h> // GLUT support library.
 
-// width of viewport in object coords
+#include "linalg.h"
 
-// (viewport will display object coord. (0,0,0) at its center, with
-// object coord. x axis parallel to viewport x axis, and object
-// coord. z axis perpendicular to the viewing plane)
-static const GLdouble vpWidthInObjCoords = 100;
+using namespace std;
 
 // viewport dimensions. updated on window resizes
 static unsigned vpWidth, vpHeight;
 
-static void setupObj2ViewportTransformation() {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+typedef GLdouble Point3D[3];    // {x,y,z}
+
+struct Coil {
+    Point3D locationInWorld;
+    GLdouble rotAngle;
+};
+
+static vector<Coil> coils;
+
+struct Viewer {
+    Matrix3D worldToEyeCoordTransform;
+};
+
+static Viewer theViewer;
+
+
+static void initCoilsAndViewer() {
+    // wanted to misuse current OGL matrix stack for matrix operations,
+    // but glGetDoublev() doesn't do anything.
+    // < AlastairLynn> you really should avoid glGet. It can cause pipeline stalls
+    
+    fillIdentity(theViewer.worldToEyeCoordTransform);
+
+    Coil coil1;
+    coil1.locationInWorld[0] = 15;
+    coil1.locationInWorld[1] = 0;
+    coil1.locationInWorld[2] = -70;
+    coil1.rotAngle = 0;
+
+    coils.push_back(coil1);
+}
+
+
+// in isometric (glOrtho) projection: width of viewport in world coords
+static const GLdouble vpWidthInWorldCoords = 100;
+
+// in perspective (glFrustum) projection: angular width of viewport in radiants
+static const GLdouble vpWidthInRadiants = 1.1;
+
+static void setupEye2ViewportTransformation() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    GLdouble vpHeightInObjCoords = vpWidthInObjCoords * vpHeight / vpWidth;
-    glOrtho(-vpWidthInObjCoords/2,  //	GLdouble  	left, 
-            vpWidthInObjCoords/2,   //    GLdouble  	right, 
+
+    /*
+    // isometric projection
+    GLdouble vpHeightInObjCoords = vpWidthInWorldCoords * vpHeight / vpWidth;
+    glOrtho(-vpWidthInWorldCoords/2,  //	GLdouble  	left, 
+            vpWidthInWorldCoords/2,   //    GLdouble  	right, 
             -vpHeightInObjCoords/2, //    GLdouble  	bottom, 
             vpHeightInObjCoords/2,  //    GLdouble  	top, 
-            -100, //  GLdouble  	nearVal, 
-            100   //  GLdouble  	farVal
+            -1000, //  GLdouble  	nearVal, 
+            1000   //  GLdouble  	farVal
             );
+    */
+
+    // perspective projection
+    GLdouble nearVal = 5;
+    GLdouble farVal = 150;
+    GLdouble vpHeightInRadiants = vpWidthInRadiants * vpHeight / vpWidth;
+    GLdouble right = nearVal * tan(vpWidthInRadiants/2);
+    GLdouble left = -right;
+    GLdouble top = nearVal * tan(vpHeightInRadiants/2);
+    GLdouble bottom = -top;
+
+    glFrustum(left,
+              right,
+              bottom,
+              top,
+              nearVal,
+              farVal
+              );
+
+    // eye coord -> viewport transformation
     glViewport(0, //GLint x, 
                0, //GLint y, 
                vpWidth, //GLsizei width, 
@@ -37,6 +96,7 @@ static void setupObj2ViewportTransformation() {
     glDepthRange(0,1);
 }
 
+// these should be per-coil eventually
 static const GLdouble coil_radius = 15;
 static const GLdouble wire_radius = 3;
 static const GLdouble coil_height = 40;
@@ -56,7 +116,10 @@ static void mesh2objCoord(GLdouble ah, GLdouble aw, GLdouble *x, GLdouble *y, GL
     *z = coil_radius * sin(ah) + wire_radius * cos(aw) * sin(ah);
 }
 
-static void display() {
+
+static void drawCoil(const Coil &c) {
+    printf("Drawing coil at %lf, %lf, %lf\n", c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
+    glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT);
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1, 0, 0);
     for (unsigned mesh_h = 0; mesh_h < mesh_count_h; mesh_h++) {
@@ -72,13 +135,31 @@ static void display() {
         }
         glEnd();
     }
+    glPopAttrib();
+}
+
+
+static void display() {
+    printf("re-displaying...\n");
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMultMatrixd(theViewer.worldToEyeCoordTransform);
+    for (vector<Coil>::iterator it = coils.begin(); it != coils.end(); it++) {
+        const Coil &c = *it;
+        glPushMatrix();
+        glTranslated(c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
+        // TODO: process c.rotAngle too
+        drawCoil(c);
+        glPopMatrix();
+    }
     glFlush();
 }
 
 static void reshape(int w, int h) {
+    printf("Reshaping to (%i, %i)\n", w, h);
     vpWidth = w;
     vpHeight = h;
-    setupObj2ViewportTransformation();
+    setupEye2ViewportTransformation();
 }
 
 int main(int argc, char **argv) {
@@ -88,7 +169,8 @@ int main(int argc, char **argv) {
     vpWidth = 800;
     vpHeight = 600;
     glutInitWindowSize(vpWidth, vpHeight);
-    setupObj2ViewportTransformation();
+    initCoilsAndViewer();
+    setupEye2ViewportTransformation();
     glutCreateWindow("Coil");
     glClearColor(0,0,0,0);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -98,3 +180,7 @@ int main(int argc, char **argv) {
     glutMainLoop();
     return 0;
 }
+
+
+// TODO: proper classes for Point3D, Matrix3D, Coil, Viewer; move
+// stuff into methods
