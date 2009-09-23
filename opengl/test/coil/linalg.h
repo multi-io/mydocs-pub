@@ -9,4 +9,15 @@ void fillZeros(GLdouble *m);
 
 void fillIdentity(GLdouble *m);
 
+/**
+ * Like glRotated with a being the previous and res becoming the
+ * following top-of-stack
+ */
+void fillRotation(const GLdouble *a,
+                  GLfloat  	angle, 
+                  GLfloat  	x, 
+                  GLfloat  	y, 
+                  GLfloat  	z,
+                  GLdouble *res);
+
 #endif
