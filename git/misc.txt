@@ -81,3 +81,10 @@ so. Issue "git remote -v" to see all defined remote aliases, "git
 remote add name url" to add a new one, etc.
 
 To pull changes from it, use "git pull <remotename> <branch>"   
+
+
+
+
+TODO: branching/merging
+
+- common workflow: merge branches, topic branches
