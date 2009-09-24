@@ -17,6 +17,8 @@ static unsigned vpWidth, vpHeight;
 
 typedef GLdouble Point3D[3];    // {x,y,z}
 
+static Matrix3D identityTransform;
+
 struct Coil {
     Point3D locationInWorld;
     GLdouble rotAngle;
@@ -83,8 +85,8 @@ static void setupEye2ViewportTransformation() {
     */
 
     // perspective projection
-    GLdouble nearVal = 5;
-    GLdouble farVal = 150;
+    GLdouble nearVal = 3;
+    GLdouble farVal = 300;
     GLdouble vpHeightInRadiants = vpWidthInRadiants * vpHeight / vpWidth;
     GLdouble right = nearVal * tan(vpWidthInRadiants/2);
     GLdouble left = -right;
@@ -174,7 +176,111 @@ static void reshape(int w, int h) {
     setupEye2ViewportTransformation();
 }
 
+static void keyboardCallback(unsigned char key, int x, int y) {
+    printf("keyboardCallback(%c)\n", key);
+}
+
+static void specialKeyboardCallback(int key, int x, int y) {
+    int modifiers = glutGetModifiers();
+    printf("specialKeyboardCallback(key=%i, modifiers=%i)\n", key, modifiers);
+    int changed = 0;
+    Matrix3D newViewerTransform;
+    Matrix3D viewerDeltaTransform;
+    if (modifiers & GLUT_ACTIVE_CTRL) {
+        // translation
+        const double stepWidth = 5;
+        double tx, ty, tz;
+        switch (key) {
+        case GLUT_KEY_UP:
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                tx = 0; ty = -stepWidth; tz = 0;
+            } else {
+                tx = 0; ty = 0; tz = stepWidth;
+            }
+            changed = 1;
+            break;
+
+        case GLUT_KEY_DOWN:
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                tx = 0; ty = stepWidth; tz = 0;
+            } else {
+                tx = 0; ty = 0; tz = -stepWidth;
+            }
+            changed = 1;
+            break;
+
+        case GLUT_KEY_LEFT:
+            tx = stepWidth; ty = 0; tz = 0;
+            changed = 1;
+            break;
+
+        case GLUT_KEY_RIGHT:
+            tx = -stepWidth; ty = 0; tz = 0;
+            changed = 1;
+            break;
+
+        }
+        if (changed) {
+            printf("translating by (%lf, %lf, %lf)\n", tx, ty, tz);
+            fillTranslation(identityTransform, tx, ty, tz, viewerDeltaTransform);
+        }
+    } else {
+        // rotation
+        const double angle = 5; // degrees
+        double rotAngle;  // degrees
+        double rotAxisX, rotAxisY, rotAxisZ;
+        switch (key) {
+        case GLUT_KEY_UP:
+            rotAxisX = 1; rotAxisY = 0; rotAxisZ = 0;
+            rotAngle = angle;
+            changed = 1;
+            break;
+
+        case GLUT_KEY_DOWN:
+            rotAxisX = 1; rotAxisY = 0; rotAxisZ = 0;
+            rotAngle = -angle;
+            changed = 1;
+            break;
+
+        case GLUT_KEY_LEFT:
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                rotAxisX = 0; rotAxisY = 1; rotAxisZ = 0;
+            } else {
+                rotAxisX = 0; rotAxisY = 0; rotAxisZ = 1;
+            }
+            rotAngle = -angle;
+            changed = 1;
+            break;
+
+        case GLUT_KEY_RIGHT:
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                rotAxisX = 0; rotAxisY = 1; rotAxisZ = 0;
+            } else {
+                rotAxisX = 0; rotAxisY = 0; rotAxisZ = 1;
+            }
+            rotAngle = angle;
+            changed = 1;
+            break;
+
+        }
+        if (changed) {
+            printf("rotating by %lf around (%lf, %lf, %lf)\n", rotAngle, rotAxisX, rotAxisY, rotAxisZ);
+            fillRotation(identityTransform, rotAngle, rotAxisX, rotAxisY, rotAxisZ, viewerDeltaTransform);
+        }
+    }
+    if (changed) {
+        fillMultiplication(viewerDeltaTransform, theViewer.worldToEyeCoordTransform, newViewerTransform);
+        copyMatrix3D(newViewerTransform, theViewer.worldToEyeCoordTransform);
+        glutPostRedisplay();
+    }
+}
+
+static void idleCallback() {
+    //printf("idleCallback\n");
+}
+
 int main(int argc, char **argv) {
+    fillIdentity(identityTransform);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA /* | GLUT_DEPTH */);
     glutInitWindowPosition(200,100);
@@ -189,6 +295,9 @@ int main(int argc, char **argv) {
     glShadeModel(GL_FLAT);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboardCallback);
+    glutSpecialFunc(specialKeyboardCallback);
+    //glutIdleFunc(idleCallback);
     glutMainLoop();
     return 0;
 }

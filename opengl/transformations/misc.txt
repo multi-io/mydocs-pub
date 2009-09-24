@@ -308,13 +308,16 @@ M1*(M2*x) = (M1*M2)*x     [1]
 transformation M2, M1 must be multiplied with M2 from the left to get
 the combined transformation.
 
-the Matrix operations in OGL (manipulate the top-of-the-matrix-stack
+The Matrix operations in OGL (manipulate the top-of-the-matrix-stack
 matrix of the currently set matrix mode) all multiply the new matrix
-from the left.
+from the right:
 
 glMultMatrix(M)
 
 ==> TopOfStack := TopOfStack * M
+
+...resulting in a combined transformation that would first perform the
+new transformation M and then the previous TopOfStack transformation.
 
 glTranslate(), glRotate() etc. are all based on glMultMatrix().
 
@@ -322,7 +325,7 @@ glTranslate(), glRotate() etc. are all based on glMultMatrix().
 conventions
 ===========
 
-(as used in my coil example app)
+(maybe just mine)
 
 coordinate systems:
 

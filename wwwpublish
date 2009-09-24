@@ -68,7 +68,8 @@ sub rejected {
          m!^./xgalaga/prizes/Makefile$! or
          m!^./xgalaga/prizes/.*?xpm$! or
          m!^./xgalaga/prizes/.*?png$! or
-         m!^./wwwpublish!
+         m!^./wwwpublish! or
+         m!^./opengl/transformations/misc.txt$!
         );
 }
 

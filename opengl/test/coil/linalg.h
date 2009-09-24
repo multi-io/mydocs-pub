@@ -20,4 +20,14 @@ void fillRotation(const GLdouble *a,
                   GLfloat  	z,
                   GLdouble *res);
 
+void fillTranslation(const GLdouble *a,
+                     GLfloat  	tx, 
+                     GLfloat  	ty, 
+                     GLfloat  	tz,
+                     GLdouble *res);
+
+void fillMultiplication(const GLdouble *a, const GLdouble *b, GLdouble *res);
+
+void copyMatrix3D(const GLdouble *src, GLdouble *dest);
+
 #endif

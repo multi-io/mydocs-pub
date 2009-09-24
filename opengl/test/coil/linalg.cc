@@ -23,8 +23,9 @@ void fillRotation(const GLdouble *a,
                   GLfloat  	y, 
                   GLfloat  	z,
                   GLdouble *res) {
+    // res := a * (rotation matrix defined by angle, x, y, z)
     // (straight from http://www.opengl.org/sdk/docs/man/xhtml/glRotate.xml)
-    GLdouble aRad = angle / 180 * M_PI;
+    GLdouble aRad = angle * M_PI / 180;
     GLdouble c = cos(aRad);
     GLdouble s = sin(aRad);
 
@@ -47,4 +48,37 @@ void fillRotation(const GLdouble *a,
     res[13] = 0;
     res[14] = 0;
     res[15] = 1;
+}
+
+
+void fillTranslation(const GLdouble *a,
+                     GLfloat  	tx, 
+                     GLfloat  	ty, 
+                     GLfloat  	tz,
+                     GLdouble *res) {
+    Matrix3D tm;
+    fillIdentity(tm);
+    tm[12] = tx;
+    tm[13] = ty;
+    tm[14] = tz;
+    fillMultiplication(a, tm, res);
+}
+
+void fillMultiplication(const GLdouble *a, const GLdouble *b, GLdouble *res) {
+    for (int rr = 0; rr < 4; rr++) {
+        for (int rc = 0; rc < 4; rc++) {
+            int ri = rc * 4 + rr;
+            res[ri] = 0;
+            for (int i = 0; i < 4; i++) {
+                res[ri] += a[i * 4 + rr] * b[rc * 4 + i];
+            }
+        }
+    }
+}
+
+
+void copyMatrix3D(const GLdouble *src, GLdouble *dest) {
+    for (int i = 0; i < 16; i++) {
+        dest[i] = src[i];
+    }
 }
