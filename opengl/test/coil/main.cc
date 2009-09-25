@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #include <vector>
 
@@ -17,11 +18,19 @@ static unsigned vpWidth, vpHeight;
 
 typedef GLdouble Point3D[3];    // {x,y,z}
 
+typedef GLdouble GlColor[4];    // {r,g,b,a}
+
+static const GlColor GLCOLOR_RED     = {1,0,0,1};
+static const GlColor GLCOLOR_GREEN   = {0,1,0,1};
+static const GlColor GLCOLOR_BLUE    = {0,0,1,1};
+static const GlColor GLCOLOR_WHITE   = {1,1,1,1};
+
 static Matrix3D identityTransform;
 
 struct Coil {
     Point3D locationInWorld;
     GLdouble rotAngle;
+    GlColor color;
 };
 
 static vector<Coil> coils;
@@ -44,9 +53,18 @@ static void initCoilsAndViewer() {
     coil1.locationInWorld[0] = 15;
     coil1.locationInWorld[1] = 0;
     coil1.locationInWorld[2] = -70;
+    memcpy(coil1.color, GLCOLOR_RED, sizeof(coil1.color));
     coil1.rotAngle = 0;
 
+    Coil coil2;
+    coil2.locationInWorld[0] = -20;
+    coil2.locationInWorld[1] = 15;
+    coil2.locationInWorld[2] = -110;
+    memcpy(coil2.color, GLCOLOR_GREEN, sizeof(coil1.color));
+    coil2.rotAngle = 0;
+
     coils.push_back(coil1);
+    coils.push_back(coil2);
 }
 
 
@@ -134,8 +152,7 @@ static void mesh2objCoord(GLdouble ah, GLdouble aw, GLdouble *x, GLdouble *y, GL
 static void drawCoil(const Coil &c) {
     printf("Drawing coil at %lf, %lf, %lf\n", c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
     glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(1, 0, 0);
+    glColor3dv(c.color);
     for (unsigned mesh_h = 0; mesh_h < mesh_count_h; mesh_h++) {
         GLdouble ah = mesh_h * mesh_da_h;
         glBegin(GL_TRIANGLE_STRIP);
@@ -155,6 +172,7 @@ static void drawCoil(const Coil &c) {
 
 static void display() {
     printf("re-displaying...\n");
+    glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glMultMatrixd(theViewer.worldToEyeCoordTransform);
@@ -166,6 +184,7 @@ static void display() {
         drawCoil(c);
         glPopMatrix();
     }
+
     glFlush();
 }
 
@@ -184,7 +203,6 @@ static void specialKeyboardCallback(int key, int x, int y) {
     int modifiers = glutGetModifiers();
     printf("specialKeyboardCallback(key=%i, modifiers=%i)\n", key, modifiers);
     int changed = 0;
-    Matrix3D newViewerTransform;
     Matrix3D viewerDeltaTransform;
     if (modifiers & GLUT_ACTIVE_CTRL) {
         // translation
@@ -269,6 +287,7 @@ static void specialKeyboardCallback(int key, int x, int y) {
         }
     }
     if (changed) {
+        Matrix3D newViewerTransform;
         fillMultiplication(viewerDeltaTransform, theViewer.worldToEyeCoordTransform, newViewerTransform);
         copyMatrix3D(newViewerTransform, theViewer.worldToEyeCoordTransform);
         glutPostRedisplay();
@@ -291,7 +310,7 @@ int main(int argc, char **argv) {
     setupEye2ViewportTransformation();
     glutCreateWindow("Coil");
     glClearColor(0,0,0,0);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glShadeModel(GL_FLAT);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
