@@ -172,7 +172,7 @@ static void drawCoil(const Coil &c) {
 
 static void display() {
     printf("re-displaying...\n");
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glMultMatrixd(theViewer.worldToEyeCoordTransform);
@@ -301,7 +301,7 @@ static void idleCallback() {
 int main(int argc, char **argv) {
     fillIdentity(identityTransform);
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA /* | GLUT_DEPTH */);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowPosition(200,100);
     vpWidth = 800;
     vpHeight = 600;
@@ -309,6 +309,7 @@ int main(int argc, char **argv) {
     initCoilsAndViewer();
     setupEye2ViewportTransformation();
     glutCreateWindow("Coil");
+    glEnable(GL_DEPTH_TEST);  // has to be done after glutCreateWindow -- why?
     glClearColor(0,0,0,0);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glShadeModel(GL_FLAT);
