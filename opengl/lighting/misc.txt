@@ -1,0 +1,81 @@
+- lighting enabled globally via glEnable(GL_LIGHTING) (needed to be
+  called only once)
+
+- up to 8 light sources, GL_LIGHT0 ... GL_LIGHT7 (??)
+
+  - enabled separately via glEnabled(GL_LIGHT[0..7])
+
+- 3 kinds of things light properties are applied to:
+
+  - per - light source properties, set via glLight*
+
+    - examples of such properties:
+
+      - ambient, diffuse, specular color of the light
+
+      - position of the light
+
+        - specified as (x,y,z,w)
+
+        - with w=0: directional light (infinitely far away)
+
+        - multiplied with the modelview matrix that's in effect at the
+          time of the glLight* call to give the position in eye
+          coordinates, which is the one that's saved
+
+          - thus, to get a light that's positioned relative to the
+            camera rather than somewhere in the world cosy (i.e.,
+            moves with the viewer), set the position immediately after
+            glLoadIdentity() of the modelview matrix, before setting
+            any object->world or world->camera transformations
+
+      - constant, linear and quadratic attenuation factors
+
+        - ...ultimate intensity of a vertex at distance D from the
+          light will be determined as 1/(fC + fL*D + fQ*D^2) (plus
+          spot directions...)
+
+      - if the light is a spotlight, rather than one that's shining in
+        all directions: spot direction, cone angle ("cutoff angle"),
+        spot exponent (attenuation as you get farther away from the
+        center line of the cone)
+
+  - per - object light properties ("material properties"), set via
+    glMaterial*
+
+    - ambient, diffuse, specular, emissive color of the material
+
+       - ambient and diffuse normally the same
+
+       - ambient = global backlight affecting all surfaces euqally
+
+       - diffuse = diffuse reflection, i.e. surface color/brightness
+         depends on the angle of the surface normal relative to the
+         light direction, but not on the viewing direction
+
+       - specular = directed reflection, i.e. light "bounces off" in a
+         specific direction (with incoming = outgoing angles), so the
+         location of the viewer also determines the seen color
+
+    - specular exponent ("shininess")
+
+      - value between 0.0 and 128.0...
+
+    - seen color caused by lighting is always calculated for the
+      vertices of a polygon only and then interpolated in between, so
+      for more realistic lighting, the polygons have to be
+      comparatively small
+
+  - global light properties, set via glLightModel*
+
+    - global ambient light color
+
+    - whether or not the viewer's position is accounted for when
+      calculating specular reflection angles...
+
+    - whether both sides or just the front sides of polygons should be
+      shaded correctly (many times, all back sides are insivisible, in
+      which case it is faster to not have to consider them)
+
+    - whether specular color is calculated separately from ambient and
+      diffuse
