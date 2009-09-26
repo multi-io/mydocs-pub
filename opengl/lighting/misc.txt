@@ -41,7 +41,7 @@
         center line of the cone)
 
   - per - object light properties ("material properties"), set via
-    glMaterial*
+    glMaterial* or glColor* + glColorMaterial
 
     - ambient, diffuse, specular, emissive color of the material
 
@@ -57,6 +57,8 @@
          specific direction (with incoming = outgoing angles), so the
          location of the viewer also determines the seen color
 
+       - ambient and diffuse color should normally be the same
+
     - specular exponent ("shininess")
 
       - value between 0.0 and 128.0...
@@ -65,6 +67,21 @@
       vertices of a polygon only and then interpolated in between, so
       for more realistic lighting, the polygons have to be
       comparatively small
+
+    - as a basic rule, the R,G,B components of the seen color are
+      obtained by multiplying the respective component of the light
+      witht that of the material. (this if of course done for all
+      light sources and types of light as well as for the global
+      ambient light, and the results are properly rescaled and added)
+
+    - properties may be specified separately for the front and back
+      sides of the polygons
+
+    - rather than using glMaterial* to set all these parameters
+      separately, you can also use glColor* to set them, provided you
+      previously used glColorMaterial to specifiy which of the above
+      property the glColor should apply to. This is useful if you want
+      to change just one property very often when drawing vertices.
 
   - global light properties, set via glLightModel*
 
