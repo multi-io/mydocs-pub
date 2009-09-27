@@ -14,3 +14,95 @@
 00:51 < Jupp3> multi_io: Basically you "record sequences of immediate mode calls" and playback them later
 00:51 < Jupp3> multi_io: But they also share at least 2 of immediate modes biggest weaknesses (incompatible with OpenGL ES and deprecated from OpenGL 3) 
                and introduce new one (once you create display list, you cannot modify its contents)
+
+
+=======================================
+
+
+05:56 < multi_io> are display lists deprecated?
+05:56 < multi_io> (in OGL 3.1)
+05:57 < L-Spiro> I believe so but I am not an expert.
+05:58 < multi_io> I'm wondering about the relative merits of display lists vs. vertex buffers
+05:59 < multi_io> both seem to be means to handle vertex generation on the server / GPU, right?
+06:00 < L-Spiro> One is slow, the other is super-slow.
+06:00 < multi_io> oh :-P
+06:00 < multi_io> so what is fast then?
+06:01 < L-Spiro> VBO will be the fastest you can get when available.
+06:01 < L-Spiro> If not available, fall back on vertex buffers.
+06:02 < L-Spiro> (Though using shaders is the fastest way.)
+06:02 < L-Spiro> Should be if you code them right.
+06:02 -!- hax0r1337 [n=nfm@c-71-201-7-44.hsd1.il.comcast.net] has joined ##OpenGL
+06:03 < multi_io> ok, wait...
+06:04 < multi_io> I'm a newbee, not sure about the terminology
+06:04 -!- dododomo [n=alpha@69.106.58.79] has quit [Read error: 104 (Connection reset by peer)]
+06:04 < multi_io> so, the preferred way (excluding shaders) is vertex buffers
+06:04 < multi_io> eh..
+06:05 -!- braden_ [n=braden@ip72-205-34-41.dc.dc.cox.net] has joined ##OpenGL
+06:05 < multi_io> I mean buffer objects containing vertices
+06:05 -!- hax0r1337 [n=nfm@c-71-201-7-44.hsd1.il.comcast.net] has quit [Remote closed the connection]
+06:05 < multi_io> which are called "VBOs", right?
+06:06 < multi_io> (the red book doesn't seem to use the term "VBO" anywhere)
+06:07 < boghog> they are basically vertex arrays, but wrapped in buffer objects
+06:09 < Obfuscate> multi_io: Yes. I think L-Spiro is saying vertex buffer where he means vertex array.
+06:09 < boghog> vertex arrays without using buffer objects live in client-side memory, buffer objects 
+                allow them to live on the GPU in VRAM as far as I know, which makes VBOs a lot faster
+06:09 < multi_io> yeah, I see
+06:10 -!- exobyte [n=exobyte@user-64-9-236-71.googlewifi.com] has joined ##opengl
+06:10 < multi_io> but what about display lists then? Shouldn't they be able to live on the server as 
+                  well?
+06:10 < multi_io> they're immutable and all...
+06:11 < boghog> I guess they can yeah, and from what I understand (which isnt terribly much), if you're 
+                not using VBOs, displaylists are the next best choice
+06:13 -!- skoskav [n=nnscript@c-3a9072d5.019-125-73746f3.cust.bredbandsbolaget.se] has quit [Read error: 
+          104 (Connection reset by peer)]
+06:13 < exobyte> is there a way to do specular highlights on a texture in opengl es?
+06:13 -!- skoskav [n=nnscript@c-3a9072d5.019-125-73746f3.cust.bredbandsbolaget.se] has joined ##OpenGL
+06:14 -!- hax0r1337 [n=nfm@c-71-201-7-44.hsd1.il.comcast.net] has joined ##OpenGL
+06:17 < multi_io> hm, ok. So you guys basically never use display lists?
+06:17 < R0b0t1> ^ that question is relevant to my interests.
+06:18 -!- braden__ [n=braden@ip72-205-34-41.dc.dc.cox.net] has joined ##OpenGL
+06:20 -!- dododomo [n=alpha@69.106.57.124] has joined ##OpenGL
+06:20 < boghog> I actually use them to pack a whole bunch of material state changes together, but I 
+                think that it is pointless and will probably rip it out of my code at some point when I 
+                actually get to benchmark it
+06:22 < Obfuscate> multi_io: I did at one point, but that was quite a while ago. Note that they're 
+                   removed from the opengl 3.2 core profile.
+06:36 < L-Spiro> multi_io, never used them and never will.
+06:37 < multi_io> ok, thanks
+06:43 < RTFM_FTW> - the reason VAs w/o VBO are slow is due to the fact that the server must copy the 
+                  resulting (vertex, ... ) data from the client -> server on a per draw call basis
+06:43 < RTFM_FTW> - this is due to the fact that the server has no way of knowing whether or not the 
+                  underlying memory was manipulated by the client before a draw call is executed
+06:44 < L-Spiro> Did you see my modifications based on your suggestions, RTFM_FTW?
+06:44 < RTFM_FTW> - the server itself will draw with a copy of that data in local VRAM
+06:44 < L-Spiro> I only have 5 minutes and I am out of ideas.
+06:45 < RTFM_FTW> - do you actually have a 5:6:5 FB? ...I'm guessing not if that isn't working
+06:45 < RTFM_FTW> - I'd suggest tracking down the actual FB format first...
+06:45 < L-Spiro> Not using frame buffers for this.
+06:45 < multi_io> RTFM_FTW: yes, I was mistaking vertex arrays for buffer objects containing vertices
+06:45 < L-Spiro> Err oops, I meant FBO.
+06:45 < L-Spiro> The actual frame buffer is R8G8B8.
+06:46 < L-Spiro> Which is what my previous code was handling.
+06:46 < multi_io> I understand that vertex arrays can't be fast
+06:46 < L-Spiro> But the call to glCopyTexSubImage2D() will convert to my texture format for me.
+06:46 < L-Spiro> So it can't be that.
+06:47 < L-Spiro> Do I need to manually change GL_READ_BUFFER?
+06:47 -!- banisterfiend [n=user@202-89-137-197.ue.woosh.co.nz] has joined ##OpenGL
+06:49 < L-Spiro> Damn it, 2 of my 5 minutes were just wasted by an unexpected visit from the postman.
+06:49 < L-Spiro> And now my time is up.
+06:50 < multi_io> what I wasn't so sure about was why display lists can't be fast (given that they can 
+                  live on the server)
+06:50 < multi_io> but I guess they're too flexible to be fast, or something like that
+06:51 -!- monty_hall [n=sprague_@adsl-75-51-108-164.dsl.sgnwmi.sbcglobal.net] has quit [Read error: 110 
+          (Connection timed out)]
+06:54 < RTFM_FTW> - L-Spiro are you reading from the right buffer? (i.e. you can verify this by calling 
+                  glGet with READ_BUFFER as the enum)
+06:54 -!- BlueThen [n=bluethen@68-184-245-251.dhcp.stls.mo.charter.com] has quit []
+06:56 < RTFM_FTW> - DLs are frequently implemented via an additional layer upon VBO so they are quite 
+                  fast *in* cases where the server can optimize the content
+06:58 < RTFM_FTW> - the problem with them is that its very difficult for the server to compile the data 
+                  into a optimal (vertex, ...) buffer object... a number of commands allowed in the DL 
+                  interface will break various optimizations not to mention the order of the IM GL calls 
+                  themselves
+06:59 < RTFM_FTW> - in any case VBO is a much more effective path for vertex submission... after-all the 
+                  client knows much more about their data than the server...
