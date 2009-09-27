@@ -54,7 +54,7 @@ static void initCoilsAndViewer() {
     coil1.locationInWorld[1] = 0;
     coil1.locationInWorld[2] = -70;
     memcpy(coil1.color, GLCOLOR_RED, sizeof(coil1.color));
-    coil1.rotAngle = 0;
+    coil1.rotAngle = 70;
 
     Coil coil2;
     coil2.locationInWorld[0] = -20;
@@ -180,7 +180,7 @@ static void display() {
         const Coil &c = *it;
         glPushMatrix();
         glTranslated(c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
-        // TODO: process c.rotAngle too
+        glRotated(c.rotAngle, 0, 1, 0);
         drawCoil(c);
         glPopMatrix();
     }
@@ -325,3 +325,6 @@ int main(int argc, char **argv) {
 
 // TODO: proper classes for Point3D, Matrix3D, Coil, Viewer; move
 // stuff into methods
+
+// TODO: try performance gain achieved by switching to
+// single-precision floats
