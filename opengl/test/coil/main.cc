@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include <vector>
 
@@ -29,7 +31,8 @@ static Matrix3D identityTransform;
 
 struct Coil {
     Point3D locationInWorld;
-    GLdouble rotAngle;
+    GLdouble rotAngle;   // in degrees
+    GLdouble rotAngularVelocity;   // in degrees / sec
     GlColor color;
 };
 
@@ -55,6 +58,7 @@ static void initCoilsAndViewer() {
     coil1.locationInWorld[2] = -70;
     memcpy(coil1.color, GLCOLOR_RED, sizeof(coil1.color));
     coil1.rotAngle = 70;
+    coil1.rotAngularVelocity = 0;
 
     Coil coil2;
     coil2.locationInWorld[0] = -20;
@@ -62,6 +66,7 @@ static void initCoilsAndViewer() {
     coil2.locationInWorld[2] = -110;
     memcpy(coil2.color, GLCOLOR_GREEN, sizeof(coil1.color));
     coil2.rotAngle = 0;
+    coil1.rotAngularVelocity = 40;
 
     coils.push_back(coil1);
     coils.push_back(coil2);
@@ -294,8 +299,20 @@ static void specialKeyboardCallback(int key, int x, int y) {
     }
 }
 
-static void idleCallback() {
-    //printf("idleCallback\n");
+static struct timeval last_anim_step_time;
+
+static void animate() {
+    struct timeval newtime;
+    gettimeofday(&newtime, NULL);
+    double dt = (double)newtime.tv_sec+(double)newtime.tv_usec/1e6 -
+        (double)last_anim_step_time.tv_sec-(double)last_anim_step_time.tv_usec/1e6;
+    last_anim_step_time = newtime;
+    for (vector<Coil>::iterator it = coils.begin(); it != coils.end(); it++) {
+        Coil &c = *it;
+        c.rotAngle += dt * c.rotAngularVelocity;
+        c.rotAngle -= 360 * (int)(c.rotAngle / 360);
+    }
+    glutPostRedisplay();
 }
 
 int main(int argc, char **argv) {
@@ -317,7 +334,8 @@ int main(int argc, char **argv) {
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboardCallback);
     glutSpecialFunc(specialKeyboardCallback);
-    //glutIdleFunc(idleCallback);
+    gettimeofday(&last_anim_step_time, NULL);
+    glutIdleFunc(animate);
     glutMainLoop();
     return 0;
 }
