@@ -185,7 +185,7 @@ static void display() {
         glPopMatrix();
     }
 
-    glFlush();
+    glutSwapBuffers();
 }
 
 static void reshape(int w, int h) {
@@ -301,7 +301,7 @@ static void idleCallback() {
 int main(int argc, char **argv) {
     fillIdentity(identityTransform);
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowPosition(200,100);
     vpWidth = 800;
     vpHeight = 600;
