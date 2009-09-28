@@ -144,7 +144,7 @@ static const unsigned mesh_count_h = 40 * (coil_winding_angle_range / 2 / M_PI);
 static const GLdouble mesh_da_w = 2 * M_PI / (mesh_count_w - 1);
 static const GLdouble mesh_da_h = coil_winding_angle_range / (mesh_count_h - 1);
 static const GLdouble coil_bottom = -coil_height/2;
-static const GLdouble coil_dh = coil_height / mesh_count_h;
+static const GLdouble coil_dh = coil_height / (mesh_count_h - 1);
 
 
 static void mesh2objCoord(GLdouble ah, GLdouble aw, GLdouble *x, GLdouble *y, GLdouble *z) {
@@ -155,7 +155,7 @@ static void mesh2objCoord(GLdouble ah, GLdouble aw, GLdouble *x, GLdouble *y, GL
 
 
 static void drawCoil(const Coil &c) {
-    printf("Drawing coil at %lf, %lf, %lf\n", c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
+    // printf("Drawing coil at %lf, %lf, %lf\n", c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
     glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT);
     glColor3dv(c.color);
     for (unsigned mesh_h = 0; mesh_h < mesh_count_h; mesh_h++) {
@@ -176,7 +176,7 @@ static void drawCoil(const Coil &c) {
 
 
 static void display() {
-    printf("re-displaying...\n");
+    // printf("re-displaying...\n");
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
