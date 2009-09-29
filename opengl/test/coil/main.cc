@@ -154,6 +154,24 @@ static void mesh2objCoord(GLdouble ah, GLdouble aw, GLdouble *x, GLdouble *y, GL
 }
 
 
+static void mesh2normv(GLdouble ah, GLdouble aw, GLdouble *result) {
+    Point3D tangv1;
+    tangv1[0] = -coil_radius*sin(ah) - wire_radius*cos(aw)*sin(ah);
+    tangv1[1] = coil_dh/mesh_da_h;
+    tangv1[2] = coil_radius*cos(ah) + wire_radius*cos(ah)*cos(aw);
+
+    Point3D tangv2;
+    tangv2[0] = -wire_radius*cos(ah)*sin(aw);
+    tangv2[1] = wire_radius*cos(aw);
+    tangv2[2] = -wire_radius*sin(ah)*sin(aw);
+
+    Point3D unnormalized;
+    cross(tangv1, tangv2, unnormalized);
+
+    norm(unnormalized, result);
+}
+
+
 static void drawCoil(const Coil &c) {
     // printf("Drawing coil at %lf, %lf, %lf\n", c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
     glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT);

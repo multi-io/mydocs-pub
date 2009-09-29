@@ -30,4 +30,12 @@ void fillMultiplication(const GLdouble *a, const GLdouble *b, GLdouble *res);
 
 void copyMatrix3D(const GLdouble *src, GLdouble *dest);
 
+void cross(const GLdouble *a, const GLdouble *b, GLdouble *dest);
+
+void multiply(GLdouble s, const GLdouble *v, GLdouble *dest);
+
+GLdouble length(const GLdouble *v);
+
+void norm(const GLdouble *v, GLdouble *dest);
+
 #endif

@@ -82,3 +82,28 @@ void copyMatrix3D(const GLdouble *src, GLdouble *dest) {
         dest[i] = src[i];
     }
 }
+
+
+void cross(const GLdouble *a, const GLdouble *b, GLdouble *dest) {
+    dest[0] = -a[2] * b[1] + a[1] * b[2];
+    dest[1] = a[2] * b[0] - a[0] * b[2];
+    dest[2] = -a[1] * b[0] + a[0] * b[1];
+}
+
+
+void multiply(GLdouble s, const GLdouble *v, GLdouble *dest) {
+    dest[0] = s * v[0];
+    dest[1] = s * v[1];
+    dest[2] = s * v[2];
+}
+
+
+GLdouble length(const GLdouble *v) {
+    return sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+}
+
+
+void norm(const GLdouble *v, GLdouble *dest) {
+    GLdouble l = length(v);
+    multiply(1.0/l, v, dest);
+}

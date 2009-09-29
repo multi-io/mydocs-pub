@@ -21,3 +21,11 @@ gtags:
 	else \
 		gtags -I; \
 	fi
+
+depend:
+	makedepend -Y *.c *.cc 2>/dev/null
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+linalg.o: linalg.h
+main.o: linalg.h
