@@ -20,12 +20,16 @@ static unsigned vpWidth, vpHeight;
 
 typedef GLdouble Point3D[3];    // {x,y,z}
 
-typedef GLdouble GlColor[4];    // {r,g,b,a}
+typedef GLfloat GlColor[4];    // {r,g,b,a}
 
-static const GlColor GLCOLOR_RED     = {1,0,0,1};
-static const GlColor GLCOLOR_GREEN   = {0,1,0,1};
-static const GlColor GLCOLOR_BLUE    = {0,0,1,1};
-static const GlColor GLCOLOR_WHITE   = {1,1,1,1};
+static const GlColor GLCOLOR_RED     = {0.6,0,0,1};
+static const GlColor GLCOLOR_GREEN   = {0,0.6,0,1};
+static const GlColor GLCOLOR_BLUE    = {0,0,0.6,1};
+static const GlColor GLCOLOR_WHITE   = {0.6,0.6,0.6,1};
+
+static const GLfloat low_shininess[] = {5};
+static const GLfloat mid_shininess[] = {20};
+static const GLfloat high_shininess[] = {100};
 
 static Matrix3D identityTransform;
 
@@ -57,6 +61,10 @@ static void initCoilsAndViewer() {
     coil1.locationInWorld[1] = 0;
     coil1.locationInWorld[2] = -70;
     memcpy(coil1.color, GLCOLOR_RED, sizeof(coil1.color));
+    coil1.color[0] = 0.4;
+    coil1.color[1] = 0.0;
+    coil1.color[2] = 0.0;
+    coil1.color[3] = 1.0;
     coil1.rotAngle = 70;
     coil1.rotAngularVelocity = 0;
 
@@ -176,7 +184,11 @@ static void mesh2normv(GLdouble ah, GLdouble aw, GLdouble *result) {
 static void drawCoil(const Coil &c) {
     // printf("Drawing coil at %lf, %lf, %lf\n", c.locationInWorld[0], c.locationInWorld[1], c.locationInWorld[2]);
     glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT);
-    glColor3dv(c.color);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    //glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, GLCOLOR_WHITE);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mid_shininess);
+    glColor3fv(c.color);
     for (unsigned mesh_h = 0; mesh_h < mesh_count_h; mesh_h++) {
         GLdouble ah = mesh_h * mesh_da_h;
         glBegin(GL_TRIANGLE_STRIP);
@@ -204,6 +216,13 @@ static void display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glMultMatrixd(theViewer.worldToEyeCoordTransform);
+    // define light source
+    GLfloat l0Pos[] = {200, 40, -10, 0};
+    glLightfv(GL_LIGHT0, GL_POSITION, l0Pos);
+    // global ambient light
+    GLfloat ambientLight[] = {1,1,1, 0.1};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+    // draw all the coils
     for (vector<Coil>::iterator it = coils.begin(); it != coils.end(); it++) {
         const Coil &c = *it;
         glPushMatrix();
@@ -353,6 +372,7 @@ int main(int argc, char **argv) {
     glEnable(GL_RESCALE_NORMAL);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
     glClearColor(0,0,0,0);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     //glShadeModel(GL_FLAT);
