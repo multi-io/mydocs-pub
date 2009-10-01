@@ -166,7 +166,8 @@ static void mesh2normv(GLdouble ah, GLdouble aw, GLdouble *result) {
     tangv2[2] = -wire_radius*sin(ah)*sin(aw);
 
     Point3D unnormalized;
-    cross(tangv1, tangv2, unnormalized);
+    //cross(tangv1, tangv2, unnormalized);
+    cross(tangv2, tangv1, unnormalized);
 
     norm(unnormalized, result);
 }
@@ -349,9 +350,13 @@ int main(int argc, char **argv) {
     setupEye2ViewportTransformation();
     glutCreateWindow("Coil");
     glEnable(GL_DEPTH_TEST);  // has to be done after glutCreateWindow -- why?
+    glEnable(GL_RESCALE_NORMAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
     glClearColor(0,0,0,0);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glShadeModel(GL_FLAT);
+    //glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboardCallback);
