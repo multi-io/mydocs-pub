@@ -66,7 +66,7 @@ static void initCoilsAndViewer() {
     coil1.color[2] = 0.0;
     coil1.color[3] = 1.0;
     coil1.rotAngle = 70;
-    coil1.rotAngularVelocity = 0;
+    coil1.rotAngularVelocity = 40;
 
     Coil coil2;
     coil2.locationInWorld[0] = -20;
@@ -74,7 +74,7 @@ static void initCoilsAndViewer() {
     coil2.locationInWorld[2] = -110;
     memcpy(coil2.color, GLCOLOR_GREEN, sizeof(coil1.color));
     coil2.rotAngle = 0;
-    coil1.rotAngularVelocity = 40;
+    coil2.rotAngularVelocity = 0;
 
     coils.push_back(coil1);
     coils.push_back(coil2);
