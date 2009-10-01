@@ -147,10 +147,10 @@ static const GLdouble coil_bottom = -coil_height/2;
 static const GLdouble coil_dh = coil_height / (mesh_count_h - 1);
 
 
-static void mesh2objCoord(GLdouble ah, GLdouble aw, GLdouble *x, GLdouble *y, GLdouble *z) {
-    *x = coil_radius * cos(ah) + wire_radius * cos(aw) * cos(ah);
-    *y = coil_bottom + coil_dh * ah / mesh_da_h + wire_radius * sin(aw);
-    *z = coil_radius * sin(ah) + wire_radius * cos(aw) * sin(ah);
+static void mesh2objCoord(GLdouble ah, GLdouble aw, GLdouble *result) {
+    result[0] = coil_radius * cos(ah) + wire_radius * cos(aw) * cos(ah);
+    result[1] = coil_bottom + coil_dh * ah / mesh_da_h + wire_radius * sin(aw);
+    result[2] = coil_radius * sin(ah) + wire_radius * cos(aw) * sin(ah);
 }
 
 
@@ -181,11 +181,15 @@ static void drawCoil(const Coil &c) {
         glBegin(GL_TRIANGLE_STRIP);
         for (unsigned mesh_w = 0; mesh_w < mesh_count_w; mesh_w++) {
             GLdouble aw = mesh_w * mesh_da_w;
-            double x, y, z;
-            mesh2objCoord(ah, aw, &x, &y, &z);
-            glVertex3d(x, y, z);
-            mesh2objCoord(ah + mesh_da_h, aw, &x, &y, &z);
-            glVertex3d(x, y, z);
+            Point3D objv, normv;
+            mesh2normv(ah, aw, normv);
+            mesh2objCoord(ah, aw, objv);
+            glNormal3dv(normv);
+            glVertex3dv(objv);
+            mesh2normv(ah + mesh_da_h, aw, normv);
+            mesh2objCoord(ah + mesh_da_h, aw, objv);
+            glNormal3dv(normv);
+            glVertex3dv(objv);
         }
         glEnd();
     }
