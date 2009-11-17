@@ -365,9 +365,9 @@ int main(int argc, char **argv) {
     vpWidth = 800;
     vpHeight = 600;
     glutInitWindowSize(vpWidth, vpHeight);
+    glutCreateWindow("Coil");
     initCoilsAndViewer();
     setupEye2ViewportTransformation();
-    glutCreateWindow("Coil");
     glEnable(GL_DEPTH_TEST);  // has to be done after glutCreateWindow -- why?
     glEnable(GL_RESCALE_NORMAL);
     glEnable(GL_LIGHTING);

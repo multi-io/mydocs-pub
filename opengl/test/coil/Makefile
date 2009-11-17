@@ -12,6 +12,9 @@ All: coil
 coil: main.o linalg.o
 	$(CC) $(CFLAGS) -o $@ $(LIBDIR) $+ $(LIBRARIES)
 
+glcrash: glcrash.o
+	$(CC) $(CFLAGS) -o $@ $(LIBDIR) $+ $(LIBRARIES)
+
 clean:
 	rm -f coil *.o
 
