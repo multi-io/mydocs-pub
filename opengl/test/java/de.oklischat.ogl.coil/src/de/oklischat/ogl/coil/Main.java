@@ -1,5 +1,6 @@
 package de.oklischat.ogl.coil;
 
+import com.sun.opengl.util.Animator;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -35,9 +36,12 @@ public class Main {
         frame.setSize(800, 600);
         frame.setBackground(Color.black);
         frame.setVisible(true);
+        final Animator anim = new Animator(canvas);
+        anim.start();
 		frame.addWindowListener(new WindowAdapter() {
             @Override
 			public void windowClosing(WindowEvent e) {
+                //anim.stop();
 				System.exit(0);
 			}
 		});
@@ -265,6 +269,7 @@ public class Main {
         @Override
         public void display(GLAutoDrawable glAutoDrawable) {
             GL2 gl = (GL2) glAutoDrawable.getGL();
+            animate();
             // printf("re-displaying...\n");
             gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
             gl.glMatrixMode(gl.GL_MODELVIEW);
@@ -286,6 +291,20 @@ public class Main {
             }
 
             glAutoDrawable.swapBuffers();
+        }
+
+        private long lastAnimStepTime = -1;
+
+        private void animate() {
+            final long now = System.currentTimeMillis();
+            if (lastAnimStepTime > 0) {
+                float dt = (float) (now - lastAnimStepTime) / 1000;
+                for (Coil c : coils) {
+                    c.rotAngle += dt * c.rotAngularVelocity;
+                    c.rotAngle -= 360 * (int)(c.rotAngle / 360);
+                }
+            }
+            lastAnimStepTime = now;
         }
 
         @Override
