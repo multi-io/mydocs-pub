@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
@@ -27,10 +28,12 @@ public class Main {
         frame.setBackground(Color.WHITE);
         //GLCanvas canvas = GLDrawableFactory.getFactory(GLProfile.get(GLProfile.GL2)).createGLCanvas(new GLCapabilities(null));
         GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+        caps.setDoubleBuffered(true);
         GLCanvas canvas = new GLCanvas(caps);
-        canvas.addGLEventListener(glEventListener);
+        canvas.addGLEventListener(new GLEventHandler(canvas));
         frame.add(canvas);
         frame.setSize(800, 600);
+        frame.setBackground(Color.black);
         frame.setVisible(true);
 		frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -40,7 +43,13 @@ public class Main {
 		});
     }
 
-    protected GLEventListener glEventListener = new GLEventListener() {
+    protected class GLEventHandler implements GLEventListener {
+
+        private final GLDrawable drawable;
+
+        public GLEventHandler(GLDrawable drawable) {
+            this.drawable = drawable;
+        }
 
         // this is a least-effort port straight from my C "coil" test app
         // Beware: Very ugly. No typedefs in Java... must use classes eventually
@@ -62,9 +71,6 @@ public class Main {
         (0.9 rad = 51.... degrees)
          */
         final float vpWidthInRadiants = 0.9F;
-
-        // viewport dimensions. updated on window resizes
-        int vpWidth, vpHeight;
 
         public /*static*/ final float[] GLCOLOR_RED = {0.6F,0F,0F,1F};
         public /*static*/ final float[] GLCOLOR_GREEN = {0F,0.6F,0F,1F};
@@ -99,8 +105,6 @@ public class Main {
         @Override
         public void init(GLAutoDrawable glAutoDrawable) {
             GL2 gl = (GL2) glAutoDrawable.getGL();
-            vpWidth = 800;
-            vpHeight = 600;
             initCoilsAndViewer();
             setupEye2ViewportTransformation(gl);
             gl.glEnable(gl.GL_DEPTH_TEST);
@@ -163,7 +167,7 @@ public class Main {
             // perspective projection
             float nearVal = 3;
             float farVal = 300;
-            float vpHeightInRadiants = vpWidthInRadiants * vpHeight / vpWidth;
+            float vpHeightInRadiants = vpWidthInRadiants * drawable.getHeight() / drawable.getWidth();
             float right = nearVal * (float) Math.tan(vpWidthInRadiants/2);
             float left = -right;
             float top = nearVal * (float) Math.tan(vpHeightInRadiants/2);
@@ -180,8 +184,8 @@ public class Main {
             // eye coord -> viewport transformation
             gl.glViewport(0, //GLint x,
                           0, //GLint y,
-                          vpWidth, //GLsizei width,
-                          vpHeight //GLsizei height
+                          drawable.getWidth(), //GLsizei width,
+                          drawable.getHeight() //GLsizei height
                           );
             gl.glDepthRange(0,1);
         }
@@ -287,9 +291,6 @@ public class Main {
         @Override
         public void reshape(GLAutoDrawable glAutoDrawable, int x, int y, int width, int height) {
             GL2 gl = (GL2) glAutoDrawable.getGL();
-            //printf("Reshaping to (%i, %i)\n", w, h);
-            vpWidth = width;
-            vpHeight = height;
             setupEye2ViewportTransformation(gl);
         }
     };
