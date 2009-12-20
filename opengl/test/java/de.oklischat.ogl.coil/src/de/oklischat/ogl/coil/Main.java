@@ -132,6 +132,8 @@ public class Main {
 
             LinAlg.fillIdentity(theViewer.worldToEyeCoordTransform);
 
+            coils.clear();
+
             Coil coil1 = new Coil();
             coil1.locationInWorld[0] = 15;
             coil1.locationInWorld[1] = 0;
