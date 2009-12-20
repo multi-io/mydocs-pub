@@ -138,10 +138,6 @@ public class Main {
         }
 
         private void initCoilsAndViewer() {
-            // wanted to misuse current OGL matrix stack for matrix operations,
-            // but glGetDoublev() doesn't do anything.
-            // < AlastairLynn> you really should avoid glGet. It can cause pipeline stalls
-
             LinAlg.fillIdentity(theViewer.worldToEyeCoordTransform);
 
             Coil coil1 = new Coil();
@@ -169,6 +165,7 @@ public class Main {
         }
 
         private void setupEye2ViewportTransformation() {
+            System.out.println("projecting to viewport width=" + getWidth() + ", height=" + getHeight());
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
 
@@ -277,13 +274,18 @@ public class Main {
             glPopAttrib();
         }
 
-        private boolean contextInitialized = false;
+        private boolean contextInitialized = false, resizePending = false;
 
         @Override
         protected void paintGL() {
             if (!contextInitialized) {
                 init();
                 contextInitialized = true;
+                resizePending = false;
+            }
+            if (resizePending) {
+                setupEye2ViewportTransformation();
+                resizePending = false;
             }
             animate();
             // printf("re-displaying...\n");
@@ -330,7 +332,8 @@ public class Main {
         public void componentResized(ComponentEvent e) {
             super.componentResized(e);
             if (contextInitialized) {
-                setupEye2ViewportTransformation();
+                //setupEye2ViewportTransformation();
+                resizePending = true;
             }
         }
 
