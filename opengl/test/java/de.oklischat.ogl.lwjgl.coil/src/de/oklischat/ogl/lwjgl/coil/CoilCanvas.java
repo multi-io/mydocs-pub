@@ -25,6 +25,9 @@ import static org.lwjgl.opengl.GL21.*;
  */
 public class CoilCanvas extends AWTGLCanvas {
 
+    private static int sharedCoilDisplayList;
+    private static boolean sharedCoilDisplayListInitialized = false;
+
     public CoilCanvas() throws LWJGLException {
     }
 
@@ -109,6 +112,29 @@ public class CoilCanvas extends AWTGLCanvas {
         glClearColor(0,0,0,0);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         //glShadeModel(GL_FLAT);
+        if (!sharedCoilDisplayListInitialized) {
+            sharedCoilDisplayList = glGenLists(1);
+            glNewList(sharedCoilDisplayList, GL_COMPILE);
+            for (int mesh_h = 0; mesh_h < mesh_count_h; mesh_h++) {
+                float ah = mesh_h * mesh_da_h;
+                glBegin(GL_TRIANGLE_STRIP);
+                for (int mesh_w = 0; mesh_w < mesh_count_w; mesh_w++) {
+                    float aw = mesh_w * mesh_da_w;
+                    float[] objv = new float[3], normv = new float[3];
+                    mesh2normv(ah, aw, normv);
+                    mesh2objCoord(ah, aw, objv);
+                    glNormal3f(normv[0], normv[1], normv[2]);
+                    glVertex3f(objv[0], objv[1], objv[2]);
+                    mesh2normv(ah + mesh_da_h, aw, normv);
+                    mesh2objCoord(ah + mesh_da_h, aw, objv);
+                    glNormal3f(normv[0], normv[1], normv[2]);
+                    glVertex3f(objv[0], objv[1], objv[2]);
+                }
+                glEnd();
+            }
+            glEndList();
+            sharedCoilDisplayListInitialized = true;
+        }
     }
 
     private void initCoilsAndViewer() {
@@ -228,23 +254,7 @@ public class CoilCanvas extends AWTGLCanvas {
         glMaterial(GL_FRONT_AND_BACK, GL_SPECULAR, FloatBuffer.wrap(GLCOLOR_WHITE));
         glMaterial(GL_FRONT_AND_BACK, GL_SHININESS, FloatBuffer.wrap(mid_shininess));
         glColor4f(c.color[0], c.color[1], c.color[2], c.color[3]);
-        for (int mesh_h = 0; mesh_h < mesh_count_h; mesh_h++) {
-            float ah = mesh_h * mesh_da_h;
-            glBegin(GL_TRIANGLE_STRIP);
-            for (int mesh_w = 0; mesh_w < mesh_count_w; mesh_w++) {
-                float aw = mesh_w * mesh_da_w;
-                float[] objv = new float[3], normv = new float[3];
-                mesh2normv(ah, aw, normv);
-                mesh2objCoord(ah, aw, objv);
-                glNormal3f(normv[0], normv[1], normv[2]);
-                glVertex3f(objv[0], objv[1], objv[2]);
-                mesh2normv(ah + mesh_da_h, aw, normv);
-                mesh2objCoord(ah + mesh_da_h, aw, objv);
-                glNormal3f(normv[0], normv[1], normv[2]);
-                glVertex3f(objv[0], objv[1], objv[2]);
-            }
-            glEnd();
-        }
+        glCallList(sharedCoilDisplayList);
         glPopAttrib();
     }
 
