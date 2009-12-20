@@ -5,12 +5,16 @@
 
 package de.oklischat.ogl.lwjgl.coil;
 
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ComponentEvent;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.AWTGLCanvas;
+import org.lwjgl.opengl.Drawable;
+import org.lwjgl.opengl.PixelFormat;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
@@ -28,7 +32,26 @@ public class CoilCanvas extends AWTGLCanvas {
     private static int sharedCoilDisplayList;
     private static boolean sharedCoilDisplayListInitialized = false;
 
-    public CoilCanvas() throws LWJGLException {
+    private static Drawable sharedGLDrawable;
+    //private static GraphicsDevice sharedGraphicsDevice;
+    private static PixelFormat sharedPixelFormat;
+
+    public static CoilCanvas create() throws LWJGLException {
+        if (null == sharedGLDrawable) {
+            //sharedGraphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            sharedPixelFormat = new PixelFormat();
+            sharedGLDrawable = new CoilCanvas(null, sharedPixelFormat, null);
+            return (CoilCanvas) sharedGLDrawable;
+        } else {
+            return new CoilCanvas(null, sharedPixelFormat, sharedGLDrawable);
+        }
+    }
+
+    private CoilCanvas(GraphicsDevice gd, PixelFormat pf, Drawable sharedDrawable) throws LWJGLException {
+        super(gd, pf, sharedDrawable);
+        if (null == sharedGLDrawable) {
+            sharedGLDrawable = this;
+        }
     }
 
     // this is a least-effort port straight from my C "coil" test app
