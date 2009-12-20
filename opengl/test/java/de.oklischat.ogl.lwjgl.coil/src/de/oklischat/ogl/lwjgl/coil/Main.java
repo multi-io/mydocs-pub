@@ -1,11 +1,15 @@
 package de.oklischat.ogl.lwjgl.coil;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Frame;
+import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.lwjgl.opengl.Display;
 
@@ -16,12 +20,16 @@ import org.lwjgl.opengl.Display;
 public class Main {
 
     public Main() throws Exception {
-        Frame frame = new Frame("Coil");
-        frame.setBackground(Color.WHITE);
+        JFrame frame = new JFrame("Coil");
+        JPanel toolbar = new JPanel();
+        toolbar.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JComboBox cb = new JComboBox(new Object[]{"foo","bar","baz","quux"});
+        toolbar.add(cb);
+        frame.add(cb, BorderLayout.NORTH);
         //ContextAttribs cattrs = new ContextAttribs().withDebug(true).with...;
         //GLEventHandler canvas = new GLEventHandler(cattrs);  // need to do this for OpenGL >= 3.0
         final CoilCanvas canvas = new CoilCanvas();
-        frame.add(canvas);
+        frame.add(canvas, BorderLayout.CENTER);
         frame.setSize(800, 600);
         frame.setBackground(Color.black);
         frame.setVisible(true);
