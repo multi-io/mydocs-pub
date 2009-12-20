@@ -102,6 +102,7 @@ public class CoilCanvas extends AWTGLCanvas {
     Viewer theViewer = new Viewer();
 
     public void init() {
+        setVSyncEnabled(true);
         initCoilsAndViewer();
         setupEye2ViewportTransformation();
         glEnable(GL_DEPTH_TEST);
@@ -113,7 +114,8 @@ public class CoilCanvas extends AWTGLCanvas {
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         //glShadeModel(GL_FLAT);
         if (!sharedCoilDisplayListInitialized) {
-            sharedCoilDisplayList = glGenLists(1);
+            System.out.println("initializing coil display list...");
+            sharedCoilDisplayList = glGenLists(1);  //TODO: error handling
             glNewList(sharedCoilDisplayList, GL_COMPILE);
             for (int mesh_h = 0; mesh_h < mesh_count_h; mesh_h++) {
                 float ah = mesh_h * mesh_da_h;
