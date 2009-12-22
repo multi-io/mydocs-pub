@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import org.lwjgl.opengl.Display;
 
@@ -27,8 +28,8 @@ public class Main {
         int nFrames = 3;
         for (int i = 0; i < nFrames; i++) {
             JFrame frame = new JFrame("Coil");
-            JPanel toolbar = new JPanel();
-            toolbar.setLayout(new FlowLayout(FlowLayout.LEFT));
+            JToolBar toolbar = new JToolBar();
+            toolbar.setFloatable(false);
             JComboBox cb = new JComboBox(new Object[]{"foo","bar","baz","quux"});
             toolbar.add(cb);
             frame.add(cb, BorderLayout.NORTH);
