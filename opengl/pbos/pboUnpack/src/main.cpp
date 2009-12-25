@@ -25,6 +25,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
+#include <string.h>
 #include "glInfo.h"                             // glInfo struct
 #include "Timer.h"
 
@@ -123,7 +124,9 @@ int main(int argc, char **argv)
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, IMAGE_WIDTH, IMAGE_HEIGHT, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid*)imageData);
@@ -207,7 +210,8 @@ int initGLUT(int argc, char **argv)
     // it is called before any other GLUT routine
     glutInit(&argc, argv);
 
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA); // display mode
+    //glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA); // display mode
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA | GLUT_MULTISAMPLE); // display mode
 
     glutInitWindowSize(400, 300);               // window size
 
@@ -246,7 +250,7 @@ void initGL()
     //@glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     //glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     //glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_DEPTH_TEST);
+    ///glEnable(GL_DEPTH_TEST);
     //@glEnable(GL_LIGHTING);
     glDisable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
@@ -255,6 +259,11 @@ void initGL()
      // track material ambient and diffuse from surface color, call it before glEnable(GL_COLOR_MATERIAL)
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE,GL_ONE_MINUS_SRC_COLOR);
+
+    glEnable(GL_MULTISAMPLE);
 
     glClearColor(0, 0, 0, 0);                   // background color
     glClearStencil(0);                          // clear stencil buffer
@@ -408,6 +417,7 @@ void updatePixels(GLubyte* dst, int size)
         {
             *ptr = color;
             ++ptr;
+            //color++;
         }
         color += 257;   // add an arbitary number (no meaning)
     }
@@ -645,29 +655,42 @@ void displayCB()
     // clear buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    // save the initial ModelView matrix before modifying ModelView matrix
-    glPushMatrix();
 
-    // tramsform camera
-    glTranslatef(0, 0, cameraDistance);
-    glRotatef(cameraAngleX, 1, 0, 0);   // pitch
-    glRotatef(cameraAngleY, 0, 1, 0);   // heading
-
-    // draw a point with texture
     glBindTexture(GL_TEXTURE_2D, textureId);
     glColor4f(1, 1, 1, 1);
-    glBegin(GL_QUADS);
-    glNormal3f(0, 0, 1);
-    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f);   glVertex3f( 1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f);   glVertex3f( 1.0f,  1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f);   glVertex3f(-1.0f,  1.0f, 0.0f);
-    glEnd();
+
+    for (int iQuad=0; iQuad<2; iQuad++) {
+        //iQuad = 1 - iQuad;
+
+        // save the initial ModelView matrix before modifying ModelView matrix
+        glPushMatrix();
+
+        // tramsform camera
+        glTranslatef(0, 0, cameraDistance);
+
+        glRotatef(cameraAngleX, 1, 0, 0);   // pitch
+        glRotatef(cameraAngleY, 0, 1, 0);   // heading
+
+        glTranslatef(0, 0, iQuad);
+
+        // draw a point with texture
+        glBegin(GL_QUADS);
+        glNormal3f(0, 0, 1);
+        glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0f, -1.0f, 0.0f);
+        glTexCoord2f(1.0f, 0.0f);   glVertex3f( 1.0f, -1.0f, 0.0f);
+        glTexCoord2f(1.0f, 1.0f);   glVertex3f( 1.0f,  1.0f, 0.0f);
+        glTexCoord2f(0.0f, 1.0f);   glVertex3f(-1.0f,  1.0f, 0.0f);
+        glEnd();
+
+        glPopMatrix();
+    }
 
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // draw info messages
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     showInfo();
     //showTransferRate();
     printTransferRate();
@@ -728,7 +751,7 @@ void keyboardCB(unsigned char key, int x, int y)
         if(drawMode == 0)        // fill mode
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glEnable(GL_DEPTH_TEST);
+            ///glEnable(GL_DEPTH_TEST);
             glEnable(GL_CULL_FACE);
         }
         else if(drawMode == 1)  // wireframe mode
