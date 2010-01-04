@@ -1,0 +1,63 @@
+[08:39:13] *** multi_io has joined #lwjgl
+
+[15:19:52] <multi_io> do the glTextImage* functions store the data (DataBuffer) pointer that you pass to them?
+[15:20:17] <MatthiasM2> no
+[15:21:10] <multi_io> so they copy the data to an internal buffer, and you can discard the passed buffer after the call?
+[15:21:34] <MatthiasM2> the data is copied to an OpenGL texture
+[15:22:25] <multi_io> I thought it uses the data buffer potentially whenever it needs the texture data again
+[15:22:52] <multi_io> (unless it copied it to VRAM, but I thought that's implementation-specific)
+[15:23:07] <MatthiasM2> www.opengl.org/sdk
+[15:24:55] <multi_io> yeah, I read the glTextimagve2D manpage there, but it apparently doesn't explicitly say whether or not it copies the data
+[15:25:48] <MatthiasM2> multi_io: it says what it does
+[15:25:54] <MatthiasM2> you just have to read it
+[15:27:24] <MatthiasM2> multi_io: compare the wording with glVertexPointer
+[15:28:43] *** Diablo-D3 has quit IRC
+[15:30:45] <multi_io> hm, ok
+[15:32:40] <multi_io> so if you wanted to upload a setof textures into the GL to have them all available  there to bind to, you'd preferably supply them in DataBuffers and then release the DataBuffer immediately afterwards if you wanted to save memory?
+[15:33:01] <MatthiasM2> or use PBOs
+[15:39:28] *** delt0r_ has quit IRC
+[15:39:49] *** delt0r_ has joined #lwjgl
+[15:48:21] * multi_io is reading http://www.songho.ca/opengl/gl_pbo.html
+[15:50:37] *** HaBaLeS has joined #lwjgl
+[15:55:17] <hanrock> multi_io as far as i know the image data that you supply to an opengl will be copied to some opengl managed memory and will be re-used from there whenever needed, you'll effectively end up having at least two copies of the same data, one in your programs memory managed by opengl and one in video memory
+[15:55:53] <hanrock> though as to whether pbo methods do the same (copy data to opengl managed buffers) i unknown to me. i'd assume that to be the case. though someone knownledgeable about this could confirm this
+[15:57:44] <hanrock> hmm but the dma.. maybe pbo methods rely on the buffer you supply as the last buffer before video ram.. then what happens if opengl references them when they have been freed - for example, when it needs to re-upload that texture to video ram?
+[15:59:05] <MatthiasM> OpenGL is free to do what it wants with the memory behind PBOs
+[15:59:21] <MatthiasM> so it could keep a reference to it as texture backing store
+[15:59:22] *** Archon has quit IRC
+[15:59:45] <MatthiasM> but for that you need to upload in a native texture format (eg not RGB)
+[16:01:34] <hanrock> ABGR was it. at least that was directed as the "best" format for image data for speediest transfers by nvidia pdf
+[16:01:50] <MatthiasM> or DXT1/3/5
+[16:02:20] <hanrock> but but, if it's in native format and opengl keeps just a reference to the memory, lwjgl re-uses that memory buffer and then what? in the re-upload case the texture will be some random data?
+[16:02:52] <MatthiasM> when you use PBO you have to map it, GL will decide what pointer to return
+[16:03:19] <MatthiasM> that's why you should map it as write only
+[16:03:46] <MatthiasM> so that GL doesn't have to provide valid data in that buffer
+[16:06:33] <MatthiasM> hanrock: also LWJGL doesn't do anything - it's your app and OpenGL, LWJGL is just an wrapper
+[16:07:16] <hanrock> i did something with nio buffers passed to it, re-using old buffers if they were not direct or something
+[16:08:13] <hanrock> if they are direct all hell breaks loose when they dont get freed accordingly as you go happy about using new direct bytebuffers for texture data and discarding the old - and in the case opengl stores a reference to that direct bytebuffer, you cant re-use it for old textures.
+[16:08:18] <hanrock> am i right?
+[16:08:36] <MatthiasM> no
+[16:08:40] <hanrock> explain please
+[16:08:48] *** HaBaLeS has quit IRC
+[16:08:53] <MatthiasM> I already did - read the links I gave to multi_io
+[16:09:28] <hanrock> i rather stick to real people helping me
+[16:09:48] <MatthiasM> hanrock: if you can't read then get lost
+[16:09:50] <hanrock> sorry, not too intrigued to read the whole sdk without some pointers. not that your pointers are always all so helpful.
+[16:10:14] <hanrock> can't. i'll wait for when you go to sleep and ask again.
+[16:10:24] <MatthiasM> lol
+[16:10:41] <MatthiasM> if multi_io was able to figure it out in a few minutes - why can't you?
+[16:11:00] <hanrock> he's not looking for what i'm looking
+[16:11:03] <hanrock> +for
+[16:11:09] <MatthiasM> he was
+[16:11:18] <hanrock> too bad. then we speak another language
+[16:15:22] *** SleepwalkR has joined #lwjgl
+[16:15:39] <MatthiasM> not sure what language you speak - but we used English here
+[16:18:36] <kappaOne> hmm, got two methods that do the same thing, which would be faster/better to use?
+[16:18:37] <kappaOne> http://lwjgl.pastebin.com/d7467d5b9
+[16:19:08] <kappaOne> first create a varible to store result, second does the maths twice
+[16:19:12] *** SleepwalkR has quit IRC
+[16:19:13] <MatthiasM> kappaOne: doesn't matter
+[16:19:21] <MatthiasM> use what looks nicer
+[16:19:40] <kappaOne> that'll be the second then :)
+[16:20:54] <MatthiasM> but I would use if timeStep < 1
+[16:21:14] <kappaOne> ah, nice, didn't think of that
