@@ -9,9 +9,17 @@ Buffer<type> {
      - remaining() == limit - position
      - at any time, the buffer contains limit <type>s
 
-     - Buffer<byte>s may be /direct/, meaning that they're backed by
-       some byte sequence managed by native code (i.e. one by the Java
-       code as e.g. a byte array)
+     - Buffer<byte>s (java.nio.ByteBuffer) may be /direct/, meaning
+       that they represent data buffers in native code (outside the
+       JVM's heap). Useful for high-performance data sharing with
+       non-Java code (cf. JOGL, or memory-mapped files (see
+       FileChannel below), which effectively maps the OS's buffer
+       cache into the JVM directly)
+
+       - non-byte Buffers may be created as "view buffers" into a byte
+         buffer, combining (without copying) the bytes into the view
+         buffer's element types using a specified byte
+         ordering/endianness etc.
 
    operations:
 
