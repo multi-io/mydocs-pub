@@ -43,6 +43,13 @@ JOGL Texture Konstruktor Texture(TextureData data) {
     gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS,   skipRows[0]);   // restore skipped rows
     gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, skipPixels[0]); // restore skipped pixels
     
+
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+    int wrapMode = (gl.isExtensionAvailable("GL_VERSION_1_2") || !gl.isGL2()) ? GL.GL_CLAMP_TO_EDGE : GL2.GL_CLAMP;
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, wrapMode);
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, wrapMode);
+
 }
 
 
