@@ -143,6 +143,10 @@ So, e.g. the point (l,b,-n) in eye coordinates will be transformed
 into (-1,-1,-1) in device coordinates (and ultimately to (x,y,nearVal)
 in the viewport, i.e. the lower-left corner of the viewport).
 
+Essentially, glOrtho() specifies the rectangular x/y region that
+defines the cross section of the area of the eye coordinate system
+that will be visible in the viewport.
+
 ---
 
 To set up a perspective projection, you'd normally set the projection
