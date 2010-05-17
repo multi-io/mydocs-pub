@@ -61,3 +61,96 @@
 [16:19:40] <kappaOne> that'll be the second then :)
 [16:20:54] <MatthiasM> but I would use if timeStep < 1
 [16:21:14] <kappaOne> ah, nice, didn't think of that
+
+
+
+----
+
+
+
+01:53 < multi_io_> MatthiasM2: I can now definitely say that it is the native glTexSubImage2D function call that takes 100 ms.
+01:53 < multi_io_> i.e. no Java code
+01:53 < NoobFukaire> what kind of data?
+01:53 < MatthiasM2> what texture format?
+01:54 < NoobFukaire> PNG is much slower than DXT1 for example
+01:54 < MatthiasM2> NoobFukaire: this has nothing to do with PNG
+01:54 < MatthiasM2> as nthe decoding is already done before the upload
+01:54 < NoobFukaire> You could load via PBO, which won't fix the performance itself but will make it less noticable
+01:54 < NoobFukaire> yeah but with PNG mipmaps have to be generated (possibly)
+01:55 < NoobFukaire> also I didn't mean the PNG loading from disk takes long
+01:55 < MatthiasM2> ok, that can be the case if you use GL_GENERATE_MIPMAPS
+01:55 < NoobFukaire> also PNG are generally going to be larger than compressed textures
+01:56 < MatthiasM2> let's just say DXT compressed textures vs uncompressed textures :)
+01:57 < multi_io_> I'm using a library to create the texture from a BufferedImage. I'll have to look at what parameters 
+                   are actually passed down to the native call
+01:57 < NoobFukaire> Java's image stuff sucks
+01:57 < NoobFukaire> it's feature rich but slow as fuck
+01:59 < MatthiasM2> multi_io_: use the PNGDecoder from TWL
+01:59 < MatthiasM2> it can decode into a native format for OpenGL
+01:59 < MatthiasM2> so you don't have to copy the data several times
+02:00 < NoobFukaire> MatthiasM's PNG loader is great
+02:00 < MatthiasM2> it got 8bit palette support recently too
+02:01 -!- Gwinnell [n=Ashley@cpc1-pool2-0-0-cust61.sotn.cable.ntl.com] has quit [Read error: 110 (Connection timed out)]
+02:06 < multi_io_> hm
+02:08 < MatthiasM2> multi_io_: anyway don't send data as GL_RGB
+02:08 < multi_io_> problem is, the source data is DICOM (medical image format), and I have a library that reads that into 
+                   BufferedImages.
+02:09 < MatthiasM2> then be sure to convert it into GL_ABGR
+02:10 < multi_io_> ok
+02:14 -!- Sajber^ [n=Sajber@h-142-12.A213.priv.bahnhof.se] has quit [Read error: 104 (Connection reset by peer)]
+02:19 < multi_io_> the parameters that the library passes down to the native glTexSubImage2D call are: 
+                   target=GL_TEXTURE_2D, level=0, xoffset=yoffset=0, width=819, height=999, format=GL_LUMINANCE, 
+                   type=GL_UNSIGNED_BYTE
+02:19 < MatthiasM2> urgs - the size is an issue
+02:19 < MatthiasM2> try to align the linesize to a multiple of say 32 byte
+02:19 < multi_io_> GL_LUMINANCE kind of makes sense; the ingoing BufferedImage is a 16-bit grayscale one
+02:20 < MatthiasM2> and use GL_TEXTURE_RECTANGLE
+02:20 < multi_io_> "linesize"=width?
+02:21 < multi_io_> width/8
+02:21 < MatthiasM2> not directly: stride == width * bytesPerPixel
+02:21 < NoobFukaire> is this some kind of image viewer or are you streaming data to the gpu every frame?
+02:22 < MatthiasM2> and that should be a multiple of at least 4 bytes
+02:24 < multi_io_> NoobFukaire: yes it's gonna be an image viewer, displaying maybe 25 images at a time out of 2000 (all 
+                   of the size of the one above)
+02:25 < multi_io_> I can't reasonably load all those textures up-front I think
+02:25 < NoobFukaire> k, you're probably going to want to do the texture upload with PBO and then the texture submission 
+                     calls will be very cheap from PBO -> texture
+02:26 < multi_io_> so right now I'm loading the textures into GL when they're being displayed the first time, so the 
+                   display() methods is delayed by those 100 ms (times the number of new textures to be displayed)
+02:26 < NoobFukaire> with PBO you can be uploading in a different thread
+02:27 < NoobFukaire> and then you just need to notify your display code about upload state (i.e. loading bar or whatever)
+02:27 < multi_io_> yeah I was thinking of something like that, I'm afraid of triggering dozens of driver bugs when calling 
+                   GL from multiple threads :P
+02:28 < NoobFukaire> mapped buffers are safe, it's like the only reliable way to do asynchronous stuff with GL
+02:50 < multi_io_> so I would then basically use the same GL context (and, in it, the same PBOs) from multiple threads, 
+                   right?
+02:51 < multi_io_> and use Java synchronization to ensure that I won't do things like initializing a PBO in one thread and 
+                   at the same time already drawing it in another thread
+02:52 < NoobFukaire> well, you map the buffer to client memory from the GL thread
+02:52 < NoobFukaire> then you hand it off to your IO thread which can copy the data independently
+02:53 < NoobFukaire> then when that thread is finished, you'd do like you said, with some kind of synchronized 
+                     notification system to tell GL thread it's okay to unmap the buffer and use it in the GL thread
+02:53 < NoobFukaire> the PBO creation is all still done in the GL thread
+02:57 < MatthiasM2> multi_io_: GL stays single threaded, you only pass a ByteBuffer to the other thread - use 
+                    java.util.concurrent queues for that
+
+
+
+
+02:53 < multi_io_> RTFM_FTW: the glTexSubImage2D call that takes 100 ms is called with: target=GL_TEXTURE_2D, level=0, 
+                   xoffset=yoffset=0, width=819, height=999, format=GL_LUMINANCE, type=GL_UNSIGNED_BYTE
+02:53 -!- Lemml [n=andreas@pD9E52D16.dip.t-dialin.net] has joined ##OpenGL
+02:54 < multi_io_> is that a "native" format/type combination?
+02:55 < RTFM_FTW> - LUMINANCE should be native but I'm wondering WTF are you attempting to SubImage with < 819, 999 > NPOT 
+                  dimensions...
+02:56 < RTFM_FTW> that is just nasty...
+02:56 < RTFM_FTW> - heh
+02:57 -!- gonsor [n=quassel@p57A8AA7D.dip0.t-ipconnect.de] has quit [Read error: 110 (Connection timed out)]
+02:57 < multi_io_> the people in #lwgl were asking that too :P
+02:57 < RTFM_FTW> - and the answer would be?
+02:58 < multi_io_> it's a medical image viewer; those are the dimensions of the image...  the glTexSubImage2D call is done 
+                   by a library which I use to read those images into GL
+02:58 < NoobFukaire> you can pad the texture to ^2 and "fix" things with texture coordinates
+03:00 < RTFM_FTW> - yup
+03:01 < RTFM_FTW> - in this case I'd definitely recommend padding the data
+03:02 < multi_io_> ok, I understand
