@@ -191,3 +191,5 @@
 18:08 < multi_io> ..so no %dl in that case.
 18:13 < multi_io> so in that case the uuid would be read by grub-install, patched into core.img, and then 
                   used from there at runtime to locate the disk in the system?
+18:30 < multi_io> ...and the uuid grub-install writes out would be the one of the disk the --root-directory 
+                  is located on (which is what grub-install "auto-detects")?
