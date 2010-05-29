@@ -193,3 +193,41 @@
                   used from there at runtime to locate the disk in the system?
 18:30 < multi_io> ...and the uuid grub-install writes out would be the one of the disk the --root-directory 
                   is located on (which is what grub-install "auto-detects")?
+
+[...]
+
+20:24 < multi_io> somebody should prolly separate grub_install from the whole autodetection machinery, and 
+                  just have the former read a config file that the latter generates.
+20:25 < multi_io> (unless I misunderstand what this thing really does)
+20:26 < phcoder> clausen: because you can't know X in (hdX,1) for sure
+20:26 < clausen> yeah, I get that
+20:26 < clausen> that you don't know it for sure
+20:26 < clausen> but I don't understand why that function was deprecated
+20:26 < phcoder> multi_io: it's pointless
+
+[...]
+
+21:10 < multi_io> so, to summarize, /usr/sbin/grub-install --root-directory=/mnt/newtick /dev/sda   ran 
+                  through,
+21:10 < multi_io> with /mnt/newtick/boot/grub/device.map containing (hd1)/dev/sda.
+21:10 < multi_io> ..which is correct right now (install time), but won't be at runtime.
+21:11 < multi_io> (at which time what is now /dev/sda will be hd0)
+21:11 < multi_io> is this installation going to work?
+21:12 < multi_io> or do I have to modify /mnt/newtick/boot/grub/device.map to contain (hd0) /dev/sda ?
+
+21:35 < multi_io> must device.map contain the configuration as it is at grub-install time or at system 
+                  startup time?
+21:36 < arand> multi_io: I have no idea, if you use --recheck it should create one, which presumably should 
+               be correct..
+21:36 < phcoder_> multi_io: doesn't matter. I already told you that.
+21:38 < multi_io> if it doesn't matter, why does the file exist?
+21:38 < multi_io> (sorry, that was probably a devil's advocate question)
+21:39 < phcoder_> multi_io: we're in progress of removing it
+21:39 < multi_io> arand: that would give me the configuration as it is at grub-install time I guess
+21:40 < multi_io> phcoder_: really?
+21:40 < multi_io> so both variants will work in my case?
+21:40 < phcoder_> yes
+21:41 < multi_io> so it would use that information only as a fallback at runtime (i.e. normally it won't use 
+                  it at all)?
+21:41 < phcoder_> yes
+21:41 < multi_io> I see. Thanks.
