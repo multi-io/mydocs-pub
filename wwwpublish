@@ -36,6 +36,7 @@ sub rejected {
          m!^./ajax/! or
          m!^./ruby! or
          m!^./perl! or
+         m!^./grub! or
          m!^./Makefile! or
          m!^./java/nio! or
          m!^./java/.*?txt$! or
