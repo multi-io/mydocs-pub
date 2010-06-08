@@ -1,0 +1,26 @@
+20:41 < multi_io> in this nvidia document I'm reading here (http://www.nvidia.com/docs/IO/40049/TB-04631-001_v02.pdf), they're 
+                  converting unnormalized, unsigned 16-bit grayscale input texel values (internalFormat GL_ALPHA16UI_EXT), 
+                  containing 12-bit values, to normalized (0..1) values in the shader.
+20:41 < multi_io> they do that by doing normalized = unnormalized/4096.0
+20:42 < multi_io> shouldn't that be normalized = unnormalized/4095.0 ?
+20:42 < multi_io> is that just common sloppiness?
+20:42 < multi_io> or am I wrong?
+20:42 < MatthiasM2> it's probably a lot cheaper to avoid the 1.0
+20:43 < MatthiasM2> as dividing by 4096 is just a subtraction of 14 :)
+20:43 < multi_io> hm, they use the normalized value for a lookup in a 1D texture afterwards
+20:43 -!- delt0r_ [~delt0r@188-22-160-169.adsl.highway.telekom.at] has quit [Ping timeout: 260 seconds]
+20:43 < MatthiasM2> should still be ok
+20:43 < multi_io> if you avoid the 1.0, you'll never lookup the maximum values from the 1D texture
+20:43 < multi_io> that can't be right...
+20:44 < multi_io> those are medical image visualization tasks
+20:44 < MatthiasM2> 0.0 and 1.0 can't be both inside the texture :)
+20:44 < MatthiasM2> 1.0 is the same texel as 0.0 when you use wrap around addressing
+20:44 < multi_io> hm
+20:45 < MatthiasM2> and when you draw a 2d quad you use (texX + width) / texWidth as right texture coordinate - which would also 
+                    be wrong except that the right border of a quad is exclusive
+20:45 < multi_io> so if you have a 1D texture with 4096 texels, which input coordinate would get you exactly the first texel?
+20:45 < MatthiasM2> 0.0
+20:45 < multi_io> and the last texel?
+20:46 < MatthiasM2> 4095 / 4096.0
+20:46 < multi_io> I see
+20:46 < multi_io> well, then normalized = unnormalized/4096.0 would be right
