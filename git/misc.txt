@@ -88,3 +88,36 @@ To pull changes from it, use "git pull <remotename> <branch>"
 TODO: branching/merging
 
 - common workflow: merge branches, topic branches
+
+
+
+  507  git pull origin restart-from-svn
+  508  git reset --hard
+  509  git fetch origin restart-from-svn
+  510  gitk --all &
+  511  git status MERGE_HEAD
+  512  git status HEAD
+  513  git log HEAD
+  514  git log MERGE_HEAD
+  515  git tag show
+  516  man git tag]
+  517  man git tag
+  518  ls .git/refs/tags/
+  519  ls .git/refs/tags/show 
+  520  less .git/refs/tags/show
+  521  ll .git/branches/
+  522  ll .git/refs/tags/show 
+  523  ll .git/HEAD 
+  524  cat .git/HEAD 
+  525  man git fetch
+  526  cat .git/FETCH_HEAD 
+  527  man git fetch
+  528  man git mergetool
+  529  git merge
+  530  man git mergetool
+  531  man git merge
+  532  cat .git/FETCH_HEAD 
+  533  man git pull
+  534  git merge FETCH_HEAD
+  536  git add src/de/sofd/viskit/ui/imagelist/jlistimpl/test/JListImageListTestApp.java
+  537  git commit
