@@ -1,6 +1,7 @@
 package de.oklischat.ajtest1;
 
 
+@PropChangeEventSupport
 public class Car {
 
     private String name;
@@ -28,7 +29,8 @@ public class Car {
     public double getLocation() {
         return location;
     }
-    
+
+    @FiresPropChangeEvent
     public void setLocation(double location) {
         this.location = location;
     }
@@ -37,6 +39,7 @@ public class Car {
         return speed;
     }
     
+    @FiresPropChangeEvent
     public void setSpeed(double speed) {
         this.speed = speed;
     }
