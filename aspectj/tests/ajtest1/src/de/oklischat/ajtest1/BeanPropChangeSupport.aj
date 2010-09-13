@@ -30,10 +30,14 @@ public aspect BeanPropChangeSupport {
 
 
     pointcut setterExecution(Object target, Object newVal): execution(void *.set*(..)) && target(target) && args(newVal); // && @withincode(FiresPropChangeEvent);
-    //pointcut setterExecution(): execution(void *.set*(..));
-    //pointcut setterExecution(): call(void *.set*(..));
+
+    ////doesn't work because, apparently, an execution is in its own cflow
+    pointcut outmostSetterExecution(Object target, Object newVal): setterExecution(target, newVal) && !cflow(setterExecution(*,*));
+
+    //pointcut setterExecution(Object target, Object newVal): execution(void *.set*(..)) && target(target) && args(newVal); // && @withincode(FiresPropChangeEvent);
 
 
+    
     void around(Object target, Object newVal): setterExecution(target, newVal) {
         String setterName = thisJoinPointStaticPart.getSignature().getName();
         String getterName = "get" + setterName.substring(3);

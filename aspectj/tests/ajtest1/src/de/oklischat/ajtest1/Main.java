@@ -21,7 +21,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Car c1 = new Car("c1", 0, 15);
         c1.addPropertyChangeListener(loggingPCL);
-        Car c2 = new Car("c2", 0, 25);
+        Car c2 = new VW("vw2", 0, 25);
         c2.addPropertyChangeListener(loggingPCL);
         c1.driveFor(10);
         c2.driveFor(10);
