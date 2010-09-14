@@ -8,7 +8,7 @@ public class Main {
 
     private static PropertyChangeListener loggingPCL = new PropertyChangeListener() {
         
-        //@Override
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             System.out.println("PropChangeEvt: src=" + evt.getSource() + ", prop=" + evt.getPropertyName() +
                                ", old=" + evt.getOldValue() + ", new=" + evt.getNewValue());

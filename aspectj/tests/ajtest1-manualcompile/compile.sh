@@ -9,4 +9,4 @@ ajcp=lib/aspectj/aspectjrt.jar
 
 cp="bin:$ajcp"
 
-ajc -1.5 -classpath "$cp" -d bin -sourceroots src
+ajc -1.6 -classpath "$cp" -d bin -sourceroots src
