@@ -7,13 +7,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public aspect BeanPropChangeSupport {
 
-    //TODO: how to use "all classes annotated with @PropChangeEventSupport" rather than Car?
-
     //the following results in a compiler error in the IDE but works when compiling with ajc on the command line
     // apparently the IDE thinks "this" is the BeanPropChangeSupport instance (hence the error), but ajc correctly takes it as the target Car instance
     //private PropertyChangeSupport Car.propChangeSupport = new PropertyChangeSupport((this instanceof Car));
     
-    interface PropSupport {
+    interface PropSupport extends PropEvtMethods {
     }
 
     private PropertyChangeSupport PropSupport.propChangeSupport = new PropertyChangeSupport(this);

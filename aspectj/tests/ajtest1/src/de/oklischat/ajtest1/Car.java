@@ -2,7 +2,7 @@ package de.oklischat.ajtest1;
 
 
 @PropChangeEventSupport
-public class Car {
+public class Car implements PropEvtMethods {
 
     private String name;
     private double location, speed;
