@@ -60,6 +60,13 @@ def unionRand(rand1, rand2, rand1amount)
   }
 end
 
+# add two generators rand1 and rand2
+def sumRand(rand1, rand2)
+  proc {
+      rand1.call + rand2.call
+  }
+end
+
 
 # generate and return  histogram of generator rand
 # output format [[x1,y1],[x2,y2],...,[xn,yn]]
@@ -77,6 +84,30 @@ def calcRandHistogram2(rand, lowerBound, upperBound, nSections=100, nRuns=10000)
   result
 end
 
+def getRandMeanAndStdDev(rand, nRuns=1000)
+  sum = 0.0; sqSum = 0.0
+  nRuns.times {
+    r = rand.call
+    sum += r
+    sqSum += r * r
+  }
+  mean = sum / nRuns
+  stdDev = Math.sqrt(sqSum / nRuns - mean * mean)
+  [mean, stdDev]
+end
+
+def getRandMean(rand, nRuns=1000)
+  getRandMeanAndStdDev(rand,nRuns)[0]
+end
+
+def getRandStdDev(rand, nRuns=1000)
+  getRandMeanAndStdDev(rand,nRuns)[1]
+end
+
+def getRandVariance(rand, nRuns=1000)
+  stddev = getRandMeanAndStdDev(rand,nRuns)[1]
+  stddev * stddev
+end
 
 # generate and return  histogram of generator rand
 # output format [[x1,x2,...,xn],[y1,y2,...yn]] (suitable for plotRandHistogram)
