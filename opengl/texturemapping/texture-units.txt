@@ -1,0 +1,22 @@
+15:49 < multi_io> does glTexParameter() influence the currently bound texture only? Or the whole texture target?
+17:14 < MatthiasM> multi_io: bound texture on that target
+17:50 < multi_io> MatthiasM: ...and also only the current texture unit on that target, right?
+17:50 < MatthiasM> no
+17:50 < MatthiasM> it is applied to the bound texture
+17:54 < multi_io> I thought one could have one bound texture per (texture state, texture unit)?
+17:54 < multi_io> eerm
+17:54 < MatthiasM> yes, but glTexParameter applies a value to the bound texture
+17:54 < multi_io> one bound texture per (target, texture unit)?
+17:54 < MatthiasM> yes
+17:57 < multi_io> ok, so one can say that the "currently bound texture" for a target always belongs to a texture unit of that target
+17:58 < multi_io> (which can be set by calling glActiveTexture() before glBindTexture())
+17:58 < multi_io> correct?
+17:58 < MatthiasM> yes
+17:59 < MatthiasM> but you can bind a texture to several texture units
+18:01 < multi_io> ok
+18:05 < multi_io> do you know why the OpenGL inventors decided that the target itself is not part of the GL state (but must be supplied in 
+                  each call), but the texture unit is?
+18:08 < multi_io> my current impression is that when they added texture units/multitexturing to OpenGL, they didn't want to change existing 
+                  calls, so they added the "current texture unit" as an additional state
+18:40 < MatthiasM> yes
+
