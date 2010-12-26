@@ -63,7 +63,17 @@ bug?
 
 It I understand this correctly, the sender must include an IP (and
 UDP?) header in every IP fragment (not: packet) it sends. An IP
-fragment is a part of an IP packet that fits into a layer 2 MTU. The
+fragment is a part of an IP packet that fits into a layer 2 PDU. The
 IP header contains a field "fragment offset" that specifies where in
 the packet the fragment is located. Shouldn't the IP stack do all
 this, even for UDP?
+
+
+UPDATE2:
+
+Looking at the strace again, it seems unfsd sent UDP packets with a
+length of 4100 bytes. This would mean that UDP fragmentation should
+occur even at MTU=1500. So maybe the IP stack on tick, not unfsd, is
+the culprit after all? (for not finding out that tack's MTU was
+smaller than 1500 -- so maybe path MTU discovery didn't work, possibly
+because of some firewalling issue?)
