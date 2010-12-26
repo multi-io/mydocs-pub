@@ -103,7 +103,7 @@ dead.letter.udptransfer-mtu1500-to-1400.pcap)
 (with mtu 1500 on tack it works as expected)
 
 
-on tick (Sender):
+on tick (sender):
 
 socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
@@ -134,3 +134,9 @@ recvfrom(3,
 
 //(receives nothing (local IP stack didn't deliver the received
 //fragment because it's incomplete))
+
+
+
+UPDATE4: Apparently, the problem occurs only when sending from tick to
+tack. When sending from teck to cat, UDP works even in the presence of
+changed MTUs. So the bridge code on tick is the culprit?
