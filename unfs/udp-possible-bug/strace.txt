@@ -1,0 +1,125 @@
+select(1024, [3 4], NULL, NULL, {1, 0}
+) = 1 (in [3], left {0, 976000})
+recvmsg(3, {msg_name(16)={sa_family=AF_INET, sin_port=htons(990), sin_addr=inet_addr("192.168.142.2")}, msg_iov(1)=[{"\22\270z\265\0\0\0\0\0\0\0\2\0\1\206\243\0\0\0\3\0\0\0"..., 36864}], msg_controllen=24, {cmsg_len=24, cmsg_level=SOL_IP, cmsg_type=, ...}, msg_flags=0}, 0) = 116
+lstat64("/home/olaf", {st_mode=S_IFDIR|0755, st_size=36864, ...}) = 0
+open("/home/olaf", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DIRECTORY|0x80000) = 2
+fstat64(2, {st_mode=S_IFDIR|0755, st_size=36864, ...}) = 0
+getdents64(2, /* 116 entries */, 4096)  = 4056
+lstat64("/home/olaf/.", {st_mode=S_IFDIR|0755, st_size=36864, ...}) = 0
+lstat64("/home/olaf/..", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.thumbnails", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.gnus.swangoose", {st_mode=S_IFREG|0600, st_size=22592, ...}) = 0
+lstat64("/home/olaf/.dia", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.nautilus", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/intbas.old", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/RG-5205154-7.pdf", {st_mode=S_IFREG|0600, st_size=42545, ...}) = 0
+lstat64("/home/olaf/.mailcap~", {st_mode=S_IFREG|0644, st_size=1849, ...}) = 0
+lstat64("/home/olaf/cserve-question.txt~", {st_mode=S_IFREG|0600, st_size=29, ...}) = 0
+lstat64("/home/olaf/fetchrfc.sh~", {st_mode=S_IFREG|0755, st_size=130, ...}) = 0
+lstat64("/home/olaf/int.txt", {st_mode=S_IFREG|0644, st_size=31, ...}) = 0
+lstat64("/home/olaf/myldap", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/posts", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.saves-9928-tack", {st_mode=S_IFREG|0644, st_size=100, ...}) = 0
+lstat64("/home/olaf/gnap.txt~", {st_mode=S_IFREG|0644, st_size=12, ...}) = 0
+lstat64("/home/olaf/.saves-393-localhost.localdomain", {st_mode=S_IFREG|0644, st_size=68, ...}) = 0
+lstat64("/home/olaf/shared.dat", {st_mode=S_IFREG|0644, st_size=0, ...}) = 0
+lstat64("/home/olaf/.saves-618-localhost.localdomain", {st_mode=S_IFREG|0644, st_size=56, ...}) = 0
+lstat64("/home/olaf/Explore3D", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/lesspipe", {st_mode=S_IFREG|0755, st_size=6207, ...}) = 0
+lstat64("/home/olaf/donkey", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.licq", {st_mode=S_IFDIR|0700, st_size=4096, ...}) = 0
+lstat64("/home/olaf/ppp-options", {st_mode=S_IFREG|0644, st_size=2382, ...}) = 0
+lstat64("/home/olaf/.jpython~", {st_mode=S_IFREG|0644, st_size=64, ...}) = 0
+lstat64("/home/olaf/.viminfo", {st_mode=S_IFREG|0600, st_size=9457, ...}) = 0
+lstat64("/home/olaf/ML2Vortrag.ppt", {st_mode=S_IFREG|0644, st_size=156672, ...}) = 0
+lstat64("/home/olaf/RG-5205154-12.pdf", {st_mode=S_IFREG|0600, st_size=41753, ...}) = 0
+lstat64("/home/olaf/perl6sec6", {st_mode=S_IFREG|0644, st_size=2381, ...}) = 0
+lstat64("/home/olaf/.giFT", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/cd-images", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.eMule", {st_mode=S_IFREG|0644, st_size=4162, ...}) = 0
+lstat64("/home/olaf/.gtkrc.mine", {st_mode=S_IFREG|0644, st_size=73, ...}) = 0
+lstat64("/home/olaf/ping.shar", {st_mode=S_IFREG|0644, st_size=40752, ...}) = 0
+lstat64("/home/olaf/.translate", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/Mailbox", {st_mode=S_IFREG|0600, st_size=365, ...}) = 0
+lstat64("/home/olaf/.newsrc.old", {st_mode=S_IFREG|0644, st_size=23710, ...}) = 0
+lstat64("/home/olaf/missfont.log", {st_mode=S_IFREG|0644, st_size=3702, ...}) = 0
+lstat64("/home/olaf/.gtris", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/gc.txt", {st_mode=S_IFREG|0644, st_size=2232, ...}) = 0
+lstat64("/home/olaf/.xscreensaver.ren", {st_mode=S_IFREG|0644, st_size=943, ...}) = 0
+lstat64("/home/olaf/kernelcompile-gcc", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/physik", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.htoprc", {st_mode=S_IFREG|0644, st_size=542, ...}) = 0
+lstat64("/home/olaf/signals", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/watchme", {st_mode=S_IFREG|0744, st_size=263, ...}) = 0
+lstat64("/home/olaf/.saves-1493-tack", {st_mode=S_IFREG|0644, st_size=56, ...}) = 0
+lstat64("/home/olaf/.gnus.localhost", {st_mode=S_IFREG|0644, st_size=6265, ...}) = 0
+lstat64("/home/olaf/.FVWM2-errors", {st_mode=S_IFREG|0664, st_size=144, ...}) = 0
+lstat64("/home/olaf/blatt2-aufgabe2.txt.bz2", {st_mode=S_IFREG|0644, st_size=1853, ...}) = 0
+lstat64("/home/olaf/perl6sec9", {st_mode=S_IFREG|0644, st_size=3171, ...}) = 0
+lstat64("/home/olaf/ssh-cs", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/config", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/c++plugin", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/corba.el", {st_mode=S_IFREG|0644, st_size=39523, ...}) = 0
+lstat64("/home/olaf/agent.lib.cpy", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.antrc~", {st_mode=S_IFREG|0644, st_size=28, ...}) = 0
+lstat64("/home/olaf/bluej.old", 
+{st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/bla", {st_mode=S_IFREG|0644, st_size=36, ...}) = 0
+lstat64("/home/olaf/.xemacs-options", {st_mode=S_IFREG|0644, st_size=2324, ...}) = 0
+lstat64("/home/olaf/ComponentSpecWriter.java", {st_mode=S_IFREG|0644, st_size=6798, ...}) = 0
+lstat64("/home/olaf/.lynxrc", {st_mode=S_IFREG|0600, st_size=11299, ...}) = 0
+lstat64("/home/olaf/gnus-servers.el~", {st_mode=S_IFREG|0644, st_size=374, ...}) = 0
+lstat64("/home/olaf/.nautilus-metafile.xml", {st_mode=S_IFREG|0644, st_size=281, ...}) = 0
+lstat64("/home/olaf/.qmail-klischat", {st_mode=S_IFREG|0644, st_size=21, ...}) = 0
+lstat64("/home/olaf/hot~", {st_mode=S_IFREG|0644, st_size=952, ...}) = 0
+lstat64("/home/olaf/olaf", {st_mode=S_IFDIR|0700, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.saves-1525-localhost.localdomain", {st_mode=S_IFREG|0644, st_size=38, ...}) = 0
+lstat64("/home/olaf/friends-history", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.lbreakout.cfg", {st_mode=S_IFREG|0644, st_size=144, ...}) = 0
+lstat64("/home/olaf/.jacorb_properties~", {st_mode=S_IFREG|0755, st_size=4586, ...}) = 0
+lstat64("/home/olaf/XML_Gruppe.ppt.md5sum", {st_mode=S_IFREG|0644, st_size=49, ...}) = 0
+lstat64("/home/olaf/#cff-burned.txt#", {st_mode=S_IFREG|0600, st_size=34, ...}) = 0
+lstat64("/home/olaf/mp3login", {st_mode=S_IFREG|0744, st_size=29, ...}) = 0
+lstat64("/home/olaf/glibcinst", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/tracetest", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.bashrc.myissthost", {st_mode=S_IFREG|0644, st_size=103, ...}) = 0
+lstat64("/home/olaf/.oasysrc", {st_mode=S_IFREG|0644, st_size=42, ...}) = 0
+lstat64("/home/olaf/jsp", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/bestandene-lvs.txt", {st_mode=S_IFREG|0644, st_size=1114, ...}) = 0
+lstat64("/home/olaf/heisenews.tgz", {st_mode=S_IFREG|0644, st_size=4171678, ...}) = 0
+lstat64("/home/olaf/Cluster.java", {st_mode=S_IFREG|0644, st_size=4989, ...}) = 0
+lstat64("/home/olaf/w3tracer", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.fvwm2rc.m4.new", {st_mode=S_IFREG|0644, st_size=4770, ...}) = 0
+lstat64("/home/olaf/mailtest~", {st_mode=S_IFREG|0755, st_size=303, ...}) = 0
+lstat64("/home/olaf/.Eterm", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/Noname", {st_mode=S_IFREG|0644, st_size=84, ...}) = 0
+lstat64("/home/olaf/.xsession-errors", {st_mode=S_IFREG|0600, st_size=24833, ...}) = 0
+lstat64("/home/olaf/dwnlds", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.newsrc.isstserver", {st_mode=S_IFREG|0644, st_size=9522, ...}) = 0
+lstat64("/home/olaf/pics", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.tomcatrc~", {st_mode=S_IFREG|0644, st_size=190, ...}) = 0
+lstat64("/home/olaf/nntp_fromstat", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.saves-1096-localhost.localdomain", {st_mode=S_IFREG|0644, st_size=56, ...}) = 0
+lstat64("/home/olaf/BLContractMgmt.xml", {st_mode=S_IFREG|0644, st_size=14286, ...}) = 0
+lstat64("/home/olaf/ibmwstk", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/sgraf.jpg", {st_mode=S_IFREG|0644, st_size=26626, ...}) = 0
+lstat64("/home/olaf/dnrd.2.ps", {st_mode=S_IFREG|0644, st_size=15103, ...}) = 0
+lstat64("/home/olaf/.mozilla", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.ncftp", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/mp3search", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.ssh.prw", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.w3m", {st_mode=S_IFDIR|0700, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.saves-25763-tick", {st_mode=S_IFREG|0644, st_size=56, ...}) = 0
+lstat64("/home/olaf/posting.txt~", {st_mode=S_IFREG|0644, st_size=4724, ...}) = 0
+lstat64("/home/olaf/sgl", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+lstat64("/home/olaf/.Xdefaults~", {st_mode=S_IFREG|0644, st_size=2304, ...}) = 0
+lstat64("/home/olaf/ha2.ps", {st_mode=S_IFREG|0644, st_size=84402, ...}) = 0
+lstat64("/home/olaf/httpdump", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+close(2)                                = 0
+lstat64("/home/olaf", {st_mode=S_IFDIR|0755, st_size=36864, ...}) = 0
+getuid32()                              = 501
+getgid32()                              = 100
+sendmsg(3, {msg_name(16)={sa_family=AF_INET, sin_port=htons(990), sin_addr=inet_addr("192.168.142.2")}, msg_iov(1)=[{"\22\270z\265\0\0\0\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 4100}], msg_controllen=24, {cmsg_len=24, cmsg_level=SOL_IP, cmsg_type=, ...}, msg_flags=0}, 0
+) = 4100
+time(NULL)                              = 1293341208
+select(1024, [3 4], NULL, NULL, {1, 0}
