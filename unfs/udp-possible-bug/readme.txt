@@ -77,3 +77,60 @@ occur even at MTU=1500. So maybe the IP stack on tick, not unfsd, is
 the culprit after all? (for not finding out that tack's MTU was
 smaller than 1500 -- so maybe path MTU discovery didn't work, possibly
 because of some firewalling issue?)
+
+
+working-ls.pcap contains the dump of a successful "ls
+/tickhome/olaf/utils/" (after the MTU was changed to 1500)
+
+
+
+UPDATE3:
+
+Problem can be reproduced with netcat:
+
+tack:~# ip link set eth0 mtu 1400
+tack:~# nc -l -u -p 6543
+(hangs, doesn't output anything)
+
+[root@tick /etc/init.d]# ls -l ~/dead.letter 
+-rw------- 1 root root 7941 2006-04-22 21:01 /root/dead.letter
+[root@tick /etc/init.d]# cat ~/dead.letter | nc -u tack 6543
+(hangs)
+
+(only a fragment of the data is sent -- see
+dead.letter.udptransfer-mtu1500-to-1400.pcap)
+
+(with mtu 1500 on tack it works as expected)
+
+
+on tick (Sender):
+
+socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
+setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+rt_sigaction(SIGALRM, {SIG_IGN}, {SIG_DFL}, 8) = 0
+alarm(0)                                = 0
+rt_sigprocmask(SIG_BLOCK, NULL, [], 8)  = 0
+connect(3, {sa_family=AF_INET, sin_port=htons(6543), sin_addr=inet_addr("192.168.142.2")}, 16) = 0
+rt_sigaction(SIGALRM, {SIG_IGN}, {SIG_IGN}, 8) = 0
+alarm(0)                                = 0
+select(16, [0 3], NULL, NULL, NULL)     = 1 (in [0])
+read(0, "To: root\nSubject: Debconf: Confi"..., 8192) = 7941
+write(3, "To: root\nSubject: Debconf: Confi"..., 7941) = 7941     //Sending
+select(16, [0 3], NULL, NULL, NULL)     = 1 (in [0])
+read(0, "", 8192)                       = 0
+close(0)                                = 0
+select(16, [3], NULL, NULL, NULL
+
+
+on tack (receiver):
+
+socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
+setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+bind(3, {sa_family=AF_INET, sin_port=htons(6543), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
+rt_sigaction(SIGALRM, {SIG_IGN, [ALRM], SA_RESTORER|SA_RESTART, 0x7f0336d2d1f0}, {SIG_DFL, [], 0}, 8) = 0
+alarm(0)                                = 0
+rt_sigprocmask(SIG_BLOCK, NULL, [], 8)  = 0
+recvfrom(3, 
+
+//(receives nothing (local IP stack didn't deliver the received
+//fragment because it's incomplete))
