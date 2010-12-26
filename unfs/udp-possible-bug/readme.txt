@@ -1,5 +1,6 @@
 Situation: I have unfs3 running on a small nfs server (machine named
-tick), which exports its /home to a machine named tack:
+tick (IP: 192.168.142.1)), which exports its /home to a machine named
+tack (IP: 192.168.142.2):
 
 [root@tick ~]# cat /etc/exports
 /home        tack(rw,no_subtree_check,root_squash)
@@ -7,7 +8,7 @@ tick), which exports its /home to a machine named tack:
 #/var/tmp/xmule-files    tack(rw,root_squash)
 [root@tick ~]# 
 
-unfsd is run on tick (IP 192.168.142.1) like this:
+unfsd is run on tick like this:
 
 
 olaf      1033  0.0  1.0   6912  5208 ?        Ss   06:10   0:01 /usr/sbin/unfsd -i /home/olaf/unfsd.pid -u -n 2049 -m 2049 -l 192.168.142.1 -s -p
