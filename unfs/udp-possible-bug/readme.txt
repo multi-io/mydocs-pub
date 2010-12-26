@@ -37,3 +37,33 @@ This leads me to believe that the ls call (or rather, the NFS client
 in the kernel that's invoked by it) doesn't recognize/receive
 the NFS response packets and thus hangs. The root of the problem would
 be the fact that unfsd doesn't send valid UDP packets in this case.
+
+
+
+UPDATE:
+
+The problem was that I issued a "ip link set eth0 mtu 1400" call on
+tack a few days earlier, reducing the MTU of the interface from 1500
+to 1400 and thus, apparently, causing the IP stack of tick (which
+recognized the changed MTU on tack?) to FRAGMENT the UDP packets sent
+out by unfsd. This lead to the "incomplete" IP datagrams seen in
+wireshark and thus to the problem of the NFS client on tack no longer
+recognizing the fragments as UDP packets.
+
+"ip link set eth0 mtu 1500" dealt with the problem.
+
+I'm not sure whether the fact that unfs can't handle the smaller MTU
+is to be considered a bug in unfs.
+
+See
+e.g. http://lists.apple.com/archives/darwin-development/2004/May/msg00069.html
+(this is OSX though) -- according to that, the userspace would have to
+find out the MTU and do the fragmentation itself -- so it is a unfs
+bug?
+
+It I understand this correctly, the sender must include an IP (and
+UDP?) header in every IP fragment (not: packet) it sends. An IP
+fragment is a part of an IP packet that fits into a layer 2 MTU. The
+IP header contains a field "fragment offset" that specifies where in
+the packet the fragment is located. Shouldn't the IP stack do all
+this, even for UDP?
