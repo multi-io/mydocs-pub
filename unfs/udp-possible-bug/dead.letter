@@ -1,0 +1,189 @@
+To: root
+Subject: Debconf: Configuring mysql-server-5.0 -- Install Hints
+
+On upgrades from MySQL 3.23, as shipped with Debian Woody, symlinks in
+place of /var/lib/mysql or /var/log/mysql gets accidently removed and have
+manually be restored.
+
+MySQL will only install if you have a non-numeric hostname that is
+resolvable via the /etc/hosts file. E.g. if the "hostname" command returns
+"myhostname" then there must be a line like "10.0.0.1 myhostname".
+
+A new mysql user "debian-sys-maint" will be created. This mysql account is
+used in the start/stop and cron scripts. Don't delete.
+
+Please remember to set a PASSWORD for the MySQL root user! If you use a
+/root/.my.cnf, always write the "user" and the "password" lines in there,
+never only the password!
+
+See /usr/share/doc/mysql-server-5.0/README.Debian for more information.
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Debconf: Configuring atlas3-base -- Directory layout for atlas libraries
+
+These atlas packages provide a number of static and shared libraries
+optimized for commonly found hosts.  The packages will configure your
+runtime linker to use the version best suited for your system from the
+versions you select for installation.  You can, however, override this
+system default by setting the LD_LIBRARY_PATH environment variable for a
+given process at runtime.  The first directory in this path containing the
+library sought will be used by the runtime linker.  The directory layout
+used by atlas is as follows:
+
+/usr/lib -- reference blas and lapack libraries if installed; atlas
+libraries using only generic code for this general architecture.
+
+/usr/lib/atlas	--  atlas-provided blas and lapack libs using only generic
+code for this general architecture.
+
+/usr/lib/<flag> --  atlas libraries using cpu extension instructions which
+require the running cpu to have capability <flag>, as reported in
+/proc/cpuinfo.	E.g. 'sse' for SSE1, '3dnow' for 3dnow, etc.
+
+/usr/lib/atlas/<flag> -- atlas-provided blas and lapack libraries using
+ cpu extensions as described above.
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Debconf: Configuring atlas3-base -- Using atlas-provided blas/lapack instead of reference
+
+Atlas provides binary compatible blas and lapack shared libraries which
+can transparently be used instead of the reference implementations (i.e.
+packages blas and lapack), thereby significantly enhancing the performance
+of several software packages using BLAS and LAPACK routines (e.g. R,
+octave).  This package has configured ld.so.conf to load the
+atlas-provided versions of these libraries instead of the reference
+versions which may or may not be installed.
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Debconf: Configuring atlas3-base -- Sharing /usr via nfs
+
+Please note that if you export /usr via nfs, the runtime linker
+configuration performed here will not affect the nfs clients.  These atlas
+packages can therefore be installed on an nfs server serving a mixed
+subarchitecture network, with each client running its own optimal version
+of the libraries.  To achieve this, please configure /etc/ld.so.conf on
+the clients appropriately given the directory layout specified previously,
+and then run ldconfig.
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Debconf: Configuring language-env -- Only installing this package doesn't work
+
+This package does not affect the configuration of your system during
+installation.  You need to login as an ordinary (non-root) user and invoke
+the "set-language-env" command.
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Debconf: Configuring lapack3 -- Minor lapack errors
+
+One or more minor lapack library errors were discovered when this package
+was built.  As of the time of this writing, the cause of these errors are
+unknown. These errors are typically similar to those routinely reported by
+other lapack users, and are often manifested by a loss of a few decimal
+places of precision in certain routines under conditions near overflow or
+underflow.  One should nevertheless review the discrepancies before using
+lapack for serious numerical research.
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Debconf: Configuring libraw1394-5 -- Check that /dev/raw1394 permissions are appropriate for you.
+
+The device file /dev/raw1394 will be created for libraw1394.  This library
+is used by applications to access FireWire devices.
+
+The default access permissions allows only users in the "disk" group. 
+This restrictive setting was chosen since raw1394 allows almost full
+access to the FireWire bus and all connected devices are accessible, which
+may include hard disks.
+
+If you don't intend to connect sensitive devices and e.g. only want to get
+video streams out of a camera, you can relax the permissions.  If you
+don't have malicious users on your system, you can allow access for all
+users with this command (executed as the root user):
+    chmod 666 /dev/raw1394
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Chrony
+
+
+The password for chronyc is in /etc/chrony/chrony.keys.
+
+Chrony has been configured to assume that your real-time clock is on UTC time.
+If this is not correct edit /etc/chrony/chrony.conf.  The comments explain
+what to do.
+
+In the chrony.conf included in this package:
+
+Chrony has been configured on the assumption that you are using either a dialup
+connection or a PPPoE DSL connection.  It will be brought online when PPP 
+comes up and offline when it goes down.  If this is not correct you should edit
+/etc/chrony/chrony.conf.  The comments explain what to do.  For more 
+information on configuring Chrony use the command  'info chrony'.
+
+You can also change the default time servers in  /etc/chrony/chrony.conf.
+
+Updating of the real-time clock has been enabled but some systems that use
+either the genrtc driver or have HPET hardware clocks have problems.  To
+disable real-time clock updating edit /etc/chrony/chrony.conf.  The
+comments explain what to do.
+
+To: root
+Subject: Debconf: Configuring lirc-modules-source -- How to build the binary modules package.
+
+For instruction on how to build the binary modules debian package read:
+/usr/share/doc/lirc-modules-source/README.Debian
+
+Quick walktrough:
+
+cd /usr/src/
+
+tar -xzf lirc-modules.tar.gz
+
+cd modules/lirc
+
+debian/rules binary-modules KSRC=/path/of/my/kernel/source/
+
+dpkg -i ../lirc-modules-*.deb
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
+To: root
+Subject: Debconf: Configuring shaper -- shaper needs some kernel modules
+
+In order to use the programs in this package, you need the shaper,
+sch_cbq, sch_tbf, sch_sfq, sch_prio, cls_fw, cls_u32, and cls_route kernel
+modules. Some of these (sch_cbq, sch_tbf, sch_sfq, sch_prio, cls_fw,
+cls_u32, cls_route) can't be seen on your system currently. There are
+several possibilities. You may have compiled them into your kernel
+statically (as opposed to building them as modules), in which case you may
+discard this message. If, however, they aren't available at all (either as
+modules or as compiled-in drivers), you will need to either recompile your
+kernel or use a different kernel-image package. Please read
+/usr/share/doc/shaper/README.Debian for more details.
+
+Once again, if you have these features compiled directly into your kernel,
+then please ignore this note.
+
+-- 
+Debconf, running at tick
+[ Debconf was not configured to display this note, so it mailed it to you. ]
