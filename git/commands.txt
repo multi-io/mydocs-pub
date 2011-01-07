@@ -11,3 +11,9 @@ git reset --soft HEAD^
 to unstage changes:
 
 git reset HEAD <files>
+
+
+to abort a merge:
+
+git reset --hard
+
