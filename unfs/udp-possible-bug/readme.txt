@@ -1,6 +1,6 @@
-Situation: I have unfs3 running on a small nfs server (machine named
-tick (IP: 192.168.142.1)), which exports its /home to a machine named
-tack (IP: 192.168.142.2):
+Situation: unfs3 server running on a small nfs server (machine named
+tick (IP: 192.168.142.1; see ipstacks-config.txt for details)),
+exports its /home to a machine named tack (IP: 192.168.142.2):
 
 [root@tick ~]# cat /etc/exports
 /home        tack(rw,no_subtree_check,root_squash)
@@ -19,10 +19,11 @@ On tack, this is mounted on /tickhome:
 tick:/home on /tickhome type nfs (rw,udp,port=2049,mountport=2049,nfsvers=3,mountvers=3,addr=192.168.142.1)
 
 
-I'm experiencing the problem that a "ls /tickhome/olaf" on tack hangs indefinetely.
+The immediate problem is that a "ls /tickhome/olaf" on tack hangs
+indefinetely.
 
 
-When I strace the unfsd process, I can see that it receives NFS
+When straceing the unfsd process, you can see that it receives NFS
 readdir calls every few seconds, and it also (apparently) answers them
 correctly with an NFS response packet.
 
@@ -97,8 +98,8 @@ tack:~# nc -l -u -p 6543
 [root@tick /etc/init.d]# cat ~/dead.letter | nc -u tack 6543
 (hangs)
 
-(only a fragment of the data is sent -- see
-dead.letter.udptransfer-mtu1500-to-1400.pcap)
+(only a fragment of the data is sent -- apparently the last 549 bytes
+-- see dead.letter.udptransfer-mtu1500-to-1400.pcap)
 
 (with mtu 1500 on tack it works as expected)
 
@@ -138,5 +139,11 @@ recvfrom(3,
 
 
 UPDATE4: Apparently, the problem occurs only when sending from tick to
-tack. When sending from teck to cat, UDP works even in the presence of
-changed MTUs. So the bridge code on tick is the culprit?
+tack. When sending from teck (Ubuntu laptop, 192.168.142.130) to cat,
+UDP works even in the presence of changed MTUs. So the bridge code on
+tick is the culprit? (there's a linux kernel bridge on tick that
+bridges the local ethernet and WLAN devices)
+
+
+For details of the IP configurations of the participating machines,
+see ipstacks-config.txt.
