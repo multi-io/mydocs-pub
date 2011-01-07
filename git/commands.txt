@@ -1,0 +1,13 @@
+revert local (uncommitted) changes:
+
+git checkout HEAD -- path/to/file
+
+
+git equivalent to hg rollback:
+
+git reset --soft HEAD^
+
+
+to unstage changes:
+
+git reset HEAD <files>
