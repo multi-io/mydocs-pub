@@ -1,3 +1,96 @@
+(see also http://www-uxsup.csx.cam.ac.uk/courses/ipv6_basics/x84.html,
+http://www.tcpipguide.com/free/t_IPv6NDOverviewHistoryMotivationandStandards.htm)
+
+IPv6 transport over Ethernet (RFC 2464)
+=======================================
+
+- IPv6 packet packed into ethernet frame payload, the frame's
+  ethertype of the frame is set to 86dd (in IPv4 it was 0800)
+
+- ...
+
+
+IPv6 multicast, transport over Ethernet, Neighbor discovery
+============================================================
+
+- IPv6 multicast addresses are all addresses in ff00::/8
+
+- ethernet multicast addresses are ones whose first byte's least
+  significant bit is 1. E.g. 33-33-FF-68-12-CB is a multicast MAC
+  address, while 00-C0-4F-68-12-CB is not.
+
+  - the ethernet broadcast address FF-FF-FF-FF-FF-FF is just a special
+    multicast address
+
+  - TODO: which devices will listen for frames with a given multicast
+    MAC address?
+
+  - various groups of multicast addresses (multicast groups) are
+    well-known; see
+    http://www.cavebear.com/archive/cavebear/Ethernet/multicast.html. For
+    example:
+
+    Ethernet          Ethertype	
+    Address	             Field  Usage
+
+    01-00-0C-CC-CC-CC	-802-	CDP (Cisco Discovery Protocol), VTP (Virtual Trunking Protocol)
+
+    01-00-5E-00-00-00	0800	DoD Internet Multicast (RFC-1112)
+    through
+    01-00-5E-7F-FF-FF
+
+    01-80-C2-00-00-10	-802-	Bridge Management
+
+    33-33-00-00-00-00	86DD	IPv6 Neighbor Discovery  (see below)
+    through
+    33-33-FF-FF-FF-FF
+
+    An ethernet device is probably set up (by the driver, normally) to
+    listen to multicast address groups (in addition to its own unique
+    unicast MAC address).
+
+    For example, an ethernet device that has one or more IPv6
+    addresses assigned to it would probably listen to the IPv6
+    Neighbor Discovery multicast group 33-33-xx-xx-xx-xx (or at least
+    to some portions of it?)
+
+- to send an IPv6 multicast packet over Ethernet, one simply takes the
+  last 32 bits of the destination IPv6 address, prepends 33-33- and
+  uses that as the destination Ethernet address. Any host which is
+  interested in packets for that IPv6 address is expected to be
+  listening for the corresponding Ethernet address.
+
+
+Neighbor discovery (RFC 2461)
+=============================
+
+Set of functionalities related to router and host discovery and
+configuration etc. Implemented on top of ICMPv6.
+
+layer 2 address resolution
+--------------------------
+
+- IPv6 equivalent of ARP. Used for discovering the layer2 (MAC etc.)
+  address for an IPv6 destination address.
+
+- to find the MAC address for a given IPv6 address A, the discovering
+  host sends an ICMPv6 packet containing the corresponding query to
+  the "solicited-node multicast address" of A, which is
+  FF02::1:FF<last 24 bits of A>. (this would in turn be sent to the
+  ethernet multicast address 33-33-FF-<last 24 bits of A>, as per the
+  IPv6-Ethernet multicast address conversion rule given above). (this
+  scheme is chosen in order to ensure that hosts don't get disturbed
+  by neighbour solicitations that aren't either for them or for a host
+  with a very similar IPv6 address)
+
+  The host with address A must listen to that multicast address. It
+  receives the query and sends back its response, identifying its own
+  layer2 address.
+
+
+
+========
+
 02:05 < multi_io> why does the Linux IPv6 HOWTO tell you to point the default route to 2000::/3?
 02:05 < multi_io> shouldn't it just be ::/0 ?
 02:06 < Simon-> no
