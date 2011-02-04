@@ -4,8 +4,8 @@ http://www.tcpipguide.com/free/t_IPv6NDOverviewHistoryMotivationandStandards.htm
 IPv6 transport over Ethernet (RFC 2464)
 =======================================
 
-- IPv6 packet packed into ethernet frame payload, the frame's
-  ethertype of the frame is set to 86dd (in IPv4 it was 0800)
+- IPv6 packet packed into ethernet frame payload, the ethertype of the
+  frame is set to 86dd (with IPv4 it was 0800)
 
 - ...
 
@@ -25,8 +25,8 @@ IPv6 multicast, transport over Ethernet, Neighbor discovery
   - TODO: which devices will listen for frames with a given multicast
     MAC address?
 
-  - various groups of multicast addresses (multicast groups) are
-    well-known; see
+  - various groups of ethernet multicast addresses (multicast groups)
+    are well-known; see
     http://www.cavebear.com/archive/cavebear/Ethernet/multicast.html. For
     example:
 
@@ -87,6 +87,38 @@ layer 2 address resolution
   receives the query and sends back its response, identifying its own
   layer2 address.
 
+
+Address Autoconfiguration (RFC 2462)
+------------------------------------
+
+(TODO: elaborate, extend)
+
+- after being turned on, a host assigns a "link-local" IPv6 address to
+  each interface that IPv6 is enabled on, using only information
+  that's available locally. This address is prefixed with fe80 (TODO:
+  verify); the suffix is generated from the hardware (e.g. MAC)
+  address of the interface. Before assigning this address, the host
+  will check whether it is unique on the whole link-local (L2) network
+  by sending out a "neighbor solicitation" to the address (with what
+  source address?). If the address is NOT unique, autoconfiguration
+  generally stops and manual configuration of the host is required.
+
+- after the assignment of link-local addresses has succeded, hosts
+  on the same layer 2 network will have IP connectivity.
+
+TODO: elaborate:
+
+* 2nd stage: stateless or stateful autoconfiguration using information
+  sent out by routers in router advertisements / requested by router
+  solicitations sent to the all-routers multicast group
+
+* uniqueness check for such autoconfigured addresses as well, except
+  if the layer 2 address portion was already tested during link-local
+  address setup
+
+* address deprecation
+
+- TODO: continue
 
 
 ========
