@@ -60,6 +60,26 @@ IPv6 multicast, transport over Ethernet, Neighbor discovery
   interested in packets for that IPv6 address is expected to be
   listening for the corresponding Ethernet address.
 
+- various well-known IPv6 multicast groups have been defined (see also
+  RFC 2375). Examples:
+
+   FF02:0:0:0:0:0:0:1     All Nodes Address   (link-local)
+   FF02:0:0:0:0:0:0:2     All Routers Address (link-local)
+
+   FF02::1:FFXX:XXXX     Solicited-Node Address (see above)
+
+   FF05:0:0:0:0:0:0:2       All Routers Address (site-local)
+
+   FF05:0:0:0:0:0:1:3       All-dhcp-servers (site-local)
+   FF05:0:0:0:0:0:1:4       All-dhcp-relays  (site-local)
+
+  (actually, the two nibbles after the FF (e.g. 01,05,08) are
+  standardized too -- the 0 in the first nibble means "well-known
+  multicast address", and for the second nibble, 1 means "node-local",
+  2 means "link-local", 5 means "site-local", 8 means
+  "organization-local", E means "global")
+
+
 
 Neighbor discovery (RFC 2461)
 =============================
@@ -71,16 +91,17 @@ layer 2 address resolution
 --------------------------
 
 - IPv6 equivalent of ARP. Used for discovering the layer2 (MAC etc.)
-  address for an IPv6 destination address.
+  address corresponding to a given IPv6 destination address.
 
 - to find the MAC address for a given IPv6 address A, the discovering
   host sends an ICMPv6 packet containing the corresponding query to
   the "solicited-node multicast address" of A, which is
-  FF02::1:FF<last 24 bits of A>. (this would in turn be sent to the
-  ethernet multicast address 33-33-FF-<last 24 bits of A>, as per the
-  IPv6-Ethernet multicast address conversion rule given above). (this
-  scheme is chosen in order to ensure that hosts don't get disturbed
-  by neighbour solicitations that aren't either for them or for a host
+  FF02::1:FF<last 24 bits of A>. (I guess that this would in turn be
+  packed into an ethernet frame and sent to the ethernet multicast
+  address 33-33-FF-<last 24 bits of A>, as per the IPv6-Ethernet
+  multicast address conversion rule given above). (this scheme is
+  chosen in order to ensure that hosts don't get disturbed by
+  neighbour solicitations that aren't either for them or for a host
   with a very similar IPv6 address)
 
   The host with address A must listen to that multicast address. It
@@ -88,23 +109,48 @@ layer 2 address resolution
   layer2 address.
 
 
-Address Autoconfiguration (RFC 2462)
-------------------------------------
+Address Autoconfiguration (RFC 2461/2462)
+-----------------------------------------
 
 (TODO: elaborate, extend)
 
-- after being turned on, a host assigns a "link-local" IPv6 address to
-  each interface that IPv6 is enabled on, using only information
-  that's available locally. This address is prefixed with fe80 (TODO:
-  verify); the suffix is generated from the hardware (e.g. MAC)
-  address of the interface. Before assigning this address, the host
-  will check whether it is unique on the whole link-local (L2) network
-  by sending out a "neighbor solicitation" to the address (with what
-  source address?). If the address is NOT unique, autoconfiguration
-  generally stops and manual configuration of the host is required.
+- after being switched on (or after an interface is activated etc.), a
+  host assigns a "link-local" IPv6 address to each interface that IPv6
+  is enabled on, using only information that's available locally. This
+  address is prefixed with fe80; the suffix is generated from the
+  hardware (e.g. MAC) address of the interface. Before assigning this
+  address, the host will check whether it is unique on the whole
+  link-local (L2) network by sending out a "neighbor solicitation" to
+  the adress's corresponding solicited-node multicast address as
+  defined above (FF02::1:FF<last 24 bits of the address>), with the
+  exact target address in the payload of the packet (the source
+  address will be set to the "unspecified" address: ::). If the target
+  address is NOT unique, i.e. if a host on the link has the target
+  address, it'll send a "neighbor advertisement" in reply to the
+  neighbor solicitation (using the all-hosts multicast address as the
+  target address of the reply packet). In such a case,
+  autoconfiguration generally stops for the sending host and manual
+  configuration is required.
 
-- after the assignment of link-local addresses has succeded, hosts
-  on the same layer 2 network will have IP connectivity.
+  An address that a host is currently still checking for uniqueness
+  is called a "tentative" address of that host/interface.
+
+  A host can also send a neighbor advertisement on its own, without
+  having received a neighbor solicitation message before (this is
+  called an "unsolicited" neighbor advertisement). This is normally
+  done to inform peers that the link-layer address of the host has
+  changed.
+
+- the process apparently is not free of races (e.g. multiple hosts
+  trying to check for the same address at the same time). This is
+  alleviated by the requirement that hosts wait for some random time
+  before attempting the uniqueness test, and by the requirement that
+  hosts that currently check for the uniqueness of an address also
+  listen to and process neighbor solicitations coming in from
+  other hosts for that same address at the same time
+
+- after the assignment of link-local addresses has succeeded, hosts on
+  the same layer 2 network will have IP connectivity.
 
 TODO: elaborate:
 
@@ -116,7 +162,8 @@ TODO: elaborate:
   if the layer 2 address portion was already tested during link-local
   address setup
 
-* address deprecation
+* address deprecation, valid vs. preferred address, valid
+  vs. preferred lifetime (specified in router advertisement fields)
 
 - TODO: continue
 
