@@ -81,11 +81,16 @@ IPv6 multicast, transport over Ethernet, Neighbor discovery
 
 
 
-Neighbor discovery (RFC 2461)
-=============================
+Neighbor discovery (ND) (RFC 2461)
+==================================
 
 Set of functionalities related to router and host discovery and
-configuration etc. Implemented on top of ICMPv6.
+configuration etc. ND defines a multitude of types of ND messages,
+e.g. neighbor solicitations, neighbor advertisements, router
+advertisements/solicitations. Those will be described in more detail
+in the next sections. ND is implemented on top of ICMPv6 -- each ND
+message type corresponds to a specific ICMP message type. For example,
+router advertisements have ICMP type 134.
 
 layer 2 address resolution
 --------------------------
@@ -94,25 +99,23 @@ layer 2 address resolution
   address corresponding to a given IPv6 destination address.
 
 - to find the MAC address for a given IPv6 address A, the discovering
-  host sends an ICMPv6 packet containing the corresponding query to
-  the "solicited-node multicast address" of A, which is
-  FF02::1:FF<last 24 bits of A>. (I guess that this would in turn be
-  packed into an ethernet frame and sent to the ethernet multicast
-  address 33-33-FF-<last 24 bits of A>, as per the IPv6-Ethernet
-  multicast address conversion rule given above). (this scheme is
-  chosen in order to ensure that hosts don't get disturbed by
-  neighbour solicitations that aren't either for them or for a host
+  host sends an ICMPv6 packet containing a corresponding query (a
+  "neighbor solicitation" query) to the "solicited-node multicast
+  address" of A, which is FF02::1:FF<last 24 bits of A>. (I guess that
+  this would in turn be packed into an ethernet frame and sent to the
+  ethernet multicast address 33-33-FF-<last 24 bits of A>, as per the
+  IPv6-Ethernet multicast address conversion rule given above). (this
+  scheme is chosen in order to ensure that hosts don't get disturbed
+  by neighbour solicitations that aren't either for them or for a host
   with a very similar IPv6 address)
 
   The host with address A must listen to that multicast address. It
-  receives the query and sends back its response, identifying its own
-  layer2 address.
+  receives the query and sends back its response (a neighbor
+  advertisement), identifying its own layer2 address.
 
 
 Address Autoconfiguration (RFC 2461/2462)
 -----------------------------------------
-
-(TODO: elaborate, extend)
 
 - after being switched on (or after an interface is activated etc.), a
   host assigns a "link-local" IPv6 address to each interface that IPv6
@@ -132,40 +135,98 @@ Address Autoconfiguration (RFC 2461/2462)
   autoconfiguration generally stops for the sending host and manual
   configuration is required.
 
-  An address that a host is currently still checking for uniqueness
-  is called a "tentative" address of that host/interface.
+  - An address that a host is currently still checking for uniqueness
+    is called a "tentative" address of that host/interface.
 
-  A host can also send a neighbor advertisement on its own, without
-  having received a neighbor solicitation message before (this is
-  called an "unsolicited" neighbor advertisement). This is normally
-  done to inform peers that the link-layer address of the host has
-  changed.
+    A host can also send a neighbor advertisement on its own, without
+    having received a neighbor solicitation message before (this is
+    called an "unsolicited" neighbor advertisement). This is normally
+    done to inform peers that the link-layer address of the host has
+    changed.
 
-- the process apparently is not free of races (e.g. multiple hosts
-  trying to check for the same address at the same time). This is
-  alleviated by the requirement that hosts wait for some random time
-  before attempting the uniqueness test, and by the requirement that
-  hosts that currently check for the uniqueness of an address also
-  listen to and process neighbor solicitations coming in from
-  other hosts for that same address at the same time
+  - the process apparently is not free of races (e.g. multiple hosts
+    trying to check for the same address at the same time). This is
+    alleviated by the requirement that hosts wait for some random time
+    before attempting the uniqueness test, and by the requirement that
+    hosts that currently check for the uniqueness of an address also
+    listen to and process neighbor solicitations coming in from other
+    hosts for that same address at the same time
 
 - after the assignment of link-local addresses has succeeded, hosts on
   the same layer 2 network will have IP connectivity.
 
-TODO: elaborate:
+- once that's the case, stateless autoconfiguration may ensue to set
+  up globally unique addresses for the hosts. The general way this
+  works is that a router multicasts router advertisement messages
+  specifying the network prefix of the to-be-generated global
+  addresses, and a lifetime of that prefix. A host receives the
+  advertisement and generates the corresponding host part ("interface
+  identifier") of the address using the layer2 address of the
+  interface. The resulting address is set up as the globally unique
+  address of the host.
 
-* 2nd stage: stateless or stateful autoconfiguration using information
-  sent out by routers in router advertisements / requested by router
-  solicitations sent to the all-routers multicast group
+  - routers send out router advertisements to the all-hosts multicast
+    address by themselves periodically. A host that doesn't want to
+    wait for the next regularly sent advertisement may send a "router
+    solicitation" to the all-routers multicast address, to which
+    routers must react by immediately sending their router
+    advertisements.
 
-* uniqueness check for such autoconfigured addresses as well, except
-  if the layer 2 address portion was already tested during link-local
-  address setup
+  - link prefix length (from RA) + interface identifier length MUST be
+    128 bit, otherwise the RA is ignored. The interface identifier
+    length (and thus, the prefix length as well) is normally 64 bit,
+    even for things like 48-bit ethernet addresses (the expansion to
+    64 bits is done using something called EUI-64)
 
-* address deprecation, valid vs. preferred address, valid
-  vs. preferred lifetime (specified in router advertisement fields)
+  - router advertisements also contain two (optinally infinite)
+    lifetime values for the prefix -- the "preferred" and the "valid"
+    lifetime. The preferred lifetime must be <= the valid one. For the
+    preferred lifetime, the address generated for the prefix is called
+    the "preferred" address, and should be used for new connections
+    (e.g. TCP) in the system. When the preferred lifetime is over and
+    a new RA was received, resulting in the creation of a new,
+    different preferred address, that address is to be preferred for
+    new connections, and the previous (now "deprecated") address
+    should only be used for existing connections or other
+    communication if switching them to the preferred address would
+    result in service disruption. (there may be more than one globally
+    unique IPv6 address assigned to the same interface)
 
-- TODO: continue
+  - hosts should check the uniqueness of autoconfigures global
+    addresses as well, unless the layer 2 address portion was already
+    tested during link-local address setup
+
+- DNS configuration via RA/ND was not supported initially, but now
+  there's RFC 6106 that specifies it
+
+
+16:44 < multi_io> can the DNS server IP only be configured via DHCPv6, not via ND?
+16:44 < multi_io> (apart from static configuration)
+16:45 < ardya> theres rdnss
+16:45 < jercos> RA has rdnss
+16:45 < ardya> its a part of RA
+16:45 < jercos> Er, yes.
+16:45 < ardya> but not widely supported
+16:45 < jercos> Works fine on all my systems ;)
+16:46 < jercos> resolvconf + rdnssd
+16:48 < multi_io> hm, ok...
+16:49 -!- MissionCritical [~MissionCr@unaffiliated/missioncritical] has quit [Ping timeout: 240 seconds]
+16:49 < fly23_> hm, avahi-daemon has an option to publish dns-servers
+16:49 < multi_io> jercos: does rdnssd then also support the normal link prefix configuration via RA?
+16:50 < fly23_> at least all those desktop linux systems  are running avahi by default
+16:50 < jercos> multi_io: no, it does not. But it doesn't *block* said autoconfiguration, thus it still happens.
+16:51 < jercos> multi_io: that's kinda like, ya know, does apache support ssh? Of course not... But it doesn't stop you running an SSHd. They 
+                work in tandem, as seperate systems.
+16:51 < jercos> Wheras with DHCP, the whole thing is unified.
+16:52 -!- HRH_H_Crab [~crab@kowloontong.dim-sum.org] has quit [Read error: Operation timed out]
+16:53 -!- CRCinAU is now known as CRCinAU[a]
+16:53 < multi_io> jercos: so you're also running something like radvd?
+16:54 < jercos> Ah, vice versa. radvd is serving rdnss broadcasts, and rdnssd is picking them up and putting them into client resolv.conf files, 
+                via resolvconf.
+16:54 < jercos> radvd supports rdnss, client machines just don't magically work with rdnss.
+16:54 < multi_io> ah! I see.
+16:54 < jercos> (Depending on various factors, i think networkmanager might do something with them... dunno)
+16:55 < jercos> NetworkManager is evil, so I don't touch it :p
 
 
 ========
