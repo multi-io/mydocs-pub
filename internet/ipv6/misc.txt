@@ -133,7 +133,7 @@ Address Autoconfiguration (RFC 2461/2462)
   neighbor solicitation (using the all-hosts multicast address as the
   target address of the reply packet). In such a case,
   autoconfiguration generally stops for the sending host and manual
-  configuration is required.
+  configuration (or stateful configuration via DHCPv6) is required.
 
   - An address that a host is currently still checking for uniqueness
     is called a "tentative" address of that host/interface.
@@ -165,18 +165,19 @@ Address Autoconfiguration (RFC 2461/2462)
   interface. The resulting address is set up as the globally unique
   address of the host.
 
-  - routers send out router advertisements to the all-hosts multicast
-    address by themselves periodically. A host that doesn't want to
-    wait for the next regularly sent advertisement may send a "router
-    solicitation" to the all-routers multicast address, to which
-    routers must react by immediately sending their router
-    advertisements.
+  - routers send out router advertisements (RAs) to the all-hosts
+    multicast address by themselves periodically ("unsolicited"
+    RAs). A host that doesn't want to wait for the next regularly sent
+    advertisement may send a "router solicitation" to the all-routers
+    multicast address, to which routers must react by immediately
+    sending their router advertisements ("solicited" RAs).
 
   - link prefix length (from RA) + interface identifier length MUST be
     128 bit, otherwise the RA is ignored. The interface identifier
-    length (and thus, the prefix length as well) is normally 64 bit,
-    even for things like 48-bit ethernet addresses (the expansion to
-    64 bits is done using something called EUI-64)
+    length (and thus, the prefix length as well) is 64 bit for most
+    layer2 protocol types, even for things like 48-bit ethernet
+    addresses (the expansion to 64 bits is done using something called
+    EUI-64). This may not be the case for all layer2 protocols though.
 
   - router advertisements also contain two (optinally infinite)
     lifetime values for the prefix -- the "preferred" and the "valid"
@@ -190,7 +191,13 @@ Address Autoconfiguration (RFC 2461/2462)
     should only be used for existing connections or other
     communication if switching them to the preferred address would
     result in service disruption. (there may be more than one globally
-    unique IPv6 address assigned to the same interface)
+    unique IPv6 address assigned to the same interface). Of course,
+    this only applies if the routing infrastructure actually supports
+    and routes more than one prefix simultaneously for a "transition"
+    period when switching to a new prefix.
+
+  - router advertisements may also contain hop limit (TTL) values that
+    hosts should use when generating packets
 
   - hosts should check the uniqueness of autoconfigures global
     addresses as well, unless the layer 2 address portion was already
@@ -227,6 +234,9 @@ Address Autoconfiguration (RFC 2461/2462)
 16:54 < multi_io> ah! I see.
 16:54 < jercos> (Depending on various factors, i think networkmanager might do something with them... dunno)
 16:55 < jercos> NetworkManager is evil, so I don't touch it :p
+
+
+TODO: describe other ND message types, split/rename this document
 
 
 ========
