@@ -1,0 +1,18 @@
+Read: http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html
+
+- Controller classes marked with @Controller, request handling methods
+  with @RequestMapping.
+
+- Model / ModelAndView objects for transferring data between
+  controller and view
+
+- lots of parameters are accepted for handling methods; see
+  http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html#mvc-ann-requestmapping-arguments
+
+  - .....
+
+  - request parameters can be automatically captured in "command/form
+    objects", which are accepted as handling method parameters. This
+    process ("binding") can be customized by writing an @InitBinder
+    method that takes a WebDataBinder. Command/form objects may be any
+    objects conforming to the JavaBean conventions
