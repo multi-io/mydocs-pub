@@ -231,3 +231,34 @@
                   it at all)?
 21:41 < phcoder_> yes
 21:41 < multi_io> I see. Thanks.
+
+
+----
+
+read at runtime (= system startup time):
+
+- /boot/grub/grub.cfg
+
+  - shell script-like program source code (interpreted at runtime by
+    grub). contains menu entry definitions. Example:
+
+menuentry 'Debian GNU/Linux, with Linux 2.6.24' --class debian --class gnu-linux
+ --class gnu --class os {
+        insmod msdos
+        insmod ext2
+        set root='(/dev/hdb,1)'
+        search --no-floppy --fs-uuid --set 9d74ffed-ebbc-463f-8935-177d5ad177d6
+        echo    'Loading Linux 2.6.24 ...'
+        linux   /boot/vmlinuz-2.6.24 root=/dev/hdb1 ro console=ttyS0,19200n8 acp
+i=off 
+}
+
+    the "insmod" module names refer to grub modules,
+    e.g. /boot/grub/ext2.mod for reading ext2 filesystems. "insmod"
+    loads such modules at runtime, and they may then be used to
+    perform specific tasks. They have nothing to do with Linux kernel
+    modules.
+
+
+- /boot/grub/grub.cfg is generated at setup time from
+  /etc/default/grub and /etc/grub.d/* by update-grub
