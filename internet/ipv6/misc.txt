@@ -84,13 +84,17 @@ IPv6 multicast, transport over Ethernet, Neighbor discovery
 Neighbor discovery (ND) (RFC 2461)
 ==================================
 
-Set of functionalities related to router and host discovery and
-configuration etc. ND defines a multitude of types of ND messages,
-e.g. neighbor solicitations, neighbor advertisements, router
-advertisements/solicitations. Those will be described in more detail
-in the next sections. ND is implemented on top of ICMPv6 -- each ND
-message type corresponds to a specific ICMP message type. For example,
-router advertisements have ICMP type 134.
+Set of tasks that routers and hosts must perform, related to router
+and host discovery and configuration etc. To implement those tasks, ND
+defines a multitude of types of ND messages, e.g. neighbor
+solicitations, neighbor advertisements, router
+advertisements/solicitations. Some of the tasks will be described in
+more detail in the next sections, along with the related ND
+messages.
+
+ND is implemented on top of ICMPv6 -- each ND message type corresponds
+to a specific ICMP message type. For example, router advertisements
+have ICMP type 134.
 
 layer 2 address resolution
 --------------------------
@@ -99,10 +103,10 @@ layer 2 address resolution
   address corresponding to a given IPv6 destination address.
 
 - to find the MAC address for a given IPv6 address A, the discovering
-  host sends an ICMPv6 packet containing a corresponding query (a
-  "neighbor solicitation" query) to the "solicited-node multicast
-  address" of A, which is FF02::1:FF<last 24 bits of A>. (I guess that
-  this would in turn be packed into an ethernet frame and sent to the
+  host sends an ICMPv6 packet containing a corresponding query
+  ("neighbor solicitation") to the "solicited-node multicast address"
+  of A, which is FF02::1:FF<last 24 bits of A>. (I guess that this
+  would in turn be packed into an ethernet frame and sent to the
   ethernet multicast address 33-33-FF-<last 24 bits of A>, as per the
   IPv6-Ethernet multicast address conversion rule given above). (this
   scheme is chosen in order to ensure that hosts don't get disturbed
@@ -238,6 +242,17 @@ Address Autoconfiguration (RFC 2461/2462)
 
 TODO: describe other ND message types, split/rename this document
 
+17:33 < multi_io> hm, I noticed that during autoconfiguration (with radvd on the router), my host set up a default route via the router's 
+                  link-local ip
+17:33 < multi_io> it did not set up a 2000::/3 route
+17:33 < multi_io> ardya: ^^^
+17:34 < multi_io> is that normal?
+17:34 < }dec3pti0n{> i think it is but I'm no expert
+17:34 < }dec3pti0n{> on mine is the same thing 
+17:34 < }dec3pti0n{> it sets the default route via the ll ip of my router
+17:35 < multi_io> I thought it would set up a route to 2000::/3 via the host's global IP
+17:35 < ardya> yes its normal
+17:38 < multi_io> ok
 
 ========
 
