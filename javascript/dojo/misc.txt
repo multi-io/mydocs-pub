@@ -1,0 +1,23 @@
+- base library dojo, widget library dijit
+
+- unified event processing: wiring up using dojo.connect, can connect
+  DOM events as well as dijit widget events
+
+- widget creation:
+
+  - widgets live in a DOM node (property .domNode)
+
+  - can be created fuly programmatically (no reference in HTML), but
+    most of the times there will be a HTML element containing basic
+    attributes of the widget, which will be parsed by dojo to create
+    the widget at runtime. The required "dojoType" special attribute
+    specifies the dijit type name. Example:
+
+    <button id="showDlgBtn" dojoType="dijit.form.Button">Click Me!</button>
+
+    In the JS code, you'd dojo.require("dijit.form.Button"), at which
+    time the Button widget's code is loaded. The HTML will be parsed,
+    the button element found, and the corresponding widget object
+    created. This parsing is done automatically if you have a
+    djConfig="parseOnLoad: true" attribute of the body tag, or it can
+    be initialized programmatically using dojo.parser.parse().
