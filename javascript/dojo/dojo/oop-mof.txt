@@ -1,0 +1,41 @@
+- MOF / class creation: dojo.declare
+
+
+
+
+Mixins:
+
+SomeClass.extend({
+    m2: function(){
+        this.inherited(arguments);
+        console.log("B.m2");
+    }
+});
+
+
+(or dojo.safeMixin(SomeClass, {...}))
+
+
+snippets:
+
+(with: >>>
+dojo.declare("dojox.grid.DataGrid", dojox.grid._Grid, {
+...
+});
+
+grid = new dojox.grid.DataGrid(...)
+<<<)
+
+
+
+grid.declaredClass
+=> "dojox.grid.DataGrid"
+
+
+// "dojox.grid.DataGrid" => dojox.grid.DataGrid
+dojo.getObject("dojox.grid.DataGrid") === dojox.grid.DataGrid
+=> true
+
+
+grid.isInstanceOf(dijit._Widget)
+=> true

@@ -1,0 +1,30 @@
+A data store instance (at least for grid widgets) contains a sequence
+of items, where an item is a sequence of name->value (String->Object)
+mappings. Generally (for grids at least) all items should probably
+have the same attribute names.
+
+When the store is displayed in a grid, items correspond to rows, and
+attributes correspond to columns (with the attribute names displayed
+in the column titles).
+
+There are API definitions (specified as classes with empty methods)
+for reading and writing stores: dojo.data.api.Read,
+dojo.data.api.Write.
+
+The API allows items to be represented by any JS object (i.e. not just
+maps or anything like that) -- explicit API functions are defined for
+getting the values of an item etc.
+
+The API defines a boolean "isLoaded" state for items, plus a
+loadItem() method etc. Probably intented for things like local
+caching; the grid will presumably display hourglasses etc. for
+non-loaded items.
+
+The API defines an "error" state on items.
+
+The API defines a "label" (string) for items.
+
+
+Numerous default implementations for stores are provided, using for
+their backends CSV lists, AJAX calls returning JSON data, and others.
+(TODO: elaborate)
