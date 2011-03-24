@@ -1,0 +1,179 @@
+http://kerneltrap.org/mailarchive/linux-netdev/2010/9/27/6285917
+
+03:01 < multi_io> wouldn't IPv6 at some point require changes to the IP stack and the socket APIs to enable new applications?
+03:02 -!- titankiller2 is now known as titankiller
+03:02 < patdk-lap> not really
+03:02 < patdk-lap> the changes to the ip stack where done years and years ago
+03:02 < multi_io> e.g. the ability to listen to billions of IP addresses at the same time :)
+03:02 < patdk-lap> it's just applications not using them
+03:03 < rewt> why would you listen to billions of IP addresses at the same time?
+03:03 < patdk-lap> cause your mentally insane?
+03:05 < multi_io> dunno... say you want to write an application that maps each ...hm... street light in a city to a unique IP
+03:05 -!- Logan_A [logan@zer0drive.lawarias.srb2.org] has joined #ipv6
+03:05 < multi_io> ping succeeds if the light is on :P
+03:05 < patdk-lap> that is backwards
+03:05 < rewt> still don't see the issue; the server would still have 1 ip
+03:06 < multi_io> or, maybe, you can then send UDP packet to each light to do something with it
+03:06 < patdk-lap> the light would have the ip then
+03:06 < multi_io> or even open a TCP connection to each light (not all at the same time)
+03:06 < patdk-lap> I totally don't get why you would even bother with something like that
+03:07 < patdk-lap> that goes into, why do people want to put power meters on the internet? seems stupid to me
+03:07 < rewt> so the power company can read it w/o sending a guy out
+03:07 < multi_io> patdk-lap: you may want to aggregate/manage this all in one userspace application running on one machine
+03:07 < patdk-lap> rewt, they can do that now
+03:07 < rewt> without connectivity to it?
+03:07 < patdk-lap> multi_io, yes, but why does that require the lights to be on the *internet*
+03:08 < patdk-lap> rewt, who ever said the only way to connect two things together in the world is the internet?
+03:08 < Xenith> I'd want my power meter to be accessable over the internet.
+03:08  * patdk-lap shuts off xenith's power :)
+03:08 < rewt> it's cheaper for them to use existing infrastructure than to make a new one just for the power meters
+03:08 -!- LoganA [logan@zer0drive.lawarias.srb2.org] has quit [Ping timeout: 260 seconds]
+03:08 < Xenith> patdk-lap: And why would that work?
+03:08 < patdk-lap> they already have one for power meters
+03:08 < rewt> not everywhere
+03:08 < Xenith> Why would ones power meter ACCEPT COMMANDS over the public internet? :)
+03:09 < Xenith> I already have a smart meter. Sadly I can't access it.
+03:09 < patdk-lap> xenith, that is the whole goal
+03:09 < patdk-lap> ya, you can't
+03:09 < patdk-lap> or atleast yet
+03:09 < multi_io> I'm just wondering whether the current socket APIs are really adequate to enable new kinds of applications that may become 
+                  possible when millions of IPs are readily available locally
+03:09 -!- ym [ym@cpe-74-78-137-112.twcny.res.rr.com] has joined #ipv6
+03:09 < Xenith> I'd rather have mine accessible to gather aggregate stats or see what my current usage is.
+03:09 < Xenith> Of course, I already have that.
+03:09 < patdk-lap> xenith, that is very easy to do
+03:10 < Xenith> I just can't see them.
+03:10 < rewt> multi_io, it's only limited by memory
+03:10 < patdk-lap> no power meter needed
+03:10 < patdk-lap> I don't see the point of using an ip, just cause we have them available
+03:10 < patdk-lap> give each light an ipv6 address, on a single computer
+03:10 < ym> Hey guys, just curious if seeing "::ffff:138.187.130.90" on a traceroute6 should be concerning. All the addresses are "proper" v6 
+            ones, except that ::ffff:, around hop 7 or so.
+03:11 < patdk-lap> you still have custom hardware from that computer to each light to check it's status
+03:11 -!- PhotoJim is now known as PhotoJim_
+03:11 < patdk-lap> it would be so much easier to just make a simple like, webpage that you just request, is light xxxx on?
+03:11 < patdk-lap> ym, that is an ipv4 address
+03:11 < ym> yeah, so why is my traceroute6 routing over it?
+03:12 < rewt> ask the network admin of the network it's in
+03:12 < ym> it's not proper, right?
+03:12 < Xenith> ym: ipv4 mapped ipv6 address. Silly thing to show up in a traceroute. Probably a misconfiguration.
+03:12 -!- PhotoJim [~Jim@dalby.ip4.photojim.ca] has joined #ipv6
+03:13 < ym> IPv6 switch.ch times out on a connect on port 80, and that's the only weird thing I see in the traceroute.
+03:13 < Xenith> patdk-lap: How would the server talk to each light?
+03:13 < multi_io> patdk-lap: yeah, it easier to make a web page exactly because there are APIs for it
+03:13 < patdk-lap> I dunno, but he said all the ip's would exist on the server, not lightpd
+03:13 -!- PhotoJim [~Jim@dalby.ip4.photojim.ca] has quit [Client Quit]
+03:13 < patdk-lap> the lights
+03:13 < Xenith> Just because something has an ip address doesn't mean its accessible to the entire world.
+03:14 < patdk-lap> xenith, ya, human error never happens
+03:14 < Xenith> sigh
+03:14 < Xenith> That's a "won't someone think of the children" argument.
+03:14 -!- PhotoJim [~Jim@dalby.ip4.photojim.ca] has joined #ipv6
+03:14 < patdk-lap> hehe :)
+03:15  * patdk-lap gives each kid a /64 :)
+03:15 < Xenith> "Any man can be a child molester, so we should keep EVERY MAN away from the children!"
+03:15 < multi_io> e.g. you wan write a web server that can accept HTTP requests with millions of differens request paths /lamp_277373 etc., but 
+                  you can't write apps that can receive IP packets on millions of different addresses if you wanted to map each light to an 
+03:15 < patdk-lap> I wonder how many generations that would last
+03:15 < multi_io> but maybe the example isn't brilliant anyway
+03:15 < Xenith> multi_io: You wouldn't design a system like that.
+03:15 -!- PhotoJim_ [~Jim@dubbo.ip4.photojim.ca] has quit [Quit: Still here, just changed hosts.  Impending power failure chez moi :)]
+03:15 < rewt> multi_io, no, because in your example everything would only need a single ip
+03:16 < Xenith> You could have a single server respond to an entire /64, but it'd probably run out of resources pretty quickly.
+03:16 < rewt> depending on how you do it
+03:16 < patdk-lap> I think using the network stack for something like that would be wrong anyways
+03:16 < multi_io> Xenith: why?
+03:16 < patdk-lap> just use packet capture in your program to get it
+03:17 < Xenith> multi_io: Why what?
+03:17 < patdk-lap> no need to bother with all the ip's
+03:17 < Xenith> ....?
+03:19 < JayEye> if you assign an IP address to each lamp, why have *one* server process all of the requests? let the lamps each process its own 
+                request
+03:19 < JayEye> if you want one server, then pass it as a parameter to some call you make, don't encode it in the address
+03:20 < multi_io> Xenith: why would you run out of resources? (you will if you assign a million IPs to an interface and try to bind to all of 
+                  them, but that's why the socket API would need to be extended in some more fundamental way)
+03:21 -!- Ganymede [~Ganymede@unaffiliated/ganymede] has joined #ipv6
+03:21 < patdk-lap> the socket api needs to know what ip and port each program is listening on
+03:21 < multi_io> from the kernel's perspective, it shouldn't make much of a difference for teh resource consumption whether you're listening to 
+                  one address or all addresses in a /64.
+03:21 < patdk-lap> that means allocating memory for each one
+03:22 < Xenith> The socket api is fine. It can handle binding to as many IPs at it needs to.
+03:22 < patdk-lap> at some point you will run out of ram
+03:22 < Xenith> You might just run out of memory at some point.
+03:22 < Xenith> multi_io: Not true. You have to allocate memory for all of those structs.
+03:22  * patdk-lap imagings what swapping out that data would do :)
+03:22 -!- FireEgl [FireEgl@2001:470:e056:1:dd39:17c9:fd98:9548] has quit [Ping timeout: 260 seconds]
+03:22 < multi_io> patdk-lap: it would only know which prefix each program is listening on
+03:23 < Xenith> Um, no.
+03:23 < Xenith> A prefix denotes a network.
+03:23 < Mekkis> wouldn't you need a larger address bus?
+03:24 < ym> Can someone who isn't using he.net please pastebin me a traceroute6 to www.switch.ch?
+03:25 < multi_io> you could implement that any way you want. If the kernel passes all packets whose target address are in a specific /64 to the 
+                  userspace, that /64 is no longer a "network".
+03:25 < Xenith> Yes. That /64 becomes an "address"
+03:25 < rewt> if you listen on ::, it listens on all bound ips
+03:25 < Xenith> And suddenly you've halved the v6 space.
+03:26 < patdk-lap> ym, use a routeserver
+03:27 < Ganymede> http://www.cisco.com/assets/sol/sp/ipv6_discovery/ <-- Can someone help me extract the URL of the actual video so I can DL it 
+                  via wget or something?
+03:27 < rewt> ym, google for ipv6 looking glass, and pick a result to traceroute6 from
+03:28 < multi_io> Xenith: what do you mean? You get a /56 anyway from you ISP :P
+03:28 < Xenith> Ganymede: http://www.cisco.com/assets/sol/sp/ipv6_discovery/flvplayer.swf
+03:28 < Mekkis> http://www.cisco.com/assets/sol/sp/ipv6_discovery/video.flv
+03:29 < Xenith> multi_io: What does that have to do with anything?
+03:29 < Ganymede> Mekkis, Thanks. For some reason, my Firefox download couldn't find that.
+03:30 < Ganymede> It's also a pretty cool video if anyone hasn't seen it.
+03:30 < Ganymede> Firefox addon*
+03:33 < Xenith> multi_io: I suggest you read up on the theory and practice behind TCP/IP.
+03:38 < p1mrx> it would certainly be possible to run an HTTP server on every address in a /64, with proper kernel support
+03:38 < p1mrx> you could probably do it all in userspace using tun/tap stuff
+03:39  * fly23_ just imagines a whole /64 joining this channel
+03:40 < p1mrx> well, obviously you can't have simultaneous connections to every address, because each connection requires state
+03:40 < multi_io> Xenith: "< Xenith> multi_io: Not true. You have to allocate memory for all of those structs." -- as I said, you wouldn't have 
+                  one struct per address with proper kernel support (as p1mrx suggests)
+03:40 < p1mrx> you would have one struct per active connection, but you don't need one struct per listening address, if it's implemented right.
+03:41 < multi_io> you're gonna have a resource problem of just the same proportion if you have just one IP and a million simultaneous 
+                  connections to it
+03:41 < patdk-lap> yep
+03:41 < patdk-lap> that is why ulimit -n exists
+03:41 < multi_io> (let's forget for a moment that you can only have 65000 simultaneous TCP connections to the same IP anyway)
+03:41 < p1mrx> essentialy what you'd be doing is listening on a 64-bit IP address, with a 64-bit cookie value.
+03:42 < patdk-lap> multi_io, you can have many many more
+03:42 < Xenith> I should point out that systems do currently handle millions of simultaneous connections.
+03:42 < patdk-lap> sourceip*sourceport*destport to the same ip limit
+03:43 < Xenith> Also, just because you have suddenly have a lot more IPs per network doesn't mean you'll suddenly have the same growth of 
+                simultaneous connections
+03:43 < multi_io> so anyway, the number of IPs by itself isn't gonna be a resource problem if you have proper kernel/socket API support
+03:43 < patdk-lap> so, 2^64 tcp connections limit per dest ip, using ipv4
+03:45 < Xenith> I'm done here.
+03:45 < multi_io> patdk-lap: right, ok
+03:45 < Ganymede> Which systems currently handle millions of connections? (Not asking which are capable of doing so, but which actually do so?)
+03:46 < patdk-lap> only things I can think of is loadbalancers/firewalls/routers
+03:46 < patdk-lap> cause normally you use clusters to handle it
+03:46 < multi_io> brain fart on my part :P
+03:47 < Ganymede> I wonder how much bandwidth worth of TCP keepalives a million connections would generate (also, are keepalives even necessary 
+                  in the absence of NAT?)
+03:47 < p1mrx> wait a minute, can't the "listen on a whole /64" thing be done with AnyIP? 
+               http://kerneltrap.org/mailarchive/linux-netdev/2010/9/27/6285917
+03:47 -!- mquin [~mquin@freenode/staff/mquin] has quit [Read error: Operation timed out]
+03:47 < patdk-lap> ganymede, technically no, but they are still useful
+03:47 < patdk-lap> wouldn't want my ssh connection open for weeks, when my laptop lost it's wifi connection
+03:48 < patdk-lap> but then, I do want it open, if my laptop is working for weeks with ssh open
+03:48 < multi_io> p1mrx: thanks, that's interesting 
+03:49 < Ganymede> Speaking of which, sshfs never exits cleanly when the server disappears...it leaves any process accessing files on the sshfs 
+                  mount hung so badly that kill -9 won't even kill it...
+03:49 < multi_io> looks like that's what I mean :)
+
+04:06 < multi_io> 03:43 < Xenith> Also, just because you have suddenly have a lot more IPs per network doesn't mean you'll suddenly have the 
+                  same growth of simultaneous connections
+04:06 < multi_io> That is of course correct; I know that listening to millions of IPs won't magically allow you to have more simultaneous actual 
+                  connections. It would just allow you to accept connections or connectionless packets in a different wat (e.g. one per IP 
+                  rather than one per port etc.)
+04:07 < multi_io> ...and I was wondering whether this would make certain types of applications (which may not even be invented yet) easier to 
+                  write in the future.
+04:07 < jercos> Massively peer to peer mesh networks? >.>
+04:07 < multi_io> that was the whole motivation behind my question
+04:07 < patdk-lap> na, that doesn't help many people -> service
+04:07 < patdk-lap> that only increases the available connections from a SINGLE ip, to the service
+04:08 < patdk-lap> if your using thousands of ip's from a single ip, I think your doing something wrong, probably
+04:08 < patdk-lap> or your benchmarking
