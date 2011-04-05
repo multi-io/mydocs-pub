@@ -34,3 +34,13 @@
     dijit.registry.
 
     - TODO: describe programmatic creation, attributes, ...
+
+  - various overridable callbacks are provided that're at specific
+    points during the widget's initialization/lifecycle
+
+    e.g.
+
+    postMixInProperties: function() {
+        //at this point, attributes from the markup (or from the params hash for programmatic creation)
+        //have been mixed into this instance as properties
+    },
