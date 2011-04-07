@@ -1,0 +1,41 @@
+dojo.isArray(obj)
+
+dojo.stopEvent(evt)
+
+dojo.body()  //returns body node of current document
+
+dojo.place(newNode, existingParentNode)
+
+dojo.Deferred also supports explicit .addCallback(), .addErrorback()
+
+// clone (deep copying) an object
+var obj = { a:"b", c:"d" };
+var thing = dojo.clone(obj);
+
+// clone (deep copying) an array
+var newarray = dojo.clone(["a","b","c"]);
+
+// shallow copying:
+object y = dojo.mixin({}, x);
+
+dijit._CssStateMixin:
+	// summary:
+	//		Mixin for widgets to set CSS classes on the widget DOM nodes depending on hover/mouse press/focus
+	//		state changes, and also higher-level state changes such becoming disabled or selected.
+	//
+	// description:
+	//		By mixing this class into your widget, and setting the this.baseClass attribute, it will automatically
+	//		maintain CSS classes on the widget root node (this.domNode) depending on hover,
+	//		active, focus, etc. state.   Ex: with a baseClass of dijitButton, it will apply the classes
+	//		dijitButtonHovered and dijitButtonActive, as the user moves the mouse over the widget and clicks it.
+	//
+	//		It also sets CSS like dijitButtonDisabled based on widget semantic state.
+	//
+	//		By setting the cssStateNodes attribute, a widget can also track events on subnodes (like buttons
+	//		within the widget).
+
+
+
+dojo.getObject / dojo.setObject: generalized getters/setters for
+attributes specified as dot-separated strings
+
