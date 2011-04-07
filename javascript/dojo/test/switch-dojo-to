@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -e
+
+rm -f dojo dojox dijit util
+ln -s "dojo-release-$1-src"/* .

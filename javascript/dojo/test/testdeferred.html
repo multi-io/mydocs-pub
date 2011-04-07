@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Deferreds</title>
+    <link rel="stylesheet" href="dijit/themes/tundra/tundra.css">
+	<script type="text/javascript" src="dojo/dojo.js" charset="utf-8" djConfig="parseOnLoad: true, isDebug: true"></script>
+  </head>
+
+  <body class="tundra">
+
+    <h1>Deferreds Test</h1>
+
+    <div id="div1">
+    </div>
+
+    <script type="text/javascript">
+      function deferFor(t) {
+          var def = new dojo.Deferred();
+          console.log("starting defer for " + t);
+          setTimeout(function() {
+              console.log("finished defer for " + t);
+              def.callback(t);
+          }, t);
+          return def;
+      }
+
+      function syncReturn(x) {
+          console.log("synchronously returning " + x);
+          return x;
+      }
+
+      function runTest() {
+          deferFor(1000).then(dojo.partial(deferFor, 500)).then(dojo.partial(syncReturn, 42)).then(dojo.partial(deferFor, 800));
+      }
+
+      dojo.addOnLoad(function() {
+          runTest();
+      });
+    </script>
+
+  </body>
+</html>
