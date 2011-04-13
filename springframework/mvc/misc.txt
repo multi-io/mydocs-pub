@@ -24,6 +24,10 @@ Read: http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html
     to the model: command/form objects and the results of
     @ModelAttribute annotated reference data accessor methods
 
+- in the form tag, the 'modelAttribute' attribute specifies which
+  object from the model (specified by the model attribute) to use as
+  the backing object of the form. That object will also be used as the
+  target of the binder (@InitBinder method)
 
 - if you find out in a createForm handler for an entity type that an
   instance of the type can't currently be created because some
