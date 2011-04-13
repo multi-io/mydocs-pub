@@ -23,3 +23,12 @@ Read: http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html
     created by the framework. Some attributes are automatically added
     to the model: command/form objects and the results of
     @ModelAttribute annotated reference data accessor methods
+
+
+- if you find out in a createForm handler for an entity type that an
+  instance of the type can't currently be created because some
+  dependent entities are missing, you can add to the model an entry
+  with "dependencies" as the key and a list of the missing property
+  names of the to-be-created entity as the value. In the view, the
+  Spring form tag and related tags will recognize this and show a
+  corresponding error display instead of the regular entry form.
