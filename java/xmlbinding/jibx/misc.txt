@@ -49,7 +49,7 @@ preparation workflows (optional)
 +--------+----------+                      +------+----------------------+
 |                   |                      |                             |
 |                   |                      | binding definition          |
-|  java classes     |                      |                             |
+|  java sources     |                      |                             |
 |                   |                      |     documents               |
 +-------------------+                      |                             |
                                            +-----------------------------+
