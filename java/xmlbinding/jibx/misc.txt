@@ -113,3 +113,15 @@ preparation workflows (optional)
 +-------------------+                      |                             |
                                            +-----------------------------+
 
+
+
+Frontend classes / JARs:
+------------------------
+
+binding compiler: org.jibx.binding.Compile / support.jar,jibx-bind.jar
+
+runtime: ibx-run.jar, xpp3.jar
+
+BindGen: org.jibx.binding.generator.BindGen / jibx-tools.jar,jibx-bind.jar,jibx-schema.jar,jibx-run.jar
+
+CodeGen: org.jibx.schema.codegen.CodeGen / jibx-tools.jar,jibx-bind.jar,jibx-schema.jar,jibx-run.jar
