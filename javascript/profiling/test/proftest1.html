@@ -9,6 +9,9 @@
 	<script type="text/javascript" src="proftest1.js"></script>
     <script type="text/javascript">
       dojo.require("dijit.form.Button");
+      dojo.require("dojox.grid.DataGrid");
+      dojo.require("dojox.grid.EnhancedGrid");
+      dojo.require("dojox.data.CsvStore");
     </script>
   </head>
 
@@ -20,6 +23,18 @@
       math
       <script type="dojo/method" event="onClick" args="evt">
         mathtest();
+      </script>
+    </button>
+
+    <table id="grid" dojoType="dojox.grid.EnhancedGrid" clientSort="true"
+           rowSelector="20px" autoHeight="10" columnReordering="true">
+    </table>
+
+    <button id="initGridBtn" dojoType="dijit.form.Button" type="button">
+      initGrid
+      <script type="dojo/method" event="onClick" args="evt">
+        initGrid();
+        this.set("disabled",true);
       </script>
     </button>
 
