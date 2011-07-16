@@ -26,13 +26,15 @@ definitions of the pointcuts:
 	 * Select initialization join point as object construction
 	 */
 	public pointcut beanConstruction(Object bean) : 
-		initialization(ConfigurableObject+.new(..)) && this(bean); 
+		initialization(ConfigurableObject+.new(..)) && this(bean);  //see declare parents below
 
 
 
 (from AnnotationBeanConfigurerAspect)
 
 	public pointcut inConfigurableBean() : @this(Configurable);
+
+	declare parents: @Configurable * implements ConfigurableObject;
 
 
 (from AbstractDependencyInjectionAspect)
