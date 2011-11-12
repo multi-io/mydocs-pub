@@ -39,3 +39,26 @@
 03:10 < snover> dojo.when(xhrGet(…), function (val) { dojo.when(somethingElseThatReturnsAPromiseOrValue, function 
                 (val2) { more stuff… }) })
 03:11 < multi_io> snover: right, that's how I thought it'd work, but it looks a lot uglier than chaining then() calls.
+
+
+---
+
+22:47 < multi_io> isn't it unfortunate that dojo.when does not return a promise?
+22:47 < kgf> multi_io: hehehe
+22:48 < kgf> I think so too
+22:48 < kgf> the interesting thing is if you look at kriskowal's q.js (implementation of Promises/B), when DOES return a promise
+22:48 < kgf> and it has an asap method that does what dojo.when does
+22:48 < kgf> BUT I will admit that dojo.when should be more lightweight
+22:48 < kgf> er, meaning, in its present form, it is more lightweight than promises/B's version
+22:50 < multi_io> kgf: so it's not just sloppiness of dojo guys, but they did it to be more lightweight?
+22:51 < kgf> multi_io: I reckon it was intentional
+22:51 < kgf> I'm not sure whether it's actually part of the Promises specs or not
+22:52 < kgf> I see when and asap documented in Promises/B but when isn't mentioned in Promises/A
+22:54 < multi_io> on http://wiki.commonjs.org/wiki/Promises/B it says that when returns a promise
+22:56 < kgf> multi_io: that's what I'm saying
+22:56 < kgf> dojo follows Promises/A
+22:56 < kgf> but when doesn't appear to be within the spec in that case
+22:56 -!- setsunafseisei [~chatzilla@ip68-100-149-92.dc.dc.cox.net] has joined #dojo
+22:56 < kgf> personally I've wanted to take a closer look at q.js, it seems interesting to me and well thought out
+22:56 < kgf> but in the case of when I can see pros/cons either way
+22:57 < kgf> and naturally it's possible to wrap dojo.when to always use a promise if you wanted

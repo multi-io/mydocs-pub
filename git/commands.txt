@@ -17,3 +17,11 @@ to abort a merge:
 
 git reset --hard
 
+
+clone into existing non-empty directory "foo":
+
+git clone --bare /some/where/foo.git
+mv foo.git foo/.git
+cd foo
+git config core.bare false
+git reset HEAD .

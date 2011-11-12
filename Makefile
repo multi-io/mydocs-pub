@@ -1,4 +1,4 @@
-PUBHTMLDIR=$(HOME)/www/mydocs
+PUBHTMLDIR=$(HOME)/public_html/multi-io.github.com/mydocs
 
 .PHONY: update-and-publish wwwpublish update
 
