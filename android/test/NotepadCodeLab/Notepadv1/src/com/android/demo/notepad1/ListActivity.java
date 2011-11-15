@@ -18,28 +18,49 @@ package com.android.demo.notepad1;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-public class MyNotepadv1 extends Activity {
-    private int mNoteNumber = 1;
+public class ListActivity extends Activity {
+    //private int mNoteNumber = 1;
+    
+	private ListView list;
+    private NotesDbAdapter db;
+    private Cursor listCursor;
+    
+    private final static int MID_CREATE_TESTDATA = Menu.FIRST;
+    private final static int MID_DELETE_ALL_NOTES = Menu.FIRST + 1;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notepad_list);
-        ListView list = (ListView) findViewById(android.R.id.list);
-        list.setAdapter(new SquareNumbersAdapter(20));
+        list = (ListView) findViewById(android.R.id.list);
+        //list.setAdapter(new SquareNumbersAdapter(20));
+        db = new NotesDbAdapter(this);
+        db.open();
+        refresh();
+    }
+    
+    private void refresh() {
+    	if (null != listCursor) {
+    		stopManagingCursor(listCursor);
+    	}
+    	listCursor = db.fetchAllNotes();
+    	startManagingCursor(listCursor);
+    	list.setAdapter(new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, listCursor, new String[]{NotesDbAdapter.KEY_TITLE}, new int[]{android.R.id.text1}));
     }
     
     private class SquareNumbersAdapter extends BaseAdapter {
@@ -86,13 +107,30 @@ public class MyNotepadv1 extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // TODO Auto-generated method stub
-        return super.onCreateOptionsMenu(menu);
+        menu.add(Menu.NONE, MID_CREATE_TESTDATA, Menu.NONE, R.string.create_testdata);
+        menu.add(Menu.NONE, MID_DELETE_ALL_NOTES, Menu.NONE, R.string.delete_all_notes);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        return super.onOptionsItemSelected(item);
+        if (super.onOptionsItemSelected(item)) {
+        	return true;
+        }
+        switch (item.getItemId()) {
+        case MID_CREATE_TESTDATA:
+        	Log.i(this.getClass().getName(), "create testdata");
+        	db.createNote("hello", "The first note.");
+        	db.createNote("Apfelmus", "Lecker!");
+        	db.createNote("Blah", "The quick brown fox jumps over the lazy dog.");
+        	refresh();
+        	return true;
+        case MID_DELETE_ALL_NOTES:
+        	Log.i(this.getClass().getName(), "delete all notes");
+        	db.deleteAllNotes();
+        	refresh();
+        	return true;
+        }
+        return false;
     }
 }
