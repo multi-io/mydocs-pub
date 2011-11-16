@@ -56,7 +56,11 @@ public class ListActivity extends Activity {
         	public void onItemClick(AdapterView<?> parent, View view,
         			int position, long id) {
         		Log.d(this.getClass().getName(), "item clicked " + position + ", " + id);
-        		startActivity(new Intent(ListActivity.this, EditActivity.class));
+        		Cursor c = db.fetchNote(id);
+        		Intent i = new Intent(ListActivity.this, EditActivity.class);
+        		i.putExtra(NotesDbAdapter.KEY_TITLE, c.getString(c.getColumnIndex(NotesDbAdapter.KEY_TITLE)));
+        		i.putExtra(NotesDbAdapter.KEY_BODY, c.getString(c.getColumnIndex(NotesDbAdapter.KEY_BODY)));
+        		startActivity(i);
         	}
 		});
         db = new NotesDbAdapter(this);
