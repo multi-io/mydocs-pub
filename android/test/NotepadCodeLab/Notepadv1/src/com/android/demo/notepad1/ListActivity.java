@@ -18,6 +18,7 @@ package com.android.demo.notepad1;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -49,6 +51,14 @@ public class ListActivity extends Activity {
         setContentView(R.layout.notepad_list);
         list = (ListView) findViewById(android.R.id.list);
         //list.setAdapter(new SquareNumbersAdapter(20));
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        	@Override
+        	public void onItemClick(AdapterView<?> parent, View view,
+        			int position, long id) {
+        		Log.d(this.getClass().getName(), "item clicked " + position + ", " + id);
+        		startActivity(new Intent(ListActivity.this, EditActivity.class));
+        	}
+		});
         db = new NotesDbAdapter(this);
         db.open();
         refresh();
