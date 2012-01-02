@@ -73,30 +73,75 @@ ct.foo
 
 
 
+p = proc{|a,b,c| puts "p(#{a} #{b} #{c})"} #creates a lambda in 1.8, Proc in 1.9
+# a Proc can be called with any number of arguments, a lambda can't
+
+# => 2nd and 3rd call fail (ArgumentError) in 1.8
+begin
+  p.call 1,2,3
+  p.call 1,2
+  p.call 1,2,3,4
+rescue ArgumentError => e
+  puts "ArgumentError: #{e}"
+end
+
+l = lambda{|a,b,c| puts "l(#{a} #{b} #{c})"} #creates a lambda in 1.8 and 1.9
+
+# => 2nd and 3rd call fail in 1.8 and 1.9
+begin
+  l.call 1,2,3
+  l.call 1,2
+  l.call 1,2,3,4
+rescue ArgumentError => e
+  puts "ArgumentError: #{e}"
+end
+
+p2 = Proc.new{|a,b,c| puts "p2(#{a} #{b} #{c})"} #creates a Proc in 1.8 and 1.9
+
+# => all calls work in 1.8 and 1.9
+begin
+  p2.call 1,2,3
+  p2.call 1,2
+  p2.call 1,2,3,4
+rescue ArgumentError => e
+  puts "ArgumentError: #{e}"
+end
+
+
 class Calltest2
-  def initialize(reader)
-    @reader = reader
+  def initialize(overridden_foo)
+    @overridden_foo = overridden_foo
     class << self
       alias_method :default_foo, :foo
-      def foo(obj,xml)
+      def foo(a,b)
         begin
-          @reader.call(obj,xml)
-        rescue ArgumentError
-          @reader.call(obj,xml,self.method(:default_foo))
+          @overridden_foo.call(a,b,self.method(:default_foo))
+        rescue ArgumentError  # Ruby 1.8 throws this if the @overridden_foo is a lambda (proc{...}) and doesn't take 3 arguments
+          @overridden_foo.call(a,b)
         end
       end
     end
   end
-  def foo(obj,xml)
+  def foo(a,b)
     puts "default foo"
   end
 end
 
 
-ct2 = Calltest2.new proc{|obj,xml,default|
-  puts "overridden reader, calling default..."
-  default.call(obj,xml)
+ct2 = Calltest2.new proc{|a,b,default|
+  puts "overridden foo " + (default ? ", calling default" : "")
+  if default
+    default.call(a,b)
+  end
 }
 
 
 ct2.foo "foo", "bar"
+
+
+ct22 = Calltest2.new proc{|a,b|
+  puts "ct22 overridden foo, not calling default"
+}
+
+
+ct22.foo "foo", "bar"
