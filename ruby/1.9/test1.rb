@@ -73,10 +73,27 @@ ct.foo
 
 
 
-require './base'
+class Node
+  def initialize(reader)
+    @reader = reader
+    class << self
+      alias_method :default_xml_to_obj, :xml_to_obj
+      def xml_to_obj(obj,xml)
+        begin
+          @reader.call(obj,xml)
+        rescue ArgumentError
+          @reader.call(obj,xml,self.method(:default_xml_to_obj))
+        end
+      end
+    end
+  end
+  def xml_to_obj(obj,xml)
+    puts "default xml_to_obj"
+  end
+end
 
 
-n = XML::Mapping::Node.new :reader=>proc{|obj,xml,default|
+n = Node.new proc{|obj,xml,default|
   puts "overridden reader, calling default..."
   default.call(obj,xml)
 }
