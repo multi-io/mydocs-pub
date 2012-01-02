@@ -73,30 +73,30 @@ ct.foo
 
 
 
-class Node
+class Calltest2
   def initialize(reader)
     @reader = reader
     class << self
-      alias_method :default_xml_to_obj, :xml_to_obj
-      def xml_to_obj(obj,xml)
+      alias_method :default_foo, :foo
+      def foo(obj,xml)
         begin
           @reader.call(obj,xml)
         rescue ArgumentError
-          @reader.call(obj,xml,self.method(:default_xml_to_obj))
+          @reader.call(obj,xml,self.method(:default_foo))
         end
       end
     end
   end
-  def xml_to_obj(obj,xml)
-    puts "default xml_to_obj"
+  def foo(obj,xml)
+    puts "default foo"
   end
 end
 
 
-n = Node.new proc{|obj,xml,default|
+ct2 = Calltest2.new proc{|obj,xml,default|
   puts "overridden reader, calling default..."
   default.call(obj,xml)
 }
 
 
-n.xml_to_obj "foo", "bar"
+ct2.foo "foo", "bar"
