@@ -108,6 +108,8 @@ rescue ArgumentError => e
 end
 
 
+### one codebase that works with procs and lambdas...
+
 class Calltest2
   def initialize(overridden_foo)
     @overridden_foo = overridden_foo
@@ -116,7 +118,7 @@ class Calltest2
       def foo(a,b)
         begin
           @overridden_foo.call(a,b,self.method(:default_foo))
-        rescue ArgumentError  # Ruby 1.8 throws this if the @overridden_foo is a lambda (proc{...}) and doesn't take 3 arguments
+        rescue ArgumentError  # thrown if the @overridden_foo is a lambda (i.e. no Proc) with !=3 args (e.g. proc{...} in ruby1.8)
           @overridden_foo.call(a,b)
         end
       end
