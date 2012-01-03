@@ -147,3 +147,8 @@ ct22 = Calltest2.new proc{|a,b|
 
 
 ct22.foo "foo", "bar"
+
+
+# instance_methods contains strings in 1.8, symbols in 1.9
+puts Calltest2.instance_methods.include? :foo  #true in 1.9, false in 1.8
+puts Calltest2.instance_methods.include? "foo" #true in 1.8, false in 1.9
