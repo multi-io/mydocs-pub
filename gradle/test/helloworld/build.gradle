@@ -1,0 +1,35 @@
+println "Good Afternoon." 
+
+task hello {
+    doFirst {
+        println "hello last $this"
+    }
+
+    doLast {
+        println "hello first $this"
+        println "hello a=${this.a}"
+    }
+
+    println "hello config $this"
+}
+
+hello.a = 42
+
+hello << { println "hello more stuff" }
+
+
+def t_prev = null
+(0..5).each { i->
+    def t = task "rep$i" {
+        println "task $i config"
+        doLast {
+            println "task $i last"
+        }
+    }
+    if (t_prev != null) {
+        t.dependsOn t_prev
+    }
+    t_prev = t
+}
+
+rep3.dependsOn(hello)
