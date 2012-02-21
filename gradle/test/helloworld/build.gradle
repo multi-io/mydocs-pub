@@ -1,5 +1,9 @@
 println "Good Afternoon." 
 
+gradle.taskGraph.whenReady {taskGraph ->
+    println "taskGraph ready: $taskGraph"
+}
+
 task hello {
     doFirst {
         println "hello last $this"
@@ -7,7 +11,6 @@ task hello {
 
     doLast {
         println "hello first $this"
-        println "hello a=${this.a}"
     }
 
     println "hello config $this"
