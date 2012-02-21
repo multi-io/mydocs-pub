@@ -1,0 +1,8 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "oklischat.gradle.HW"
+
+dependencies {
+    compile project(':common')
+}
