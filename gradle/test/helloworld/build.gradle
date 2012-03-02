@@ -1,4 +1,4 @@
-println "Good Afternoon." 
+println "start of build.gradle." 
 
 gradle.taskGraph.whenReady {taskGraph ->
     println "taskGraph ready: $taskGraph"
@@ -44,3 +44,6 @@ task test1 << {
         println "" + dep + ": " + dep.class 
     }
 }
+
+
+println "end of build.gradle." //run AFTER all the tasks' config stages have run!
