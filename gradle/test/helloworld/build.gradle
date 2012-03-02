@@ -5,11 +5,11 @@ gradle.taskGraph.whenReady {taskGraph ->
 }
 
 task hello {
-    doFirst {
+    doLast {
         println "hello last $this"
     }
 
-    doLast {
+    doFirst {
         println "hello first $this"
     }
 
@@ -36,3 +36,11 @@ def t_prev = null
 }
 
 rep3.dependsOn(hello)
+
+
+task test1 << {
+    println "deps of rep3:"
+    rep3.dependsOn.each { dep ->
+        println "" + dep + ": " + dep.class 
+    }
+}
