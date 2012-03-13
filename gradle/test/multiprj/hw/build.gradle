@@ -1,0 +1,20 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "oklischat.gradle.HW"
+
+dependencies {
+    compile project(':common')
+}
+
+
+task test1 << {
+    println "files of compile:"
+    configurations.compile.files.each { f ->
+        println f.path
+    }
+    println "deps of compile:"
+    configurations.compile.dependencies.each { dep ->
+        println "" + dep + ": " + dep.class 
+    }
+}

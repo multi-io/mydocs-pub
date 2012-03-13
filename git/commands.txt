@@ -25,3 +25,14 @@ mv foo.git foo/.git
 cd foo
 git config core.bare false
 git reset HEAD .
+
+
+
+<multi_io> is it possible to directly fast-forward a non-checked out branch to the checked out branch?
+[15:23] <cehteh> git push . brach:branch
+[15:24] <multi_io> i.e. I've checked out branch B, and there's a branch A in the repo which is an ancestor of B, and I want to do the equivalent of git checkout B; git merge --ff-only A; git checkout A
+
+=> git push . B:A
+
+<cmn> git branch -f A B would also work
+<cmn> and be less magical
