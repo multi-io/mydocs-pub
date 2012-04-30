@@ -8,17 +8,18 @@ deg=PI/180.0
 arcmin=deg/60.0
 arcsec=arcmin/60.0
 
-# velocities. base unit: meters/sec
-c=299792458.0
-
 # times. base unit: second
+sec=1.0
+msec=sec/1000.0
+usec=msec/1000.0
+nsec=usec/1000.0
 min=60.0
 hr=60*min
 day=24*hr
 year=365*day
 
 # distances. base unit: meter
-m=1.0
+meter=1.0
 cm=1e-2
 mm=1e-3
 um=1e-6
@@ -33,6 +34,21 @@ r_earth=6371*km
 r_sun=1.392e6*km/2
 
 rrad_sun=r_sun/au
+
+# velocities. base unit: meters/sec
+m_per_s=meter/sec
+kmh=km/hr
+c=299792458.0
+
+
+# energies, base unit: joule
+j=1.0
+ws=j
+wh=3600.0*ws
+kwh=1000.0*wh
+mwh=1000.0*kwh
+gwh=1000.0*mwh
+twh=1000.0*gwh
 
 def sterad_circle(rrad)
   2*PI*(1-cos(rrad))
