@@ -18,7 +18,9 @@ int main(int argc, const char **argv)  //argv = {"git", [global options...], "co
 
 		handle_internal_command(*argcp, *argv);
 
-          => run_builtin(p, argc, argv)  //struct cmd_struct p, z.B. { "add", cmd_add, RUN_SETUP | NEED_WORK_TREE }
+          => run_builtin(p, argc, argv)  //struct cmd_struct p, z.B. { name: "add", fn: cmd_add, options: RUN_SETUP | NEED_WORK_TREE }
+              
+              => p->fnfn(argc, argv, <name of CWD relative to worktree root, if any>)
 
 		------
 
