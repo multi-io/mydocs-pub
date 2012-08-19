@@ -1,0 +1,31 @@
+(git.c)
+
+int main(int argc, const char **argv)  //argv = {"git", [global options...], "command", options...}
+     
+  => static int run_argv(int *argcp, const char ***argv)  //*argv = {"command", options...}
+     {
+         [...]
+         while (1) {
+             /* See if it's an internal command */
+             handle_internal_command(*argcp, *argv);  //exits if successful
+             [...]
+             /* .. then try the external ones */
+             execv_dashed_external(*argv);  //exits if successful
+             [...]
+         }
+         [...]
+     }
+
+		handle_internal_command(*argcp, *argv);
+
+          => run_builtin(p, argc, argv)  //struct cmd_struct p, z.B. { "add", cmd_add, RUN_SETUP | NEED_WORK_TREE }
+
+		------
+
+        execv_dashed_external(*argv);
+
+          => {
+               argv[0] = "git-" + argv[0];
+               run_command_v_opt(argv, RUN_SILENT_EXEC_FAILURE | RUN_CLEAN_ON_EXIT);
+                 => run (fork/exec+wait)  {"git-command", options...} with git's installation directory up front in $PATH
+             }

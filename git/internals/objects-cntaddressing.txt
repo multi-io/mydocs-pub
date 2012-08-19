@@ -1,0 +1,150 @@
+From: Olaf Klischat <olaf.klischat@googlemail.com>
+To: .....
+
+Wir hatten doch neulich theoretisiert, dass beim Kopieren eines großen 
+Verzeichnisses innerhalb eines Git-Repos (z.B. Verzeichnis "SITScope" 
+bei uns) die Größe des Repos stark steigen (im Extremfall sich fast 
+verdoppeln) müsste.
+
+Ist aber nicht so.
+
+$ git init objtest
+Initialized empty Git repository in 
+/home/olaf/doc/mydocs/git/test/objects/objtest/.git/
+$ cd objtest/
+objtest$ mkdir foo
+objtest$ echo hello >foo/hello.txt
+objtest$ echo world >foo/world.txt
+objtest$ git add foo/
+objtest$ git commit -m 'foo'
+[master (root-commit) be1280a] foo
+  2 files changed, 2 insertions(+), 0 deletions(-)
+  create mode 100644 foo/hello.txt
+  create mode 100644 foo/world.txt
+objtest$
+objtest$ git log
+commit be1280ae26fac555ecf7f42bdff57fd17c111512
+Author: Olaf Klischat <olaf.klischat@googlemail.com>
+Date:   Fri Feb 24 03:07:46 2012 +0100
+
+     foo
+objtest$
+objtest$ git rev-list --objects --all  #alle Objekte listen (commits, trees, blobs)
+be1280ae26fac555ecf7f42bdff57fd17c111512
+c699fe52a73816fcf2212911e0cd56c73202561a
+88e38705fdbd3608cddbe904b67c731f3234c45b foo
+ce013625030ba8dba906f756967f9e9ca394464a foo/hello.txt
+cc628ccd10742baea8241c5924df992b5c019f71 foo/world.txt
+objtest$
+objtest$ git ls-tree 88e38705fdbd3608cddbe904b67c731f3234c45b 
+#Spezialkommando zum Anzeigen von Tree-Objekten
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	hello.txt
+100644 blob cc628ccd10742baea8241c5924df992b5c019f71	world.txt
+objtest$
+objtest$ git show c699fe52a73816fcf2212911e0cd56c73202561a  #der Root-Tree
+tree c699fe52a73816fcf2212911e0cd56c73202561a
+
+foo/
+objtest$ ##### Jetzt: Kopieren
+objtest$ cp -rf foo foo2
+objtest$ git add foo2
+objtest$ git commit -m foo2
+[master 8e88abc] foo2
+  2 files changed, 2 insertions(+), 0 deletions(-)
+  create mode 100644 foo2/hello.txt
+  create mode 100644 foo2/world.txt
+objtest$
+objtest$ git rev-list --objects --all
+8e88abc83ae71dbd48f5b0e8b71293cf4528de5e
+be1280ae26fac555ecf7f42bdff57fd17c111512
+e08505e42efa85422bf844b695a8c70d1ee6b8b1       #<- der neue Root-Tree (hieß oben noch c699fe52a7..)
+88e38705fdbd3608cddbe904b67c731f3234c45b foo
+ce013625030ba8dba906f756967f9e9ca394464a foo/hello.txt
+cc628ccd10742baea8241c5924df992b5c019f71 foo/world.txt
+c699fe52a73816fcf2212911e0cd56c73202561a
+objtest$
+objtest$ git ls-tree e08505e42efa85422bf844b695a8c70d1ee6b8b1
+040000 tree 88e38705fdbd3608cddbe904b67c731f3234c45b	foo
+040000 tree 88e38705fdbd3608cddbe904b67c731f3234c45b	foo2   #identische Kopie -> einfach im Tree 2 mal referenziert
+objtest$
+objtest$ #### foo2 ändern
+objtest$
+objtest$ echo blabla >foo2/quux.txt
+objtest$ git add foo2/quux.txt
+objtest$ git commit -m quux
+[master a268e09] quux
+  1 files changed, 1 insertions(+), 0 deletions(-)
+  create mode 100644 foo2/quux.txt
+objtest$
+objtest$
+objtest$ git rev-list --objects --all
+a268e09da5baa2971942b2f112c350145b9a7060
+8e88abc83ae71dbd48f5b0e8b71293cf4528de5e
+be1280ae26fac555ecf7f42bdff57fd17c111512
+575b2490cbfb0b9089671957e751166b9fc3eab8
+88e38705fdbd3608cddbe904b67c731f3234c45b foo
+ce013625030ba8dba906f756967f9e9ca394464a foo/hello.txt
+cc628ccd10742baea8241c5924df992b5c019f71 foo/world.txt
+c8aa6953028e7ecdb173ab9388e9f8f8709f865c foo2
+d35e62fcf6d62331a2cd9ccc43ff200254959420 foo2/quux.txt
+e08505e42efa85422bf844b695a8c70d1ee6b8b1
+c699fe52a73816fcf2212911e0cd56c73202561a
+objtest$
+objtest$ git ls-tree 575b2490cbfb0b9089671957e751166b9fc3eab8 # neuer 
+Root-Tree
+040000 tree 88e38705fdbd3608cddbe904b67c731f3234c45b	foo     # jetzt 2 unterschiedliche Subtrees...
+040000 tree c8aa6953028e7ecdb173ab9388e9f8f8709f865c	foo2
+objtest$
+objtest$ #beide Subtrees:
+objtest$ git ls-tree 88e38705fdbd3608cddbe904b67c731f3234c45b
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	hello.txt
+100644 blob cc628ccd10742baea8241c5924df992b5c019f71	world.txt
+objtest$
+objtest$ git ls-tree c8aa6953028e7ecdb173ab9388e9f8f8709f865c
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	hello.txt  #...aber hello.txt und world.txt immer noch geshared.
+100644 blob d35e62fcf6d62331a2cd9ccc43ff200254959420	quux.txt
+100644 blob cc628ccd10742baea8241c5924df992b5c019f71	world.txt
+objtest$
+
+objtest$ ## zu hello.txt binaer inhaltsgleiche Datei anlegen
+objtest$
+objtest$ echo hello >foo2/nochwas.txt
+objtest$ git add foo2/nochwas.txt
+objtest$
+objtest$
+objtest$ git commit -m 'nochwas'
+[master bdba8f6] nochwas
+  1 files changed, 1 insertions(+), 0 deletions(-)
+  create mode 100644 foo2/nochwas.txt
+objtest$
+objtest$
+objtest$ git rev-list --objects --all
+bdba8f62d065e001db96ecbd43a53f551c5c738e
+a268e09da5baa2971942b2f112c350145b9a7060
+8e88abc83ae71dbd48f5b0e8b71293cf4528de5e
+be1280ae26fac555ecf7f42bdff57fd17c111512
+1057d9f535e2b028e0161aaf0c3d9c38db531625
+88e38705fdbd3608cddbe904b67c731f3234c45b foo
+ce013625030ba8dba906f756967f9e9ca394464a foo/hello.txt
+cc628ccd10742baea8241c5924df992b5c019f71 foo/world.txt
+4364b665637df1132fd5af153c8cc2d983899491 foo2
+d35e62fcf6d62331a2cd9ccc43ff200254959420 foo2/quux.txt
+575b2490cbfb0b9089671957e751166b9fc3eab8
+c8aa6953028e7ecdb173ab9388e9f8f8709f865c foo2
+e08505e42efa85422bf844b695a8c70d1ee6b8b1
+c699fe52a73816fcf2212911e0cd56c73202561a
+objtest$
+objtest$ git ls-tree 88e38705fdbd3608cddbe904b67c731f3234c45b
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	hello.txt
+100644 blob cc628ccd10742baea8241c5924df992b5c019f71	world.txt
+objtest$ git ls-tree 4364b665637df1132fd5af153c8cc2d983899491
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	hello.txt
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	nochwas.txt 100644 
+blob d35e62fcf6d62331a2cd9ccc43ff200254959420	quux.txt
+100644 blob cc628ccd10742baea8241c5924df992b5c019f71	world.txt
+objtest$ #=>Inhalt nur einmal gespeichert.
+
+D.h. das ganze ist so quasi content-adressed. Eine Datei (Blob) wird als 
+Hash über ihren Inhalt (und nur den Inhalt -- Dateiname/Pfad stehen in 
+übergeordneten Tree-Objekten) adressiert. Solange sich der Inhalt nicht 
+ändert, wird intern kein neues Objekt angelegt.
