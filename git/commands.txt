@@ -36,3 +36,22 @@ git reset HEAD .
 
 <cmn> git branch -f A B would also work
 <cmn> and be less magical
+
+
+
+specifying commit ranges:
+
+see git help rev-list
+
+- git rev-list master: master and all commits reachable from it via "parent" relation
+
+- git rev-list master ^other: master and all commits reachable from it, but not from other, via "parent" relation
+
+from git help rev-list:
+
+       You can think of this as a set operation. Commits given on the command line form a set of commits that are reachable
+       from any of them, and then commits reachable from any of the ones given with ^ in front are subtracted from that set.
+       The remaining commits are what comes out in the command’s output. Various other options and paths parameters can be used
+       to further limit the result.
+
+several commands take commit range arguments, e.g. cherry-pick.
