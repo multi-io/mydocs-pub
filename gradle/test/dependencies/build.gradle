@@ -1,0 +1,70 @@
+//dependency configurations (defined via "configurations"),
+//dependencies (defined via "dependencies") and repositories (defined
+//via "repositories") are core Gradle concepts, not Java plugin
+//concepts.
+//
+//AFAIK: Dependency configurations are used to group
+//dependencies. Dependencies are used to specify resources, e.g. jar
+//files or other gradle projects, that are needed. Repositories are
+//used to resolve jar files specified by dependencies.
+
+configurations {
+    myconf
+    myotherconf {
+        //for what can go here, see http://gradle.org/docs/current/dsl/org.gradle.api.artifacts.Configuration.html
+        extendsFrom myconf
+    }
+    myconf2
+}
+
+dependencies {
+    //for what can be specified here, see http://gradle.org/docs/current/dsl/org.gradle.api.artifacts.dsl.DependencyHandler.html
+    myconf group: 'org.hibernate', name: 'hibernate-core', version: '3.6.7.Final'
+    myconf2 configurations.myconf
+    myconf2 group: 'foo.bar', name: 'myconf2-core', version: '1.2.3.4'
+}
+
+repositories {
+    flatDir {
+        dirs 'repo'
+    }
+}
+
+
+gradle.taskGraph.whenReady {taskGraph ->
+    println "taskGraph ready: $taskGraph"
+}
+
+task printdeps << {
+    println "myconf deps:"
+    configurations.myconf.allDependencies.each {dep ->
+        println "  $dep"
+    }
+
+    println "\nmyotherconf deps:"
+    configurations.myotherconf.allDependencies.each {dep ->
+        println "  $dep"
+    }
+
+    println "\nmyconf2 deps:"
+    configurations.myconf2.allDependencies.each {dep ->
+        println "  $dep"
+    }
+
+    println "\nmyconf2 files:"
+    configurations.myconf2.files.each {f ->
+        println "  $f"
+    }
+}
+
+task hello {
+    doLast {
+        println "hello last $this"
+    }
+
+    doFirst {
+        println "hello first $this"
+    }
+
+    println "hello config $this"
+}
