@@ -34,10 +34,24 @@ r_sun=1.392e6*km/2
 
 rrad_sun=r_sun/au
 
+# volumes. base unit: m^3
+m3=meter**3
+litre=(10*cm)**3
+barrel=119.240471*litre
+
 # velocities. base unit: meters/sec
 m_per_s=meter/sec
 kmh=km/hr
 c=299792458.0
+
+# distance
+ly=c*year
+
+
+# mass, base unit: kg
+kg=1.0
+gram=0.001*kg
+ton=1000.0*kg
 
 
 
@@ -52,6 +66,7 @@ m_sun=1.985e30
 # energies, base unit: joule
 j=1.0
 ws=j
+mj=1e6*j
 wh=3600.0*ws
 kwh=1000.0*wh
 mwh=1000.0*kwh
