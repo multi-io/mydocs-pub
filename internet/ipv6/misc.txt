@@ -61,24 +61,50 @@ IPv6 multicast, transport over Ethernet, Neighbor discovery
   listening for the corresponding Ethernet address.
 
 - various well-known IPv6 multicast groups have been defined (see also
-  RFC 2375). Examples:
+  RFC 2373, 2375). Examples:
 
    FF02:0:0:0:0:0:0:1     All Nodes Address   (link-local)
    FF02:0:0:0:0:0:0:2     All Routers Address (link-local)
 
-   FF02::1:FFXX:XXXX     Solicited-Node Address (see above)
+   FF02::1:FFXX:XXXX     Solicited-Node Address (see below)
 
    FF05:0:0:0:0:0:0:2       All Routers Address (site-local)
 
    FF05:0:0:0:0:0:1:3       All-dhcp-servers (site-local)
    FF05:0:0:0:0:0:1:4       All-dhcp-relays  (site-local)
 
-  (actually, the two nibbles after the FF (e.g. 01,05,08) are
+  actually, the two nibbles after the FF (e.g. 01,05,08) are
   standardized too -- the 0 in the first nibble means "well-known
-  multicast address", and for the second nibble, 1 means "node-local",
-  2 means "link-local", 5 means "site-local", 8 means
-  "organization-local", E means "global")
+  (permanently assigned) multicast address", and for the second
+  nibble, which is called the "scope" of the multicast address, 1
+  means "node-local", 2 means "link-local", 5 means "site-local", 8
+  means "organization-local", E means "global"
 
+  and actually, the part after the FFXX (i.e. the lower 112 bits of
+  the address) is commonly called the "group id" of the address, as it
+  defines the actual multicast group that's being addressed, and it is
+  defined for all scopes, i.e. any scope can be combined with any
+  group id. So in the above examples, 0:0:0:0:0:0:2 is the group id
+  for the "all routers" group, and it is combined with the link-local
+  scope (2) to address all router on the local link
+  (FF02:0:0:0:0:0:0:2), and with the site-local scope (5) to adress
+  all routers in the local site (FF05:0:0:0:0:0:0:2). So theoretically
+  you could address all routers globally by using the global scope
+  (E), giving FF0E:0:0:0:0:0:0:2.
+
+  RFC 2373 / section 2.7.2 says that, at least for permanently
+  assigned / "well known" multicast groups, the upper 80 bits of the
+  group ID should actually be set to 0, and only the lower 32 be used,
+  because then all group IDs differ only in the lower 32 bits, which
+  means that each of them maps to a different (unique) Ethernet MAC
+  address, as per the IPv6-Ethernet multicast address conversion rule
+  given above.
+
+- Problem with globally scoped multicast addresses is that, in all
+  likelyhood, no public router will route them, since doing so would
+  potentially explode routing tables. :-P
+
+- TODO: RFC 3306
 
 
 Neighbor discovery (ND) (RFC 2461)
