@@ -25,7 +25,6 @@ mm=1e-3
 um=1e-6
 nm=1e-9
 km=1000.0
-ly=c*year
 au=149.6e6*km
 pc=au/arcsec
 
@@ -41,6 +40,15 @@ kmh=km/hr
 c=299792458.0
 
 
+
+# masses. base unit: kg
+kg=1.0
+grams=1e-3
+tons=1e3
+m_earth=5.975e24
+m_sun=1.985e30
+
+
 # energies, base unit: joule
 j=1.0
 ws=j
@@ -49,6 +57,14 @@ kwh=1000.0*wh
 mwh=1000.0*kwh
 gwh=1000.0*mwh
 twh=1000.0*gwh
+
+
+# misc
+ly=c*year
+g=9.81
+G=6.673e-11
+
+
 
 def sterad_circle(rrad)
   2*PI*(1-cos(rrad))
