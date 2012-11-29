@@ -1,0 +1,8 @@
+sample:
+
+git filter-branch --index-filter 'git rm -rf --cached --ignore-unmatch files...' --prune-empty -- --all
+
+note: with --index-filter, the commits to be filtered are not checked
+out, so the shell command passed as an argument cannot expect there to
+be a checked-out working copy in the filesystem. If you need that, you
+should use --tree-filter instead of --index-filter.
