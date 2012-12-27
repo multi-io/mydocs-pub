@@ -8,6 +8,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
@@ -17,6 +18,7 @@ public class View extends ViewPart {
 
 	private Text addressBar;
 	private Browser browser;
+	private Label statusLine;
 
 	public View() {
 		System.out.println("View ctor");
@@ -48,6 +50,13 @@ public class View extends ViewPart {
 		//browser = new Browser(parent, SWT.MOZILLA | SWT.BORDER);
 		browser.setLayoutData(gd);
 		
+		gd = new GridData();
+		gd.horizontalAlignment = SWT.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = false;
+		statusLine = new Label(parent, SWT.LEFT | SWT.SHADOW_ETCHED_IN);
+		statusLine.setLayoutData(gd);
+
 		addressBar.addListener(SWT.DefaultSelection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -63,6 +72,7 @@ public class View extends ViewPart {
 			
 			@Override
 			public void changing(LocationEvent event) {
+				statusLine.setText("loading " + event.location + " ...");
 			}
 			
 			@Override
@@ -70,6 +80,7 @@ public class View extends ViewPart {
 				if (event.top) {
 					addressBar.setText(event.location);
 				}
+				statusLine.setText("Done.");
 			}
 		});
 	}
