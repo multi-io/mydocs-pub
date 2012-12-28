@@ -1,0 +1,24 @@
+// -*- groovy -*-
+
+version = '1.0'
+    
+apply plugin: 'java'
+apply plugin: 'eclipse'
+ 
+sourceCompatibility = 1.6
+ 
+repositories {
+    mavenCentral()
+    maven {
+        url "https://swt-repo.googlecode.com/svn/repo"
+    }
+}
+
+dependencies {
+    compile "org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:3.7.2"
+}
+
+
+apply plugin: 'application'
+
+mainClassName = 'de.oklischat.swt.test.browser.App'

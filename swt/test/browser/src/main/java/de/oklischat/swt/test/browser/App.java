@@ -14,36 +14,26 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
 
-/**
- * The activator class controls the plug-in life cycle
- */
-public class Activator implements BundleActivator {
+public class App {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "de.oklischat.swt.test.browser"; //$NON-NLS-1$
+	public static void main(String[] args) throws Exception {
+        Display display = new Display();
+		new App(display).run();
+        display.dispose();
+	}
 
-	// The shared instance
-	private static Activator plugin;
+	private final Display display;
 	
 	private Text addressBar;
 	private Browser browser;
 	private Label statusLine;
 
-	/**
-	 * The constructor
-	 */
-	public Activator() {
+	public App(Display display) {
+		this.display = display;
 	}
 
-    @Override
-	public void start(BundleContext context) throws Exception {
-		plugin = this;
-
-        Display display = new Display();
-        
+	public void run() throws Exception {
         Shell parent = new Shell(display);
         parent.setText("SWT Browser test");
         parent.setSize(900, 600);
@@ -112,12 +102,6 @@ public class Activator implements BundleActivator {
             display.sleep();
           }
         }
-
-        display.dispose();
-        
-        //shutdown OSGI container --
-        // see http://stackoverflow.com/questions/1916432/best-way-to-shutdown-an-osgi-container-specifically-equinox
-        context.getBundle(0).stop();
     }
 
     public void center(Shell shell) {
@@ -127,19 +111,5 @@ public class Activator implements BundleActivator {
         int nTop = (bds.height - p.y) / 2;
         shell.setBounds(nLeft, nTop, p.x, p.y);
     }
-
-    @Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-	}
-
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
 
 }
