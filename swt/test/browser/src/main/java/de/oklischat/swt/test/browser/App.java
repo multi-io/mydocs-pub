@@ -56,8 +56,8 @@ public class App {
 		gd.grabExcessHorizontalSpace = true;
 		gd.verticalAlignment = SWT.FILL;
 		gd.grabExcessVerticalSpace = true;
-		browser = new Browser(parent, SWT.WEBKIT | SWT.BORDER);
-		//browser = new Browser(parent, SWT.BORDER);
+		//browser = new Browser(parent, SWT.WEBKIT | SWT.BORDER);
+		browser = new Browser(parent, SWT.BORDER);
 		//browser = new Browser(parent, SWT.MOZILLA | SWT.BORDER);
 		browser.setLayoutData(gd);
 		

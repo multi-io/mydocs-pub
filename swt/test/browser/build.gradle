@@ -4,9 +4,24 @@ version = '1.0'
     
 apply plugin: 'java'
 apply plugin: 'eclipse'
- 
+
 sourceCompatibility = 1.6
- 
+
+useSwtVersion = '3.7.2'
+
+def platforms = ['cocoa.macosx',
+                 'cocoa.macosx.x86_64',
+                 'gtk.aix.ppc',
+                 'gtk.aix.ppc64',
+                 'gtk.hpux.ia64_32',
+                 'gtk.linux.ppc64',
+                 'gtk.linux.x86',
+                 'gtk.linux.x86_64',
+                 'gtk.solaris.sparc',
+                 'gtk.solaris.x86',
+                 'win32.win32.x86',
+                 'win32.win32.x86_64']
+
 repositories {
     mavenCentral()
     maven {
@@ -14,11 +29,126 @@ repositories {
     }
 }
 
+
+// dependency configuration setup:
+// configuration "compile_base" contains all platform-independent compile-time dependencies.
+// configuration "compile_<platform>" contains all compile-time dependencies for platform <platform>.
+// configuration "compile" contains all compile-time dependencies for the platform we're running on.
+// configuration "runtime_<platform>" contains all runtime dependencies for platform <platform>.
+// configuration "runtime" contains all runtime dependencies for the platform we're running on.
+
+configurations.add 'compile_base'
+
 dependencies {
-    compile "org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:3.7.2"
+    // compile_base "log4j:log4j:1.2.13"
+    // compile_base "commons-lang:commons-lang:2.5"
+    // compile_base "com.google.guava:guava:r05"
+}
+
+platforms.each { p ->
+    def platform_compile_config = configurations.add "compile_$p"
+    dependencies.add "compile_$p", "org.eclipse.swt:org.eclipse.swt.$p:$useSwtVersion"
+    platform_compile_config.extendsFrom configurations.compile_base
+
+    def platform_runtime_config = configurations.add "runtime_$p"
+    //dependencies.add "runtime_$p", "org.some.runtime-only:artifact.$p:$useSwtVersion"  //not needed atm.
+    platform_runtime_config.extendsFrom platform_compile_config
+}
+
+def runningPlatform = getRunningPlatform()
+if (runningPlatform) {
+    configurations.compile.extendsFrom configurations["compile_$runningPlatform"]
+    configurations.runtime.extendsFrom configurations["runtime_$runningPlatform"]
+}
+
+def getRunningPlatform() {
+    //TODO make this function work on all platforms
+    def oses = [linux:'gtk.linux', windows:'win32.win32', mac:'cocoa.macosx']
+    def archs = [x86:'x86', i386:'x86', amd64:'x86_64', x86_64:'x86_64', x64:'x86_64']
+    def osname = System.getProperty("os.name").split()[0].toLowerCase()
+    def osarch = System.getProperty("os.arch")
+    def os = oses[osname]
+    def arch = archs[osarch]
+    if (!os || !arch) {
+        //unsupported platform (but we can still compile here)
+        return null;
+    }
+    return "$os.$arch"
 }
 
 
-apply plugin: 'application'
+def appName = 'swtbrowser'
+def mainClassName = 'de.oklischat.swt.test.browser.App'
 
-mainClassName = 'de.oklischat.swt.test.browser.App'
+if (runningPlatform) {
+    task run(type: JavaExec) {
+        description = "Run $appName directly from the build directory"
+        classpath = sourceSets.main.runtimeClasspath
+        main = mainClassName
+        //args = //TODO
+    }
+}
+
+platforms.each { p ->
+    ssTask = project.tasks.add("startScripts_$p", org.gradle.api.tasks.application.CreateStartScripts)
+    ssTask.description = "Creates start scripts ($p)"
+    ssTask.mainClassName = mainClassName
+    ssTask.applicationName = appName
+    ssTask.classpath = tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + configurations["runtime_$p"]
+    ssTask.outputDir = new File(project.buildDir, "scripts_$p")
+
+    def applicationDistribution = project.copySpec {
+        from(project.file("src/dist"))
+        
+        into("lib") {
+            from(tasks[JavaPlugin.JAR_TASK_NAME])
+            from(configurations["runtime_$p"])
+        }
+        into("bin") {
+            from(ssTask)
+            fileMode = 0755
+        }
+    }
+
+    def instTask = tasks.add("install_$p", org.gradle.api.tasks.Sync)
+    instTask.description = "Installs the project, including all dependencies, into a directory, for creating the zip file later ($p)"
+    instTask.with applicationDistribution
+    instTask.into { project.file("${project.buildDir}/install_${p}/$appName") }
+    instTask.doFirst {
+        if (destinationDir.directory) {
+            if (!new File(destinationDir, 'lib').directory || !new File(destinationDir, 'bin').directory) {
+                throw new GradleException("The specified installation directory '${destinationDir}' is neither empty nor does it contain an installation for $appName.\n" +
+                                          "If you really want to install to this directory, delete it and run the install task again.\n" +
+                                          "Alternatively, choose a different installation directory."
+                                         )
+            }
+        }
+    }
+    instTask.doLast {
+        project.ant.chmod(file: "${destinationDir.absolutePath}/bin/$appName", perm: 'ugo+x')
+    }
+
+    def distZipTask = project.tasks.add("distZip_$p", org.gradle.api.tasks.bundling.Zip)
+    distZipTask.description = "Bundles the project as a JVM application with libs and OS specific scripts into a zip file ($p)"
+    distZipTask.baseName = "$appName-$p"
+    def baseDir = { distZipTask.archiveName - ".zip" }
+    distZipTask.into(baseDir) {
+        with(applicationDistribution)
+    }
+}
+
+if (runningPlatform) {
+    task distZip {
+        description "Bundles the project as a JVM application with libs and OS specific scripts into a zip file for the running platform ($runningPlatform)"
+        dependsOn tasks["distZip_$runningPlatform"]
+    }
+}
+
+task distZipAll {
+    description "Creates zip files for all supported platforms"
+    platforms.each { p ->
+        dependsOn tasks["distZip_$p"]
+    }
+}
+
+//TODO: OSX requires -XstartOnFirstThread
