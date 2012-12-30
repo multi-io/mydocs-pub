@@ -86,7 +86,7 @@ if (runningPlatform) {
         classpath = sourceSets.main.runtimeClasspath
         main = mainClassName
         if (runningPlatform =~ /^cocoa.macosx/) {
-            args = ['-XstartOnFirstThread']
+            jvmArgs = ['-XstartOnFirstThread']
         }
     }
 }
