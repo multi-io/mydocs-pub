@@ -85,7 +85,9 @@ if (runningPlatform) {
         description = "Run $appName directly from the build directory"
         classpath = sourceSets.main.runtimeClasspath
         main = mainClassName
-        //args = //TODO
+        if (runningPlatform =~ /^cocoa.macosx/) {
+            args = ['-XstartOnFirstThread']
+        }
     }
 }
 
@@ -93,6 +95,9 @@ platforms.each { p ->
     ssTask = project.tasks.add("startScripts_$p", org.gradle.api.tasks.application.CreateStartScripts)
     ssTask.description = "Creates start scripts ($p)"
     ssTask.mainClassName = mainClassName
+    if (p =~ /^cocoa.macosx/) {
+        ssTask.defaultJvmOpts = ['-XstartOnFirstThread']
+    }
     ssTask.applicationName = appName
     ssTask.classpath = tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + configurations["runtime_$p"]
     ssTask.outputDir = new File(project.buildDir, "scripts_$p")
