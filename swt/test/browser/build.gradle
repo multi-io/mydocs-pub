@@ -22,3 +22,4 @@ dependencies {
 apply plugin: 'application'
 
 mainClassName = 'de.oklischat.swt.test.browser.App'
+defaultJvmOpts = ['-Dfoo=bar', '-Xmx500m']
