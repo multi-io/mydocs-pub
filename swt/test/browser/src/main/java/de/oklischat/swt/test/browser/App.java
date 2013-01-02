@@ -1,5 +1,8 @@
 package de.oklischat.swt.test.browser;
 
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
@@ -36,9 +39,10 @@ public class App {
 	public void run() throws Exception {
         Shell parent = new Shell(display);
         parent.setText("SWT Browser test");
-        parent.setSize(900, 600);
+        //parent.setSize(900, 600);
 
-        center(parent);
+        //center(parent);
+        parent.setBounds(getFormFrameBounds());
 
         GridLayout gl = new GridLayout();
 		gl.numColumns = 1;
@@ -112,4 +116,17 @@ public class App {
         shell.setBounds(nLeft, nTop, p.x, p.y);
     }
 
+    private Rectangle getFormFrameBounds() {
+        GraphicsDevice[] screens = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+        int nScreens = screens.length;
+    	java.awt.Rectangle b = screens[nScreens-1].getDefaultConfiguration().getBounds();
+        java.awt.Rectangle awtBounds;
+        if (nScreens > 1) {
+        	awtBounds = b;
+        } else {
+        	awtBounds = new java.awt.Rectangle(b.x + b.width / 4, b.y + b.height / 4, b.width / 2, b.height / 2);
+        }
+        System.out.println("frame bounds: " + awtBounds);
+        return new Rectangle(awtBounds.x, awtBounds.y, awtBounds.width, awtBounds.height);
+    }
 }
