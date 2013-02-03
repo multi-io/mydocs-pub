@@ -73,7 +73,7 @@ public class App {
 			public void handleEvent(Event event) {
 				String address = addressBar.getText();
 				if (!(address.startsWith("http://") || address.startsWith("https://"))) {
-					address = "http://" + address;
+					address = (address.startsWith("/") ? "file://" : "http://") + address;
 				}
 				browser.setUrl(address);
 			}
