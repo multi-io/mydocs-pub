@@ -45,5 +45,19 @@ task test1 << {
     }
 }
 
+buildscript {
+    println 'start of buildscript environment'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'commons-io:commons-io:2.4'
+    }
+    println 'end of buildscript environment'
+}
+
+def f = file('build.gradle')
+def str = org.apache.commons.io.FileUtils.readFileToString(f, "UTF-8")
+println "this file: $str"
 
 println "end of build.gradle." //run AFTER all the tasks' config stages have run!
