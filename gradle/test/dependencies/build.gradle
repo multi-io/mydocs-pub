@@ -7,6 +7,14 @@
 //dependencies. Dependencies are used to specify resources, e.g. jar
 //files or other gradle projects, that are needed. Repositories are
 //used to resolve jar files specified by dependencies.
+//
+//How is the resolution of a dependency (and thus, the download of its
+//Jar files, if necessary) initiated?
+//
+//- AFAICS, this is triggered "lazily" by build script code accessing (reading)
+//  any of the configuration objects (which are lists of j.io.File objects). At that
+//  time, some Groovy magic invokes code that ensures those files exist in the
+//  filesystem -- which can mean downloading them from the repositories.
 
 configurations {
     myconf
