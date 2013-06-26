@@ -1,28 +1,30 @@
 package de.olafklischat.gwttest.gwteditors.client;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Widget;
 
-public class AppUI extends UIObject {
+public class AppUI extends Composite {
 
     private static AppUIUiBinder uiBinder = GWT.create(AppUIUiBinder.class);
 
-    interface AppUIUiBinder extends UiBinder<Element, AppUI> {
+    interface AppUIUiBinder extends UiBinder<Widget, AppUI> {
     }
 
     @UiField
-    SpanElement nameSpan;
+    ListBox listBox;
 
     public AppUI() {
-        setElement(uiBinder.createAndBindUi(this));
+        initWidget(uiBinder.createAndBindUi(this));
     }
     
-    public void setName(String name) {
-        nameSpan.setInnerText(name);
+    public void setNames(String... names) {
+        for (String name : names) {
+            listBox.addItem(name);
+        }
     }
 
 }
