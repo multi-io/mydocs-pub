@@ -55,3 +55,13 @@ from git help rev-list:
        to further limit the result.
 
 several commands take commit range arguments, e.g. cherry-pick.
+
+
+directly moving HEAD pointer to any branch, without touching either
+the index or the wd (essentially a checkout without modifying the
+index or wd):
+
+git symbolic-ref HEAD refs/heads/<branch>
+
+(after which you'd probably issue a "git reset" to copy the new HEAD
+tree into the index)
