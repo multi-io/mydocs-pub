@@ -1,9 +1,12 @@
 Uploadtest::Application.routes.draw do
+  get "upload/index"
+  get "upload/add"
+  get "upload/remove"
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  # root 'welcome#index'
+  root 'upload#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
