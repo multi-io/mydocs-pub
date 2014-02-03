@@ -12,7 +12,7 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
 
     templateString: dojo.cache("de.olafklischat.uploadtest", "UploadsController.html"),
 
-    constructor: function() {
+    startup: function() {
         var self = this;
         dojo.when(dojo.xhrGet({url:"uploads/all_existing", handleAs:"json"}), function(uploads) {
             dojo.forEach(uploads, function (ul) {
@@ -25,9 +25,25 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
         function(error) {
             console.log("ERROR: " + error);
         });
-        dojo.connect(self._fileButton, "onclick", self, function() { self._fileInput.click(); });        
-        dojo.connect(self._fileInput, "onchange", self, function() { self._onFilesChosen(self._fileInput.files); });        
-        dojo.connect(self._mainTable, "ondrop", self, function(evt) {
+        dojo.connect(self._fileButton, "onclick", self, function() {
+            self._fileInput.click();
+        });
+        dojo.connect(self._fileInput, "onchange", self, function() {
+            self._onFilesChosen(self._fileInput.files);
+        });
+
+        var droptarget = self._mainTable;
+        window.addEventListener("dragenter", function(evt) {
+            evt.preventDefault();
+            droptarget.setAttribute("dragenter", true);
+        }, true);
+        window.addEventListener("dragleave", function(evt) {
+            droptarget.removeAttribute("dragenter");
+        }, true);
+        dojo.connect(droptarget, "ondragover", self, function(evt) {
+            evt.preventDefault();
+        });
+        dojo.connect(droptarget, "ondrop", self, function(evt) {
             evt.preventDefault();
             self._onFilesChosen(evt.dataTransfer.files);
         });
