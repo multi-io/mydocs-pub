@@ -10,7 +10,7 @@ dojo.require("dojo.NodeList-traverse");
 
 dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dijit._Templated], {
 
-    templateString: '<div style="overflow:scroll"><table dojoAttachPoint="_mainTable"></table></div>',
+    templateString: dojo.cache("de.olafklischat.uploadtest", "UploadsController.html"),
 
     constructor: function() {
         var self = this;
@@ -24,6 +24,19 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
         },
         function(error) {
             console.log("ERROR: " + error);
+        });
+        dojo.connect(self._fileButton, "onclick", self, function() { self._fileInput.click(); });        
+        dojo.connect(self._fileInput, "onchange", self, function() { self._onFilesChosen(self._fileInput.files); });        
+        dojo.connect(self._mainTable, "ondrop", self, function(evt) {
+            evt.preventDefault();
+            self._onFilesChosen(evt.dataTransfer.files);
+        });
+    },
+
+    _onFilesChosen: function(files) {
+        console.log("Files chosen: " + files);
+        dojo.forEach(files, function(file) {
+            console.log("file: " + file);
         });
     },
 
