@@ -86,6 +86,16 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
         self._npanel_names.splice(i, 0, name);
     },
 
+    _panel_byname: function(name) {
+        var self = this;
+        var idx = dojo.indexOf(self._npanel_names, name);
+        if (idx == -1) {
+            return null;
+        } else {
+            return self._panel_at(idx);
+        }
+    },
+
 
     // _panel_* functions: low-level API for handling the file panels (table rows)
 
