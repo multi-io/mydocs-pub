@@ -14,24 +14,11 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
 
     constructor: function() {
         var self = this;
-        self._npanel_names = [];
+        self._panel_names = [];
     },
 
     startup: function() {
         var self = this;
-        dojo.when(dojo.xhrGet({url:"uploads/all_existing", handleAs:"json"}), function(uploads) {
-            dojo.forEach(uploads, function (ul) {
-                console.log(ul.file);
-                self._npanel_create(ul.file || ul.name, 42);
-            });
-            var p = self._panel_at(1);
-            self._panel_setpct(p, 20 + self._panel_getpct(p));
-            self._panel_create("foo.hällo.<bar", 23, 2);
-            console.log("NAME: " + self._panel_getname(self._panel_at(2)));
-        },
-        function(error) {
-            console.log("ERROR: " + error);
-        });
         dojo.connect(self._fileButton, "onclick", self, function() {
             self._fileInput.click();
         });
@@ -55,6 +42,24 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
             self._onFilesChosen(evt.dataTransfer.files);
         });
     },
+    
+    loadUploadData: function(baseUrl) {
+        var self = this;
+        if (baseUrl) {
+            return dojo.xhrGet({url:baseUrl, handleAs:"json"}).then(function(res) {
+                console.debug("loadUploadData(" + baseUrl + "): " + dojo.toJson(res));
+                self._panel_delete_all();
+                self._baseUrl = baseUrl;
+                dojo.forEach(res, function(ul) {
+                    console.log(ul.file);
+                    self._panel_create(ul.file || ul.name, 100);
+                });
+            });
+        } else {
+            self._panel_delete_all();
+            return {then: function(f) { f(); }};
+        }
+    },
 
     _onFilesChosen: function(files) {
         console.log("Files chosen: " + files);
@@ -63,44 +68,30 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
         });
     },
 
+    _startUpload: function(file) {
+        
+    },
 
-    // _npanel_* function: mid-level API on top of _panel_*; makes panels accessible by name, maintains sorting
 
-    //    store the names in _npanel_names array
+    // _panel_* functions: low-level API for handling the file panels (table rows). Keeps panels sorted by name
+    // panels should be treated as opaque objects by API users. They can be treated as JS objects though (i.e. values can be stored in them).
 
-    _npanel_create: function(name, percent) {
+    //    store the names in _panel_names array
+
+    _panel_create: function(name, percent) {
         var self = this;
         //TODO: O(n^2). Consider binary search.
-        var i = 0, count = self._npanel_names.length;
-        while (i < count) {
-            var n = self._npanel_names[i];
+        var pos = 0, count = self._panel_names.length;
+        while (pos < count) {
+            var n = self._panel_names[pos];
             if (n === name) {
                 throw "duplicate name: " + name;
             }
             if (n > name) {
                 break;
             }
-            i++;
+            pos++;
         }
-        self._panel_create(name, percent, i);
-        self._npanel_names.splice(i, 0, name);
-    },
-
-    _panel_byname: function(name) {
-        var self = this;
-        var idx = dojo.indexOf(self._npanel_names, name);
-        if (idx == -1) {
-            return null;
-        } else {
-            return self._panel_at(idx);
-        }
-    },
-
-
-    // _panel_* functions: low-level API for handling the file panels (table rows)
-
-    _panel_create: function(name, percent, pos) {
-        var self = this;
         var id = dijit.registry.getUniqueId("uploads_panel");
         var tr = dojo.create("tr", {id: id}, self._mainTable, pos);
         var td1 = dojo.create("td", {id: id + "_name", innerHTML: dojox.html.entities.encode(name)}, tr);
@@ -109,16 +100,45 @@ dojo.declare("de.olafklischat.uploadtest.UploadsController", [dijit._Widget, dij
         var pb = new dijit.ProgressBar({id: id + "_progress", style: "width: 300px"});
         pb.placeAt(td2);
         pb.set('value', percent);
+        self._panel_names.splice(pos, 0, name);
         return tr;
     },
 
     _panel_at: function(index) {
         return this._mainTable.children[index];
     },
+    
+    _panel_delete: function(panel) {
+        var self = this;
+        var name = self._panel_getname(panel);
+        dojo.destroy(panel);
+        var i = dojo.indexOf(self._panel_names, name);
+        if (i != -1) {
+            self._panel_names.splice(i, 1);
+        }
+    },
+
+    _panel_delete_all: function() {
+        dojo.empty(this._mainTable);
+        this._panel_names = [];
+    },
+
+    _panel_byname: function(name) {
+        var self = this;
+        var idx = dojo.indexOf(self._panel_names, name);
+        if (idx == -1) {
+            return null;
+        } else {
+            return self._panel_at(idx);
+        }
+    },
 
     _panel_getname: function(panel) {
         var td = dojo.byId(panel.id + "_name");
         return dojox.html.entities.decode(dojo.attr(td, 'innerHTML'));
+    },
+
+    _panel_getstate: function(panel) {
     },
 
     _panel_getpct: function(panel) {
