@@ -1,0 +1,3 @@
+Enabling error/exception logging in Dojo asynchronous methods/promises:
+
+djConfig={.... parseOnLoad:true, useDeferredInstrumentation: true, isDebug: true}
