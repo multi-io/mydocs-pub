@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- demo from http://dojotutorial.org/008/custom-confirm-dialog -->
+<html>
+  <head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="-1" />
+    <title>dijit.Dialog</title>
+    <link rel="stylesheet" href="dijit/themes/tundra/tundra.css">
+    <script type="text/javascript" src="dojo/dojo.js" charset="utf-8" djConfig="parseOnLoad: true"></script>
+    <script type="text/javascript">
+      dojo.require('dijit.form.Button');
+      dojo.require('de.olafklischat.ConfirmDialog');
+    </script>
+
+  </head>
+
+  <body class="tundra">
+
+      <button id="showBtn" dojoType="dijit.form.Button">show</button>
+
+    <script type="text/javascript">
+      dojo.addOnLoad(function() {
+	/**
+	 * Display confirm dialog.
+	 */
+	confirm = function(options){
+        var dialog = new de.olafklischat.ConfirmDialog(options);
+        dialog.show();
+	};
+ 
+	/**
+	 * Button click action.
+	 */
+	onButtonClick = function() {
+		confirm({
+			message: 'Do you like this demo?',
+			onExecute: function(){
+				console.log('great! :)');
+			},
+			onCancel: function(){
+				console.log('too bad :<');
+			}
+		});
+	};
+
+        dojo.connect(dijit.byId('showBtn'), 'onClick', onButtonClick);
+        console.log('loaded!');
+
+      });
+    </script>
+
+  </body>
+</html>
