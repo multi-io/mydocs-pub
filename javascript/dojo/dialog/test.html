@@ -22,26 +22,10 @@
     <script type="text/javascript">
       dojo.addOnLoad(function() {
 	/**
-	 * Display confirm dialog.
-	 */
-	confirm = function(options){
-        var dialog = new de.olafklischat.ConfirmDialog(options);
-        dialog.show();
-	};
- 
-	/**
 	 * Button click action.
 	 */
 	onButtonClick = function() {
-		confirm({
-			message: 'Do you like this demo?',
-			onExecute: function(){
-				console.log('great! :)');
-			},
-			onCancel: function(){
-				console.log('too bad :<');
-			}
-		});
+            confirm("Hello", {OK:null});
 	};
 
         dojo.connect(dijit.byId('showBtn'), 'onClick', onButtonClick);
