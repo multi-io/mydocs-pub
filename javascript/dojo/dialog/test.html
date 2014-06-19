@@ -25,7 +25,13 @@
 	 * Button click action.
 	 */
 	onButtonClick = function() {
-            confirm("Hello", {OK:null});
+            confirm("Hello",
+                {Grr:    function(){ console.log("Grr clicked"); },
+                 Hello: function(){ console.log("Hello clicked");},
+                 Doit: '_OK',
+                 Yoyo: function(){ console.log("Yoyo");},
+                 Holle: 'Hello'}
+            );
 	};
 
         dojo.connect(dijit.byId('showBtn'), 'onClick', onButtonClick);
