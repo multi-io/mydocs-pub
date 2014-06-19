@@ -53,10 +53,9 @@ dojo.declare('de.olafklischat.ConfirmDialog', [dijit.Dialog, dijit._Templated], 
 
 //TODO avoid polluting the global namespace
 confirm = function(msg, buttons) {
-    var dialog = new de.olafklischat.ConfirmDialog({message:msg}); //TODO: only have one instance, at least in the DOM
-    window.dlg = dialog; //debugging
-    dialog.recreateButtons(buttons);
-    console.debug('bp1=' + dlg._btnPane);
-    dialog.show();
-    console.debug('bp2=' + dlg._btnPane);
+    if (!window.__de_olafklischat_ConfirmDialog) {
+        __de_olafklischat_ConfirmDialog = new de.olafklischat.ConfirmDialog({message:msg}); //only have one instance, at least in the DOM
+    }
+    __de_olafklischat_ConfirmDialog.recreateButtons(buttons);
+    __de_olafklischat_ConfirmDialog.show();
 }
