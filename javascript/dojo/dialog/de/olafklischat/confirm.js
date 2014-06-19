@@ -1,4 +1,4 @@
-dojo.provide('de.olafklischat.ConfirmDialog');
+dojo.provide('de.olafklischat.confirm');
 
 dojo.require('dijit.Dialog');
 dojo.require("dijit.form.Button");
@@ -52,7 +52,7 @@ dojo.declare('de.olafklischat.ConfirmDialog', [dijit.Dialog, dijit._Templated], 
 
 
 //TODO avoid polluting the global namespace
-confirm = function(msg, buttons) {
+de.olafklischat.confirm = function(msg, buttons) {
     if (!window.__de_olafklischat_ConfirmDialog) {
         __de_olafklischat_ConfirmDialog = new de.olafklischat.ConfirmDialog({message:msg}); //only have one instance, at least in the DOM
     }
