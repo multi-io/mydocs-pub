@@ -3,6 +3,8 @@
 
 # generic (non-linear) numerical optimization of a function of 2 parameters
 
+1;
+
 global M = [3 2]
 
 function phi = phi(x)
@@ -13,18 +15,26 @@ endfunction
 
 ##plot it -- incredibly convoluted
 
-#ezmesh('phi', [0 5])  #error
 
-function phimesh = phimesh(x, y)
-  phimesh = ones([size(x,1), size(x,2)]);
-  for m = 1:size(x,1)
-    for n = 1:size(x,2)
-      phimesh(m,n) = phi([x(m,n), y(m,n)]);
+# nested function -- only works when copied & pasted into the command line???
+function plotR2_R = plotR2_R(func, xrange, yrange)
+
+  function funcmesh = funcmesh(x, y)
+    funcmesh = ones([size(x,1), size(x,2)]);
+    for m = 1:size(x,1)
+      for n = 1:size(x,2)
+        funcmesh(m,n) = func([x(m,n), y(m,n)]);
+      endfor
     endfor
-  endfor
+  endfunction
+
+  #ezmesh(funcmesh, [0 5])  #error
+  #ezmesh('funcmesh', [0 5])  #error
+  #ezmesh(@funcmesh, xrange, yrange) #error ("handles to nested functions are not yet supported")
+  ezmesh(@(x,y) funcmesh(x,y), xrange, yrange)
+
 endfunction
 
-#ezmesh(phimesh, [0 5])  #error
-#ezmesh('phimesh', [0 5])  #error
 
-ezmesh(@(x,y) phimesh(x,y), [0 5])
+plotR2_R(@phi, [0 5], [0 5])  #error
+
