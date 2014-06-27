@@ -26,11 +26,11 @@ function [x,y,length] = intersect(angle,p1,p2)
   c = cos(angle);
   dx = p2(1)-p1(1);
   # special cases
-  if (norm(c) < eps)
+  if (norm(c) < 1e-6)
     x = 0;
     y = p1(2) - p1(1)*(p2(2)-p1(2))/dx;
     length = y;
-  elseif (norm(dx) < eps)
+  elseif (norm(dx) < 1e-6)
     x = p1(1);
     y = s/c * x;
     length = norm([x;y]);
@@ -92,17 +92,36 @@ end
 
 #the optimizer (sqp) can only minimize
 function m = to_minimize(phi_alpha_theta)
+  #printf("...to_minimize([%.6f; %.6f; %.6f; ])\n", phi_alpha_theta(1), phi_alpha_theta(2), phi_alpha_theta(3));
   m = -D(phi_alpha_theta(1), phi_alpha_theta(2), phi_alpha_theta(3));
 endfunction
 
-# TODO try multiple starting points
-phi_alpha_theta_max = sqp([0.1;0.3;0.3], @to_minimize);
+# try N_steps values in each dimension as starting points
+N_steps = 5;
+
+D_max = -1; phi_alpha_theta_max = [0;0;0];
+for phi0 = linspace(1e-4, pi/4-1e-4, N_steps)
+  for alpha0 = linspace(1e-4, pi/2-1e-4, N_steps)
+    for theta0 = linspace(1e-4, pi/2-1e-4, N_steps)
+      printf("trying starting point: %.6f; %.6f; %.6f\n", phi0, alpha0, theta0);
+      try
+        pat = sqp([phi0;alpha0;theta0], @to_minimize, [], [], [0;0;0], [pi/4,pi/2,pi/2]);
+        D_ = D(pat(1), pat(2), pat(3));
+        if (D_ > D_max)
+          D_max = D_;
+          phi_alpha_theta_max = pat;
+          printf("new optimum found: %.6f\n", D_max);
+        endif
+      catch
+      end_try_catch
+    endfor
+  endfor
+endfor
 
 phi_max = phi_alpha_theta_max(1);
 alpha_max = phi_alpha_theta_max(2);
 theta_max = phi_alpha_theta_max(3);
 
-D_max = D(phi_max, alpha_max, theta_max);
 printf("Optimal:\n");
 printf("alpha = %.6f\n", alpha_max);
 printf("phi = %.6f\n", phi_max);
