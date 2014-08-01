@@ -1,0 +1,103 @@
+call stack (innermost (controller) last)
+=====================================
+
+    AjaxSecurityFilter
+
+    CharacterEncodingFilter
+
+    OpenEntityManagerInViewFilter
+
+    HiddenHttpMethodFilter
+
+    DelegatingFilterProxy
+
+      SecurityContextPersistenceFilter
+
+      LogoutFilter
+
+      UsernamePasswordAuthenticationFilter
+
+      BasicAuthenticationFilter
+
+        - if BASIC auth credentials were passed, check them against
+          the user database
+
+          - if successful: writes them into the SecurityContextHolder
+
+          - if failure: send back 401 Unauthorized with
+            WWW-Authenticate: Basic realm=?? (Tomcat will add the
+            web.xml-defined error page to that)
+
+      RequestCacheAwareFilter
+
+      SecurityContextHolderAwareRequestFilter
+
+      AnonymousAuthenticationFilter
+
+      SessionManagementFilter
+
+      ExceptionTranslationFilter
+
+        - catches all exceptions
+
+        - if it's an AuthenticationException ist (i.e. credentials
+          present but invalid, e.g. an invalid password):
+          redirect to login page
+
+          - but, BASIC auth requests with invalid credentials will
+            already get caught further up the stack, by
+            BasicAuthenticationFilter (see above) and thus never reach
+            ExceptionTranslationFilter
+
+        - if it's an AccessDeniedException (i.e. valid or no
+          (anonymous) credentials, but authorization failed)
+
+          - if the authentication is anonymous, redirect to login page
+          
+          - otherwise, send back 403 Forbidden
+
+        - other exceptions will be rethrown or (if they're not
+          RuntimeExceptions) wrapped into RuntimeExceptions and
+          rethrown (and probably be caught only by Tomcat, which will
+          map them to the web.xml-defined error page)
+
+    DomainSecurityFilter
+
+    ContextStudyFilter
+
+    DispatcherServlet
+
+      - catches any exception(...!), usually maps it to a spring
+        model/view (error view)
+
+        - this is also how authorization exceptions
+          (AccessDeniedException, e.g. exceptions caught by spring's
+          declarative @PreAuthorize etc. things) are
+          handled. Apparently they're not treated specially at all
+
+        - TODO so ExceptionTranslationFilter above never sees any user
+          exceptions?
+
+          - TODO maybe you'd customize the exception handling for JSON
+            here rather than in a filter. Investigate!
+
+
+    AnnotationMethodHandlerAdapter.handle(HttpServletRequest, HttpServletResponse, Object) line: 414    
+    AnnotationMethodHandlerAdapter.invokeHandlerMethod(HttpServletRequest, HttpServletResponse, Object) line: 426    
+    AnnotationMethodHandlerAdapter$ServletHandlerMethodInvoker(HandlerMethodInvoker).invokeHandlerMethod(Method, Object, NativeWebRequest, ExtendedModelMap) line: 176    
+    Method.invoke(Object, Object...) line: 597    
+    DelegatingMethodAccessorImpl.invoke(Object, Object[]) line: 25    
+    GeneratedMethodAccessor99.invoke(Object, Object[]) line: not available    
+    FormTemplateController$$EnhancerByCGLIB$$eb0401d.showJson(Long) line: not available    
+    Cglib2AopProxy$DynamicAdvisedInterceptor.intercept(Object, Method, Object[], MethodProxy) line: 617    
+    MethodProxy.invoke(Object, Object[]) line: 191    
+    FormTemplateController$$FastClassByCGLIB$$70143e0d.invoke(int, Object, Object[]) line: not available    
+
+    FormTemplateController.showJson(Long) line: 434
+
+
+
+
+TODO look into HandlerExceptionResolver 
+
+also, http://spring.io/blog/2013/11/01/exception-handling-in-spring-mvc
