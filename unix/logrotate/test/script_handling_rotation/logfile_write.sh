@@ -4,9 +4,18 @@ cd "`dirname $0`"
 
 set -e
 
-exec >>logfile.txt 2>&1
+restart_required=''
+
+trap restart_required='yes' HUP
 
 while true; do
-  date;
-  sleep 1;
+    exec >>logfile.txt 2>&1
+
+    while [ -z "$restart_required" ]; do
+        date;
+        sleep 1;
+    done
+
+    #echo restart...
+    restart_required='';
 done
