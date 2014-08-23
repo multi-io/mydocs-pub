@@ -100,9 +100,9 @@ endfunction
 N_steps = 5;
 
 D_max = -1; phi_alpha_theta_max = [0;0;0];
-for phi0 = linspace(1e-4, pi/4-1e-4, N_steps)
-  for alpha0 = linspace(1e-4, pi/2-1e-4, N_steps)
-    for theta0 = linspace(1e-4, pi/2-1e-4, N_steps)
+for phi0 = linspace(0, pi/4, N_steps)
+  for alpha0 = linspace(0, pi/2, N_steps)
+    for theta0 = linspace(0, pi/2, N_steps)
       printf("trying starting point: %.6f; %.6f; %.6f\n", phi0, alpha0, theta0);
       try
         pat = sqp([phi0;alpha0;theta0], @to_minimize, [], [], [0;0;0], [pi/4,pi/2,pi/2]);

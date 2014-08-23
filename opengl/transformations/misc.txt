@@ -9,19 +9,19 @@ Transformations in general:
 
 object coords --(modelview matrix)---> eye coords --(projection matrix)--> device coords.[1] --(viewport params)--> 2D viewport (pixel) coords
 
-Here, object coordinates are the original object coordinates set via
-glVertex* etc. calls, eye coordinates are corresponding coordinates in
-an orthogonal coordinate system whose origin is located in the
-viewer's eye (hence the name I assume), whose x axis points to the
-right, y axis to the top, z axis towards the viewer (so the viewing
-direction is "down the z axis", i.e. in -z direction). Device
-coordinates should generally fall within a cube of side length 2
-around the origin, but otherwise already correspond to viewport
-(i.e. 2D output window) coordinates, which means they will already
-include the projection and thus account for things like a perspective
-or parallel projection. Finally, the viewport coordinates will be the
-actual output window (x,y) coordinates, with the z component
-corresponding to depth buffer depth values.
+Here, object coordinates are the original object coordinates passed in
+via glVertex* calls or vertex buffers etc., eye coordinates are
+corresponding coordinates in an orthogonal coordinate system whose
+origin is located in the viewer's eye (hence the name I assume), whose
+x axis points to the right, y axis to the top, z axis towards the
+viewer (so the viewing direction is "down the z axis", i.e. in -z
+direction). Device coordinates should generally fall within a cube of
+side length 2 around the origin, but otherwise already correspond to
+viewport (i.e. 2D output window) coordinates, which means they will
+already include the projection and thus account for things like a
+perspective or parallel projection. Finally, the viewport coordinates
+will be the actual output window (x,y) coordinates, with the z
+component corresponding to depth buffer depth values.
 
 
 Viewport Parameters
@@ -81,6 +81,13 @@ see glFrustum() below), so (xnd,ynd,znd)=(xd,yd,zd,wd).
 
 Projection Matrix Specification
 ===============================
+
+(beware -- the matrix stack has been deprecated in the core profile
+(not in the compatibility profile). You should consider computing
+complete object->eye transformation matrices in your client code and
+then passing them to (vertex) shaders as needed, which might be easier
+in some cases anyway. Still, this discussion may be helpful for a
+better understanding of transformations in OpenGL)
 
 As mentioned above, the projection matrix is used to transform eye
 coordinates (i.e. coordinates relative to the viewer's eye) to device

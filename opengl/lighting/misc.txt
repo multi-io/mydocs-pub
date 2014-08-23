@@ -1,3 +1,5 @@
+(beware -- all obsolete these days, use shaders instead)
+
 - lighting enabled globally via glEnable(GL_LIGHTING) (needed to be
   called only once)
 

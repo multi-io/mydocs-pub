@@ -34,5 +34,10 @@ function funcmesh = funcmesh(func, xs, ys)
 endfunction
 
 
-plotR2_R(@phi, [0 5 0 5])
+plotR2_R(@phi, [0 5 0 5]);
 
+xmin = sqp([1;1], @phi)
+
+hold on
+
+plot3([xmin(1),xmin(1)], [xmin(2),xmin(2)], [-2,1]);

@@ -14,11 +14,11 @@
 
     <h2>sub-directories</h2>
 
-    <% $sep = (keys %{$dir->{DIRS}}) < 25? "<br/>":"&nbsp;"; %>
+    <% $sep = (@{$dir->{DIRS}}) < 25? "<br/>":"&nbsp;"; %>
 
-    <% foreach my $d (keys %{$dir->{DIRS}}) { %>
+    <% foreach my $d (@{$dir->{DIRS}}) { %>
 
-  <a href="<%= $dir->{DIRS}->{$d}->{NAME} %>"> <%= $dir->{DIRS}->{$d}->{NAME} %>/ </a> <%=$sep%>
+  <a href="<%= $d->{NAME} %>"> <%= $d->{NAME} %>/ </a> <%=$sep%>
     <% } %>
 
     <h2>files</h2>
@@ -38,6 +38,6 @@
 
   <p/>
 
-  <font size="-3">(C) 1998-<%= 1900+(localtime())[5] %> Olaf Klischat  &lt;olaf.klischat@googlemail.com&gt; </font>
+  <font size="-3">(C) 1998-<%= 1900+(localtime())[5] %> Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
 
 </body>

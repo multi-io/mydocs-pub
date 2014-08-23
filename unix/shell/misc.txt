@@ -1,0 +1,19 @@
+11:27 < multi_io> I want to nest double quotes in backticks in double quotes.
+11:27 -!- BiggFREE [~BiggFREE@modemcable215.196-22-96.mc.videotron.ca] has joined #bash
+11:28 -!- BiggFREE [~BiggFREE@modemcable215.196-22-96.mc.videotron.ca] has quit [Remote host closed the connection]
+11:29 < multi_io> e.g. xml_pp `basename "$filename_wth_whitespaces"`
+11:29 -!- marvin2 [~marvin@CPE-124-190-26-126.obcz1.win.bigpond.net.au] has joined #bash
+11:29 < patagonicus> use $(): xml_pp "$(basename "$filename")"
+11:30 -!- hookdump [~hookdump@201.254.48.129] has quit [Quit: Saliendo]
+11:31 -!- arborist [~arborist@g224211046.adsl.alicedsl.de] has joined #bash
+11:31 < multi_io> patagonicus: ah!
+11:31 < multi_io> thank you, that seems to work.
+
+
+
+process substitution:
+
+paste <(./progA) <(./progB)
+
+(output of progA/progB written to tmp file, the name of which is
+substituted for the <(..) thing)

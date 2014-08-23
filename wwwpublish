@@ -9,21 +9,44 @@ sub rejected {
     local ($_) = shift;
     my $accessible_file = shift;
     (! -f $accessible_file and ! -d $accessible_file) or
-    (stat($accessible_file))[7] > 100000 or
+    (stat($accessible_file))[7] > 120000 or
     ### things we don't want to publish
     m!/CVS! or
+    m!cvsignore$! or
     m!~$! or
+    m!\/.gradle! or
+    m!/tmp/! or
+    m!/build/! or
+    m!/core$! or
+    m!\.metadata! or
+    m!\.orig! or
+    m!\.git! or
     m!\.gz$! or
-    m!tgz$! or
+    m!\.tgz$! or
     m!\.bz2$! or
-    m!tbz2$! or
+    m!\.tbz2$! or
     m!\.exe$! or
+    m!\.dll$! or
+    m!\.dylib$! or
+    m!\.so$! or
+    m!\.jnilib$! or
+    m!\.zip$! or
+    m!\.jar$! or
+    m!\.class$! or
+    m!^./git/git-svn/! or
     m!^./isst! or
     m!^./isst! or
     m!^./java/test! or
+    m!^./math/.*?\.png$! or
+    m!^./population_development/derivation.png! or
     m!^./passwords.txt.asc! or
+    m!^./elasticsearch/test/node*! or
+    m!^./elasticsearch/test/singlenode/data/*! or
     m!scheme/test/dstruct.sc! or
     m!scheme/test/queens.sc! or
+    m!^./javascript/dojo/test/dojo! or
+    m!^./javascript/dojo/test/dijit! or
+    m!^./opengl/ms_aa_blend_textfilt! or
     m!ruby/rails/actionpack! or
     m!ruby/rails/problems.txt! or
     m!aerzte!i or
@@ -34,6 +57,11 @@ sub rejected {
          m!^.$! or
          m!^./$! or
          m!^./ajax/! or
+         m!^./aspectj/! or
+         m!^./avreceivers/! or
+         m!^./backups/! or
+         m!^./elasticsearch/! or
+         m!^./ibatis/! or
          m!^./ruby! or
          m!^./perl! or
          m!^./grub! or
@@ -47,31 +75,44 @@ sub rejected {
          m!^./wget! or
          m!^./linux/requested-modules.txt! or
          m!^./longhorn! or
-         m!^./dotnet/cs/language.txt! or
+         m!^./math/! or
+         m!^./dotnet/! or
          m!^./debian! or
+         m!^./git/.*?txt$! or
          m!^./apt/apt-build.txt! or
          m!^./emacs/! or
+         m!^./gradle/! or
+         m!^./mongodb/! or
+         m!^./matlab_octave/! or
          m!^./bluetooth/bluetooth.txt! or
          m!^./bluetooth/rfcomm.txt! or
          m!^./internet! or
          m!^./javascript/closure-based-oop.txt$! or
          m!^./javascript/misc.txt$! or
+         m!^./javascript/dojo! or
+         m!^./javascript/drawing! or
+         m!^./javascript/profiling/! or
          m!^./lisp/! or
          m!^./root! or
          m!^./internet$! or
          m!^./sane.txt! or
+         m!^./springframework/.*?txt$! or
+         m!^./springframework/.*?pdf$! or
+         m!^./unfs/! or
+         m!^./unix/! or
          m!^./cdwriting.txt! or
          m!^./grepre-examples.txt! or
          m!^./mbrsaverestore.txt! or
          m!^./printing-hierarchical-websites.txt! or
+         m!^./physics! or
+         m!^./swt/test/browser! or
          m!^./xgalaga/prizes/prizes.html$! or
          m!^./xgalaga/prizes/code.txt$! or
          m!^./xgalaga/prizes/Makefile$! or
          m!^./xgalaga/prizes/.*?xpm$! or
          m!^./xgalaga/prizes/.*?png$! or
          m!^./wwwpublish! or
-         m!^./opengl/transformations/! or
-         m!^./opengl/lighting/!
+         m!^./opengl/!
         );
 }
 
@@ -147,14 +188,29 @@ find(sub {
 $root = $root->{DIRS}->{'.'};
 $root->{PARENT} = undef;
 
-return unless (__FILE__ eq $0);
+# turn all DIRS into lists, sort all DIRS and FILES
+sub sortdir {
+    my $dir = shift;
+    $dir->{DIRS} = [sort { $a->{NAME} cmp $b->{NAME} } (values %{$dir->{DIRS} || {}})];
+    $dir->{FILES} = [sort @{$dir->{FILES} || []}];
+    foreach my $d (@{$dir->{DIRS}}) {
+        sortdir($d);
+    }
+}
+
+sortdir($root);
+
+unless (__FILE__ eq $0) {
+    our $root = $root;
+    return;
+}
 
 
 sub check {
     our $dir = shift;
     print STDERR "checking: $dir->{PATH}\n";
-    foreach my $d (keys %{$dir->{DIRS}}) {
-        check($dir->{DIRS}->{$d});
+    foreach my $d (@{$dir->{DIRS}}) {
+        check($d);
     }
 }
 
@@ -215,8 +271,8 @@ sub publish($) {
         close FILEHTM;
     }
 
-    foreach my $d (keys %{$_dir->{DIRS}}) {
-        publish($_dir->{DIRS}->{$d});
+    foreach my $d (@{$dir->{DIRS}}) {
+        publish($d);
     }
 }
 

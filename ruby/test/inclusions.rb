@@ -1,5 +1,5 @@
 module WebConfig
-  XMLS_PATH="/home/olaf/wind/providerxmls/providerxmls/provider-xmls/"
+  XMLS_PATH="/home/olaf/isst-backup/olaf/wind/providerxmls/providerxmls-ui/provider-xmls/"
 end
 
 
