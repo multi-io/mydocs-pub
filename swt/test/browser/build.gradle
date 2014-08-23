@@ -7,13 +7,13 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = 1.6
 
-useSwtVersion = '3.7.2'
+ext.useSwtVersion = '4.4'
 
 def platforms = ['cocoa.macosx',
                  'cocoa.macosx.x86_64',
                  'gtk.aix.ppc',
                  'gtk.aix.ppc64',
-                 'gtk.hpux.ia64_32',
+                 //'gtk.hpux.ia64_32',
                  'gtk.linux.ppc64',
                  'gtk.linux.x86',
                  'gtk.linux.x86_64',
@@ -37,7 +37,7 @@ repositories {
 // configuration "runtime_<platform>" contains all runtime dependencies for platform <platform>.
 // configuration "runtime" contains all runtime dependencies for the platform we're running on.
 
-configurations.add 'compile_base'
+configurations.create 'compile_base'
 
 dependencies {
     // compile_base "log4j:log4j:1.2.13"
@@ -46,11 +46,11 @@ dependencies {
 }
 
 platforms.each { p ->
-    def platform_compile_config = configurations.add "compile_$p"
+    def platform_compile_config = configurations.create "compile_$p"
     dependencies.add "compile_$p", "org.eclipse.swt:org.eclipse.swt.$p:$useSwtVersion"
     platform_compile_config.extendsFrom configurations.compile_base
 
-    def platform_runtime_config = configurations.add "runtime_$p"
+    def platform_runtime_config = configurations.create "runtime_$p"
     //dependencies.add "runtime_$p", "org.some.runtime-only:artifact.$p:$useSwtVersion"  //not needed atm.
     platform_runtime_config.extendsFrom platform_compile_config
 }
@@ -90,7 +90,7 @@ if (runningPlatform) {
 }
 
 platforms.each { p ->
-    ssTask = project.tasks.add("startScripts_$p", org.gradle.api.tasks.application.CreateStartScripts)
+    def ssTask = project.tasks.create("startScripts_$p", org.gradle.api.tasks.application.CreateStartScripts)
     ssTask.description = "Creates start scripts ($p)"
     ssTask.mainClassName = mainClassName
     ssTask.applicationName = appName
@@ -110,7 +110,7 @@ platforms.each { p ->
         }
     }
 
-    def instTask = tasks.add("install_$p", org.gradle.api.tasks.Sync)
+    def instTask = tasks.create("install_$p", org.gradle.api.tasks.Sync)
     instTask.description = "Installs the project, including all dependencies, into a directory, for creating the zip file later ($p)"
     instTask.with applicationDistribution
     instTask.into { project.file("${project.buildDir}/install_${p}/$appName") }
@@ -128,7 +128,7 @@ platforms.each { p ->
         project.ant.chmod(file: "${destinationDir.absolutePath}/bin/$appName", perm: 'ugo+x')
     }
 
-    def distZipTask = project.tasks.add("distZip_$p", org.gradle.api.tasks.bundling.Zip)
+    def distZipTask = project.tasks.create("distZip_$p", org.gradle.api.tasks.bundling.Zip)
     distZipTask.description = "Bundles the project as a JVM application with libs and OS specific scripts into a zip file ($p)"
     distZipTask.baseName = "$appName-$p"
     def baseDir = { distZipTask.archiveName - ".zip" }
