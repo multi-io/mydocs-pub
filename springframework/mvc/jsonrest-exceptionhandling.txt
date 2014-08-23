@@ -1,8 +1,6 @@
 call stack (innermost (controller) last)
 =====================================
 
-    AjaxSecurityFilter
-
     CharacterEncodingFilter
 
     OpenEntityManagerInViewFilter
@@ -25,8 +23,8 @@ call stack (innermost (controller) last)
           - if successful: writes them into the SecurityContextHolder
 
           - if failure: send back 401 Unauthorized with
-            WWW-Authenticate: Basic realm=?? (Tomcat will add the
-            web.xml-defined error page to that)
+            WWW-Authenticate: Basic realm=?? (the servlet container
+            will add the web.xml-defined error page to that)
 
       RequestCacheAwareFilter
 
@@ -38,7 +36,8 @@ call stack (innermost (controller) last)
 
       ExceptionTranslationFilter
 
-        - catches all exceptions
+        - catches all exceptions (but most will never reach this
+          filter; see below)
 
         - if it's an AuthenticationException ist (i.e. credentials
           present but invalid, e.g. an invalid password):
@@ -56,19 +55,27 @@ call stack (innermost (controller) last)
           
           - otherwise, send back 403 Forbidden
 
+          - TODO: but which AccessDeniedExceptions will reach this
+            point at all under normal conditions? Won't they all be
+            caught by DispatcherServlet already?
+
         - other exceptions will be rethrown or (if they're not
           RuntimeExceptions) wrapped into RuntimeExceptions and
-          rethrown (and probably be caught only by Tomcat, which will
-          map them to the web.xml-defined error page)
-
-    DomainSecurityFilter
-
-    ContextStudyFilter
+          rethrown (and probably be caught only by the servlet
+          container, which will map them to the web.xml-defined error
+          page)
 
     DispatcherServlet
 
       - catches any exception(...!), usually maps it to a spring
-        model/view (error view)
+        model/view (error view) via HandlerExceptionResolvers
+
+        - has a list of HandlerExceptionResolvers that get called in
+          turn to handle any exception, until one of them handles
+          it. By default, this list contains 2 such resolvers:
+          AnnotationMethodHandlerExceptionResolver, which delegates
+          the request onwards to any defined @ExceptionHandler
+          methods, and SimpleMappingExceptionResolver, which
 
         - this is also how authorization exceptions
           (AccessDeniedException, e.g. exceptions caught by spring's

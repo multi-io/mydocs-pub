@@ -9,7 +9,7 @@ SANE (scanner access now easy) -- scanner drivers for Unix systems
 - /SANE plugins/ implement this API for a specific backend (most often
   a specific scanner)
 
-- SANE plugins are realized as shared objects (.so files) which
+- SANE plugins are implemented as shared objects (.so files) which
   SANE-enabled applications (e.g. The GIMP, scanimage, xsane, ...)
   load into their address space
 
