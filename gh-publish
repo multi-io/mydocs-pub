@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Find;
+
+my $root = {NAME => ".", PATH => "./", PARENT => undef};
+open(GITLS, "git ls-files |");
+while(<GITLS>) {
+    chomp;
+    my @comps = split(m!/!);
+    my @dirs = @comps[0 .. (@comps-2)];
+    my $file = $comps[-1];
+    my $currdir = $root;
+    foreach my $d (@dirs) {
+        my $parent = $currdir;
+        $currdir = ($currdir->{DIRS}->{$d} ||= {});
+        $currdir->{PATH} = $parent->{PATH} . $d . "/";
+        $currdir->{PARENT} = $parent;
+        $currdir->{NAME} = $d;
+    }
+    push @{$currdir->{FILES}}, $file;
+}
+
+# turn all DIRS into lists, sort all DIRS and FILES
+sub sortdir {
+    my $dir = shift;
+    $dir->{DIRS} = [sort { $a->{NAME} cmp $b->{NAME} } (values %{$dir->{DIRS} || {}})];
+    $dir->{FILES} = [sort @{$dir->{FILES} || []}];
+    foreach my $d (@{$dir->{DIRS}}) {
+        sortdir($d);
+    }
+}
+
+sortdir($root);
+
+unless (__FILE__ eq $0) {
+    our $root = $root;
+    return;
+}
+
+
+sub check {
+    our $dir = shift;
+    print STDERR "checking: $dir->{PATH}\n";
+    foreach my $d (@{$dir->{DIRS}}) {
+        check($d);
+    }
+}
+
+
+use Publish;
+use File::Temp qw/tempdir/;
+use autodie qw(:all);  # needs libautodie-perl, libipc-system-simple-perl (on Debian at least)
+
+my $tmpdir = tempdir( CLEANUP => 1 );
+chomp(my $revision=`git rev-parse HEAD`);
+
+# --no-checkout also deletes all files in the target's index
+system("git clone --branch gh-pages --no-checkout . $tmpdir");
+publish $root, $tmpdir;
+system("cd $tmpdir && git add . && git commit -m 'upgrade to $revision'");
+system("git fetch $tmpdir");
+system("git branch -f gh-pages FETCH_HEAD");

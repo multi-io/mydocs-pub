@@ -9,50 +9,56 @@ use File::Copy;
 
 sub htmlizable {
     local ($_) = shift;
-    m!bsh$! or
-    m!c$! or
-    m!cc$! or
-    m!cgi$! or
-    m!classpath$! or
+    m!\.bsh$! or
+    m!\.c$! or
+    m!\.cc$! or
+    m!\.cgi$! or
+    m!\.classpath$! or
     m!consign$! or
-    m!cs$! or
-    m!css$! or
-    m!dat$! or
-    m!dtd$! or
+    m!\.cs$! or
+    m!\.css$! or
+    m!\.dat$! or
+    m!\.dtd$! or
     m!edit$! or
-    m!el$! or
-    m!eli$! or
-    m!env$! or
-    m!gplot$! or
-    m!h$! or
-    m!jad$! or
-    m!java$! or
-    m!jpr$! or
-    m!js$! or
-    m!latex$! or
-    m!li$! or
-    m!local$! or
-    m!log$! or
+    m!\.el$! or
+    m!\.eli$! or
+    m!\.env$! or
+    m!\.gplot$! or
+    m!\.h$! or
+    m!\.jad$! or
+    m!\.java$! or
+    m!\.jpr$! or
+    m!\.js$! or
+    m!\.latex$! or
+    m!\.li$! or
+    m!\.launch$! or
+    m!\.local$! or
+    m!\.log$! or
     m!\.ml$! or
-    m!pac$! or
-    m!php3$! or
-    m!pl$! or
-    m!pm$! or
-    m!policy$! or
-    m!project$! or
-    m!py$! or
-    m!rb$! or
-    m!sax2$! or
-    m!show$! or
-    m!sql$! or
-    m!templ$! or
-    m!tex$! or
-    m!txt$! or
-    m!txt,v$! or
-    m!url$! or
-    m!xerces$! or
+    m!\.m$! or
+    m!\.pac$! or
+    m!\.php3$! or
+    m!\.pl$! or
+    m!\.pm$! or
+    m!\.policy$! or
+    m!\.project$! or
+    m!\.py$! or
+    m!\.rb$! or
+    m!\.sax2$! or
+    m!\.sc$! or
+    m!\.show$! or
+    m!\.sh$! or
+    m!\.sql$! or
+    m!\.templ$! or
+    m!\.tex$! or
+    m!\.txt$! or
+    m!\.txt,v$! or
+    m!\.url$! or
+    m!\.xerces$! or
     m!Makefile$! or
-    m!xml$!;
+    m!\.xml$! or
+    m!wwwpublish$! or
+    m!gh-publish$!;
 }
 
 sub publish($$);
