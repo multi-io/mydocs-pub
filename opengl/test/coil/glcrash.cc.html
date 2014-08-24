@@ -1,0 +1,45 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/test/coil/glcrash.cc </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">opengl</a>/<a href="../.">test</a>/<a href=".">coil</a>/glcrash.cc </h1>
+
+  <a href="glcrash.cc">download original</a>
+
+  <pre>
+// this program crashes in some Linux OGL implementations
+// (reproduced on Ubuntu 9.10 / 32-bit, Intel GMA)
+
+#include &lt;GL/gl.h&gt;
+#include &lt;GL/glu.h&gt;
+#include &lt;GL/glut.h&gt;
+
+int main(int argc, char **argv) {
+    glutInit(&amp;argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitWindowPosition(200,100);
+    glutInitWindowSize(500, 400);
+    glMatrixMode(GL_PROJECTION);
+    return 0;
+}
+
+  </pre>
+
+  <a href="."> back to coil </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

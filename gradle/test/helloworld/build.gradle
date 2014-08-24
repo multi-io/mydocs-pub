@@ -1,0 +1,63 @@
+println "start of build.gradle." 
+
+gradle.taskGraph.whenReady {taskGraph ->
+    println "taskGraph ready: $taskGraph"
+}
+
+task hello {
+    doLast {
+        println "hello last $this"
+    }
+
+    doFirst {
+        println "hello first $this"
+    }
+
+    println "hello config $this"
+}
+
+hello.a = 42
+
+hello << { println "hello more stuff" }
+
+
+def t_prev = null
+(0..5).each { i->
+    def t = task "rep$i" {
+        println "task $i config"
+        doLast {
+            println "task $i last"
+        }
+    }
+    if (t_prev != null) {
+        t.dependsOn t_prev
+    }
+    t_prev = t
+}
+
+rep3.dependsOn(hello)
+
+
+task test1 << {
+    println "deps of rep3:"
+    rep3.dependsOn.each { dep ->
+        println "" + dep + ": " + dep.class 
+    }
+}
+
+buildscript {
+    println 'start of buildscript environment'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'commons-io:commons-io:2.4'
+    }
+    println 'end of buildscript environment'
+}
+
+def f = file('build.gradle')
+def str = org.apache.commons.io.FileUtils.readFileToString(f, "UTF-8")
+println "this file: $str"
+
+println "end of build.gradle." //run AFTER all the tasks' config stages have run!

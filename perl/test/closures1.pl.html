@@ -1,0 +1,87 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/closures1.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/closures1.pl </h1>
+
+  <a href="closures1.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+package C;
+
+sub new($$) {
+    my ($class, $param) = @_;
+    bless {param=&gt;$param}, $class;
+}
+
+
+sub getparam($) {
+    my ($self) = @_;
+    $self-&gt;{param};
+}
+
+
+sub setparam($$) {
+    my ($self,$val) = @_;
+    $self-&gt;{param} = $val;
+}
+
+
+
+package main;
+
+my $var=42;
+
+my $printvar = sub { print "var=$var\n"; };
+
+
+
+$printvar-&gt;();
+
+++$var;
+
+$printvar-&gt;();
+
+$var=23;
+
+$printvar-&gt;();
+
+
+
+my $c=C-&gt;new(5);
+
+my $printc = sub { print "c-&gt;param=",$c-&gt;getparam,"\n"; };
+
+$printc-&gt;();
+
+$c-&gt;setparam(5 + $c-&gt;getparam);
+
+$printc-&gt;();
+
+
+$c=C-&gt;new(27);
+
+$printc-&gt;();
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

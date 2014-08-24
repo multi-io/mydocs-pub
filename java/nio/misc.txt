@@ -1,0 +1,138 @@
+Buffer<type> {
+   a linear sequence of <type>s.
+
+   int position, limit, capacity;
+
+   invariants:
+     - capacity never changes (after initialization);
+     - 0 <= position <= limit <= capacity;
+     - remaining() == limit - position
+     - at any time, the buffer contains limit <type>s
+
+     - Buffer<byte>s (java.nio.ByteBuffer) may be /direct/, meaning
+       that they represent data buffers in native code (outside the
+       JVM's heap). Useful for high-performance data sharing with
+       non-Java code (cf. JOGL, or memory-mapped files (see
+       FileChannel below), which effectively maps the OS's buffer
+       cache into the JVM directly)
+
+       - non-byte Buffers may be created as "view buffers" into a byte
+         buffer, combining (without copying) the bytes into the view
+         buffer's element types using a specified byte
+         ordering/endianness etc.
+
+   operations:
+
+     - transferring <type>s to/from the buffer from/to <type>[]s or
+       other buffer<type>s.
+
+       (relative) transfers from the buffer read their <type>s
+       starting at position, advancing position acordingly if the read
+       succeeded, or throwing BufferUnderflowException (and not
+       changing the buffer's state in any way) if more than
+       remaining() <type>s would have had to be read.
+
+       (relative) transfers to the buffer write their <type>s starting
+       at position, advancing position acordingly if the write
+       succeeded, or throwing BufferOverflowException (and not
+       changing the buffer's state in any way) if more than
+       remaining() <type>s would have had to be written.
+
+};
+
+
+Channel {
+
+    represents a connection to some data source or -sink (e.g. a
+    Buffer<byte> or another channel). May be open or closed at a given
+    time. Once closed, it remains closed.
+
+    Some channels (e.g. FileChannel; see below) may have a current
+    position inside their stream.
+
+    Subclasses/subinterfaces provide specific functionality,
+    e.g. readability, writability (or both), blockable/non-blockable
+    etc.:
+
+    - ReadableByteChannel: interface for channels which bytes can be
+      read from (into a ByteBuffer)
+
+      - ScatteringByteChannel extends ReadableByteChannel: interface
+        for ReadableByteChannels that "scatter" their output into
+        multiple buffers (potentially more efficient than using byte[]
+        arrays and performing the scattering manually)
+
+    - WritableByteChannel: interface for channels which bytes can be
+      written to (from a ByteBuffer)
+
+      - GatheringByteChannel extends WritableByteChannel: interface
+        for WritableByteChannels that "gather" their input from
+        multiple buffers (potentially more efficient than using byte[]
+        arrays and performing the gathering manually)
+
+    - ByteChannel implements ReadableByteChannel, WritableByteChannel
+
+
+    - InterruptibleChannel: interface for channels that are
+      "asynchronously closeable": one thread may close the channel
+      while another one blocks in an I/O operation; the latter thread
+      will receive a AsynchronousCloseException.
+
+    - SelectableChannel implements InterruptibleChannel
+
+      Channel that may be set to "non-blocking" mode and then be
+      registered with a "Selector". Several SelectableChannels can be
+      registered with the same selector, which can then be queried for
+      whether specific I/O events have occured on some of the
+      registered channels.
+
+      Key methods:
+
+      - configureBlocking(boolean block)
+
+        set to blocking/non-blocking mode
+
+      - SelectionKey register(Selector sel, int ops)
+
+        register this channel with Selector sel, waiting for I/O
+        events of the types specified in ops (one or more of
+        SelectionKey.OP_ACCEPT, SelectionKey.OP_CONNECT,
+        SelectionKey.OP_READ, SelectionKey.OP_WRITE). The returned
+        "SelectionKey" represents the registration (later querying
+        whether an event has occured on this SelectionKey:
+        sel.selectedKeys().contains(theSelectionKey))
+
+
+    - FileChannel implements InterruptibleChannel, ByteChannel,
+      GatheringByteChannel, ScatteringByteChannel
+
+      Channel that wraps an open file.
+
+      Has a current position inside the file stream that may be
+      queried and modified.
+
+      A region of the file may be mapped  directly into memory.
+
+      A region of the file may be locked against access by other
+      programs
+
+      transferTo(long position, long count, WritableByteChannel
+                 target):
+
+      - transfer data from this FileCHannel to another channel. VM
+        vendor may have provided an efficient native implementation
+        (e.g. ("zero copy" etc.) that is much faster than copying
+        manually via byte[] buffers
+
+
+      transferFrom(ReadableByteChannel src, long position, long count)
+
+      - same thing for the opposite direction
+
+    - SocketChannel implements SelectableChannel, ByteChannel,
+      ScatteringByteChannel, GatheringByteChannel
+
+      A selectable channel for stream-oriented sockets.
+
+
+}

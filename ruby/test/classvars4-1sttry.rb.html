@@ -1,0 +1,53 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/classvars4-1sttry.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/classvars4-1sttry.rb </h1>
+
+  <a href="classvars4-1sttry.rb">download original</a>
+
+  <pre>
+module M
+
+  @@cv = 42
+
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def cm2
+      puts @@cv
+    end
+  end
+
+end
+
+
+class C
+  include M
+  cm2  # =&gt; should print 42, but:
+       #   in `cm': uninitialized class variable @@cv in M::ClassMethods (NameError)
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

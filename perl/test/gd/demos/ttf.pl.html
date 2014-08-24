@@ -1,0 +1,61 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/gd/demos/ttf.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">perl</a>/<a href="../../.">test</a>/<a href="../.">gd</a>/<a href=".">demos</a>/ttf.pl </h1>
+
+  <a href="ttf.pl">download original</a>
+
+  <pre>
+#!/usr/local/bin/perl
+
+use lib '../blib/lib','../blib/arch';
+use GD 1.20;
+use constant font =&gt; '../t/Generic.ttf';
+
+$im = new GD::Image(400,250);
+
+
+warn $GD::VERSION;
+
+($white,$black,$red,$blue,$yellow) = 
+    (
+     $im-&gt;colorAllocate(255, 255, 255),
+     $im-&gt;colorAllocate(0, 0, 0),
+     $im-&gt;colorAllocate(255, 0, 0),
+     $im-&gt;colorAllocate(0,0,255),
+     $im-&gt;colorAllocate(255,250,205)
+     );
+$im-&gt;interlaced(1);		# cool venetian blinds effect
+
+# Some TTFs
+$im-&gt;stringTTF($black,font,12.0,0.0,20,20,"Hello world!") || die $@;
+$im-&gt;stringTTF($red,font,14.0,0.0,20,80,"Hello world!")|| die $@;;
+$im-&gt;stringTTF($blue,font,30.0,-0.5,60,100,"Goodbye cruel world!")|| die $@;;
+
+binmode STDOUT;
+
+# print the image to stdout
+print $im-&gt;png;
+
+
+  </pre>
+
+  <a href="."> back to demos </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

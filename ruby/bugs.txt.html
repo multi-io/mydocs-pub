@@ -1,0 +1,52 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/bugs.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/bugs.txt </h1>
+
+  <a href="bugs.txt">download original</a>
+
+  <pre>
+olaf@tack:~$ irb
+irb(main):001:0&gt; 'foo"bar"baz' =~ /\".*?\"/
+=&gt; 3
+irb(main):002:0&gt; 'foo"bar"baz' =~ /\"(.*?\)"/
+SyntaxError: compile error
+(irb):2: unmatched (: /\"(.*?\)"/
+        from (irb):2
+irb(main):003:0&gt; 'foo"bar"baz' =~ /\"(.*?)\"/
+=&gt; 3
+irb(main):004:0&gt; /\"(.*?)\"/.class.instance_methods
+=&gt; ["send", "options", "object_id", "singleton_methods", "__send__", "equal?", "taint", "frozen?", "instance_variable_get", "kind_of?", "to_a", "method", "instance_eval", "kcode", "type", "protected_methods", "extend", "eql?", "display", "instance_variable_set", "~", "hash", "is_a?", "to_s", "match", "class", "tainted?", "private_methods", "untaint", "source", "id", "inspect", "==", "===", "clone", "public_methods", "respond_to?", "freeze", "__id__", "=~", "methods", "nil?", "dup", "instance_variables", "casefold?", "instance_of?"]
+irb(main):005:0&gt; /\"(.*?)\"/.match('foo"bar"baz')
+=&gt; #&lt;MatchData:0x40309150&gt;
+irb(main):006:0&gt; /\"(.*?)\"/.match('foo"bar"baz').to_a
+=&gt; ["\"bar\"", "bar"]
+irb(main):007:0&gt; /\"(.*?)\"/.match('foo"bar"baz')[1]
+=&gt; "bar"
+/usr/lib/ruby/1.8/irb.rb:273: [BUG] Segmentation fault
+ruby 1.8.2 (2005-04-11) [i386-linux]
+
+Aborted (core dumped)
+olaf@tack:~$ 
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

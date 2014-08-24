@@ -1,0 +1,40 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/scoping.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/scoping.rb </h1>
+
+  <a href="scoping.rb">download original</a>
+
+  <pre>
+module A
+  module B
+    print "B: I am #{self}\n"
+    v=42
+    require 'scoping_import'
+    print "#{__FILE__}: v=#{v}\n"
+  end
+end
+
+print "X::Y is visible outside the scope 'require' appeared in: #{X::Y}\n"
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

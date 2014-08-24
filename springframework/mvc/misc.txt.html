@@ -1,0 +1,68 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./springframework/mvc/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">springframework</a>/<a href=".">mvc</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+Read: http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html
+
+- Controller classes marked with @Controller, request handling methods
+  with @RequestMapping.
+
+- lots of parameters are accepted for handling methods; see
+  http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html#mvc-ann-requestmapping-arguments
+
+  - .....
+
+  - request parameters can be automatically captured in "command/form
+    objects", which are accepted as handling method parameters. This
+    process ("binding") can be customized by writing an @InitBinder
+    method that takes a WebDataBinder. Command/form objects may be any
+    objects conforming to the JavaBean conventions
+
+- Model / ModelAndView objects for transferring data between
+  controller and view
+
+  - Model / ModelAndView object may be explicitly created and
+    returned, or it may be declared as a handler method parameter, or
+    not be declared/used at all -- in which case one is automatically
+    created by the framework. Some attributes are automatically added
+    to the model: command/form objects and the results of
+    @ModelAttribute annotated reference data accessor methods
+
+- in the form tag, the 'modelAttribute' attribute specifies which
+  object from the model (specified by the model attribute) to use as
+  the backing object of the form. That object will also be used as the
+  target of the binder (@InitBinder method)
+
+- if you find out in a createForm handler for an entity type that an
+  instance of the type can't currently be created because some
+  dependent entities are missing, you can add to the model an entry
+  with "dependencies" as the key and a list of the missing property
+  names of the to-be-created entity as the value. In the view, the
+  Spring form tag and related tags will recognize this and show a
+  corresponding error display instead of the regular entry form.
+
+  </pre>
+
+  <a href="."> back to mvc </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

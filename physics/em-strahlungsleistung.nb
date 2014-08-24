@@ -1,0 +1,265 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.1'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      6194,        186]*)
+(*NotebookOutlinePosition[      7138,        215]*)
+(*  CellTagsIndexPosition[      7094,        211]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+    \(Welcher\ Strahlungsleistung\ \((in\ W/
+              m\^2)\)\ entspricht\ die\ in\ D\ maximal\ zul\[ADoubleDot]ssige\
+\ el . \ Feldst\[ADoubleDot]rke\ f\[UDoubleDot]r\ EM - \
+\(\(Wellen\)\(?\)\)\)], "Subsection"],
+
+Cell[BoxData[{
+    RowBox[{\(\(\(http\)\(:\)\) // \(www . iddd . de/umtsno\)/26 
+           bvemf . htm\), "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+    RowBox[{\(1. \ die\ im\ Anhang\ 1\ bestimmten\ Grenzwerte\ der\ \
+elektrischen\ und\ magnetischen\ Feldst\[ADoubleDot]rke\ f\[UDoubleDot]r\ den\
+\ jeweiligen\ Frequenzbereich\ nicht\ \[UDoubleDot]berschritten\ werden\ \
+und\), "\n"}], "\[IndentingNewLine]", 
+    RowBox[{\(2. \ bei\ gepulsten\ elektromagnetischen\ Feldern\ zus\
+\[ADoubleDot]tzlich\ der\ Spitzenwert\ f\[UDoubleDot]r\ die\ elektrische\ und\
+\ die\ magnetische\ Feldst\[ADoubleDot]rke\ das\ 32  
+        fache\ der\ Werte\ des\ Anhangs\ 1\ nicht\ \[UDoubleDot]berschreitet \
+. \[IndentingNewLine]\[IndentingNewLine]Anhang\ 1\), ":", 
+      "\[IndentingNewLine]", GridBox[{
+          {\(Fequenz\ \((f)\)\ in\ MHz\), \(elektrische\ \
+Feldst\[ADoubleDot]rke\ in\ \((V/m)\)\)},
+          {\(10 - 400\), \(27, 5\)},
+          {\(400 - 2\ 000\), \(1, 375\ \@f\)}
+          }]}]}], "Text"],
+
+Cell[BoxData[
+    \(\(e[t_] = emax\ Sin[2\ \[Pi]\ f\ t];\)\)], "Input"],
+
+Cell[BoxData[
+    \(\(h[t_] = hmax\ Sin[2\ \[Pi]\ f\ t];\)\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(poynting[t_] = 
+      e[t]\ h[t]\  /. \ hmax\  \[Rule] \ \(1\/\(u0\ c\)\) emax\)], "Input"],
+
+Cell[BoxData[
+    \(\(emax\^2\ Sin[2\ f\ \[Pi]\ t]\^2\)\/\(c\ u0\)\)], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(poynting\_avg = \(1\/period\) \(\[Integral]\_0\%period poynting[
+                t] \[DifferentialD]t\)\  /. \ 
+        period\  \[Rule] \ 1\/f\)], "Input"],
+
+Cell[BoxData[
+    \(emax\^2\/\(2\ c\ u0\)\)], "Output"]
+}, Open  ]],
+
+Cell[BoxData[
+    \(<< Miscellaneous`Units`\)], "Input"],
+
+Cell[BoxData[
+    \(<< Miscellaneous`PhysicalConstants`\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell["kontinuierliche Strahlung, 1800 MHz:", "Subsubsection"],
+
+Cell[BoxData[
+    \(\(emax\_cont = 1.375\ \(\@1800\) Volt/Meter;\)\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    RowBox[{
+      RowBox[{"Convert", "[", 
+        RowBox[{
+          RowBox[{\(poynting\_avg\), " ", "/.", 
+            RowBox[{"{", 
+              RowBox[{\(c \[Rule] SpeedOfLight\), ",", " ", 
+                RowBox[{"u0", "->", 
+                  StyleBox["VacuumPermeability",
+                    GridBoxOptions->{RowSpacings->0.4,
+                    RowLines->False}]}], 
+                StyleBox[",",
+                  GridBoxOptions->{RowSpacings->0.4,
+                  RowLines->False}], 
+                StyleBox[" ",
+                  GridBoxOptions->{RowSpacings->0.4,
+                  RowLines->False}], 
+                RowBox[{"emax", 
+                  StyleBox["->",
+                    GridBoxOptions->{RowSpacings->0.4,
+                    RowLines->False}], \(emax\_cont\)}]}], "}"}]}], ",", 
+          " ", \(Watt\ /\ Meter\^2\)}], "]"}], "   ", "//", "N"}]], "Input"],
+
+Cell[BoxData[
+    \(\(4.516659369309471`\ Watt\)\/Meter\^2\)], "Output"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["gepulste Strahlung, 1800 MHz:", "Subsubsection"],
+
+Cell[BoxData[
+    \(\(emax\_pulse = 32\ emax\_cont;\)\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    RowBox[{
+      RowBox[{"Convert", "[", 
+        RowBox[{
+          RowBox[{\(poynting\_avg\), " ", "/.", 
+            RowBox[{"{", 
+              RowBox[{\(c \[Rule] SpeedOfLight\), ",", " ", 
+                RowBox[{"u0", "->", 
+                  StyleBox["VacuumPermeability",
+                    GridBoxOptions->{RowSpacings->0.4,
+                    RowLines->False}]}], 
+                StyleBox[",",
+                  GridBoxOptions->{RowSpacings->0.4,
+                  RowLines->False}], 
+                StyleBox[" ",
+                  GridBoxOptions->{RowSpacings->0.4,
+                  RowLines->False}], 
+                RowBox[{"emax", 
+                  StyleBox["->",
+                    GridBoxOptions->{RowSpacings->0.4,
+                    RowLines->False}], \(emax\_pulse\)}]}], "}"}]}], ",", 
+          " ", \(Watt\ /\ Meter\^2\)}], "]"}], "   ", "//", "N"}]], "Input"],
+
+Cell[BoxData[
+    \(\(4625.059194172898`\ Watt\)\/Meter\^2\)], "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+FrontEndVersion->"5.1 for X",
+ScreenRectangle->{{0, 1280}, {0, 1024}},
+WindowSize->{865, 839},
+WindowMargins->{{186, Automatic}, {75, Automatic}},
+PrintingPageRange->{Automatic, Automatic},
+PrintingOptions->{"PaperSize"->{612, 792},
+"PaperOrientation"->"Portrait",
+"PostScriptOutputFile":>FrontEnd`FileName[{$RootDirectory, "home", "olaf", \
+"doc", "mydocs", "physics"}, "em-strahlungsleistung.nb.ps", CharacterEncoding \
+-> "iso8859-1"],
+"Magnification"->1}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[1776, 53, 232, 4, 60, "Subsection"],
+Cell[2011, 59, 1008, 17, 218, "Text"],
+Cell[3022, 78, 71, 1, 27, "Input"],
+Cell[3096, 81, 71, 1, 27, "Input"],
+
+Cell[CellGroupData[{
+Cell[3192, 86, 111, 2, 45, "Input"],
+Cell[3306, 90, 80, 1, 48, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[3423, 96, 176, 3, 48, "Input"],
+Cell[3602, 101, 55, 1, 48, "Output"]
+}, Open  ]],
+Cell[3672, 105, 56, 1, 27, "Input"],
+Cell[3731, 108, 68, 1, 27, "Input"],
+
+Cell[CellGroupData[{
+Cell[3824, 113, 61, 0, 28, "Subsubsection"],
+Cell[3888, 115, 79, 1, 31, "Input"],
+
+Cell[CellGroupData[{
+Cell[3992, 120, 907, 21, 50, "Input"],
+Cell[4902, 143, 72, 1, 45, "Output"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[5023, 150, 54, 0, 28, "Subsubsection"],
+Cell[5080, 152, 66, 1, 29, "Input"],
+
+Cell[CellGroupData[{
+Cell[5171, 157, 908, 21, 50, "Input"],
+Cell[6082, 180, 72, 1, 45, "Output"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

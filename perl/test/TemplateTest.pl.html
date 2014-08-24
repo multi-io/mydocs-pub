@@ -1,0 +1,53 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/TemplateTest.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/TemplateTest.pl </h1>
+
+  <a href="TemplateTest.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+BEGIN { @INC = (".", @INC); }
+
+use Template;
+
+
+# my $rs = Template-&gt;new("letter.templ", do{open(F,"&gt;out.txt"); *F});
+my $rs = Template-&gt;new("letter.templ");
+
+my $out = "foo";
+# my $rs = Template-&gt;new("letter.templ", \$out);
+
+our @people =
+( {name=&gt;'Meier', sex=&gt;'m', debt=&gt;4000},
+  {name=&gt;'Schubert', sex=&gt;'f', debt=&gt;2500},
+  {name=&gt;'Hubertus', sex=&gt;'m', debt=&gt;3000}
+);
+
+$rs-&gt;run();
+
+
+# print "output: &gt;&gt;&gt;&gt;${out}&lt;&lt;&lt;&lt;\n";
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

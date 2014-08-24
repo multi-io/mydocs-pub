@@ -1,0 +1,97 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/instancevars.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/instancevars.rb </h1>
+
+  <a href="instancevars.rb">download original</a>
+
+  <pre>
+class B
+  def bb
+    @b
+  end
+
+  def bb=(x)
+    @b=x
+  end
+end
+
+
+class C &lt;B
+  def cb
+    @b
+  end
+
+  def cb=(x)
+    @b=x
+  end
+end
+
+
+module M
+  def mb
+    @b
+  end
+
+  def mb=(x)
+    @b=x
+  end
+end
+
+
+
+class X &lt;C
+  include M
+end
+
+
+c=C.new
+c.bb = 1
+c.cb = 2
+
+x=X.new
+x.bb = 1
+x.cb = 2
+x.mb = 3
+
+print &lt;&lt;-EOS
+#{c.bb}
+#{c.cb}
+#{x.bb}
+#{x.cb}
+#{x.mb}
+EOS
+
+
+# prints:
+#
+# 2
+# 2
+# 3
+# 3
+# 3
+#
+# =&gt; all instance variables of all inherited/included classes/modules
+#    share one namespace
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

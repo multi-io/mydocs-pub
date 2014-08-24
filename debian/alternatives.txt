@@ -1,0 +1,113 @@
+update-alternatives:
+
+interactive:
+
+update-alternatives --config name
+
+
+modes
+------
+
+--install $alink,$name,$apath,$apriority,@ARGV
+--remove $name,$apath,@ARGV
+--display $name
+
+
+options
+-------
+--slave$ $slink,$sname,$spath,@ARGV
+
+        $aslavelinkcount{$slink}++ && &badusage("slave link $slink duplicated");
+        $aslavelink{$sname}= $slink;
+        $aslavepath{$sname}= $spath;
+
+--altdir $altdir
+
+--admindir $admindir
+
+
+
+
+
+Format of /var/lib/dpkg/alternatives/$name:
+
+-------
+"auto"|"manual"
+link
+(sname
+ slink)*
+
+(version
+ priority
+ spath* (so viele wie oben snames)
+)*
+
+
+link => $link
+
+(sname,slink)s => @slavenames, @slavelinks
+
+(version,priority,spath*) => $versions[lfd.Nr.],
+                             $priorities[lfd.Nr.],
+                             $slavepath{lfd.Nr., spathnr}
+
+lfd.Nr. für version v steht in $versionnum{v}
+
+
+
+--install $alink,$name,$apath,$apriority,@ARGV {
+    rename_mv($link,$alink);  # d.h. alink mit link identifiziert
+    $link= $alink;
+
+    lfd.Nr. := $versionnum{$apath}; # d.h. apath mit version identifiziert
+}
+
+
+
+===========================
+
+[root@tick /]# cat /var/lib/dpkg/alternatives/www-browser 
+manual
+/usr/bin/www-browser
+www-browser.1.gz
+/usr/share/man/man1/www-browser.1.gz
+
+/usr/bin/w3m
+25
+/usr/share/man/man1/w3m.1.gz
+/usr/bin/links.main
+40
+/usr/share/man/man1/links.main.1.gz
+/usr/bin/lynx
+50
+/usr/share/man/man1/lynx.1.gz
+
+[root@tick /]# 
+
+
+==> in update-alternatives:
+
+$manual="manual"
+$link="/usr/bin/www-browser"
+@slavenames = ("www-browser.1.gz")
+$slavenum{"www-browser.1.gz"} = 1
+$slavelinkcount{"/usr/share/man/man1/www-browser.1.gz"} = 1
+@slavelinks = ("/usr/share/man/man1/www-browser.1.gz")
+
+
+@versions = ("/usr/bin/w3m","/usr/bin/links.main", "/usr/bin/lynx")
+
+$versionnum{"/usr/bin/w3m"} = 1
+$priorities[1] = 25
+$slavepath{1,0} = "/usr/share/man/man1/w3m.1.gz"
+           ^ ^
+           | |
+ $versionnum index in @slavenames
+
+$versionnum{"/usr/bin/links.main"} = 2
+$priorities[2] = 40
+$slavepath{2,0} = "/usr/share/man/man1/links.main.1.gz"
+
+$versionnum{"/usr/bin/lynx"} = 3
+$priorities[3] = 50
+$slavepath{3,0} = "/usr/share/man/man1/lynx.1.gz"

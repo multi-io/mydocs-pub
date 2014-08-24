@@ -1,0 +1,42 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/locale/testapp.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">locale</a>/testapp.pl </h1>
+
+  <a href="testapp.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+our (%messages);
+
+do "myapp_$ENV{LANG}.pl" or do "myapp_DEFAULT.pl" or die "no locale!";
+
+print "lalala\n";
+
+$wert = 42;
+$richtig = 0;
+
+die sprintf($messages{IDS_MASKE}, $wert) unless $richtig;
+
+  </pre>
+
+  <a href="."> back to locale </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

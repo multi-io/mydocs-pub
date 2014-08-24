@@ -1,0 +1,41 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/threads_mod.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/threads_mod.rb </h1>
+
+  <a href="threads_mod.rb">download original</a>
+
+  <pre>
+#M.synchronize do
+#Mutex.new.synchronize do
+
+
+($m||=Mutex.new).synchronize do
+
+  puts "#{Thread.current}: start"
+  sleep 0.3
+  puts "#{Thread.current}: stop"
+
+end
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

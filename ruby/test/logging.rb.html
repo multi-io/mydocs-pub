@@ -1,0 +1,69 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/logging.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/logging.rb </h1>
+
+  <a href="logging.rb">download original</a>
+
+  <pre>
+# include this into classes/modules whose methods should be logged,
+#  then call "add_logging" to enable logging for all instance methods
+#  defined in that class, or for all methods provided as parameters
+module Logging
+
+  def self.included(target_class)
+    super
+    target_class.extend(ClassMethods)
+  end
+
+
+  module ClassMethods
+
+    def add_logging(methods = self.instance_methods(false))
+      for method in methods
+        self.module_eval &lt;&lt;-EOS
+          alias_method :#{method}_orig, :#{method}
+          
+          def #{method}(*args, &amp;block)
+            call_descr = "#{method} on \#{self} with arguments (\#{args.join(',')})"
+            begin
+              STDERR.print "LOG: calling \#{call_descr}\n"
+              result = self.__send__(:#{method}_orig, *args, &amp;block)
+              STDERR.print "LOG: result of calling \#{call_descr} was: \#{result}\n"
+              return result
+            rescue =&gt; err
+              STDERR.print "LOG: exception when calling \#{call_descr}:
+                            \#{err.message}\n\#{err.backtrace.join('\n')}\n"
+              $@[0,2] = nil # restore original stack trace
+              raise
+            end
+          end
+        EOS
+      end
+    end
+
+  end
+
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./javascript/drawing/svg/index.xml </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">javascript</a>/<a href="../.">drawing</a>/<a href=".">svg</a>/index.xml </h1>
+
+  <a href="index.xml">download original</a>
+
+  <pre>
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+&lt;script type="text/javascript"&gt;
+var svgns="http://www.w3.org/2000/svg";
+var path=null;
+
+function startDraw(evt){
+	path=document.createElementNS(svgns,"path");
+	var x=evt.clientX;
+	var y=evt.clientY;
+	path.setAttribute("d","M "+x+" "+y);
+	path.setAttribute("stroke","black");
+	path.setAttribute("fill","none");
+	document.getElementById('target').appendChild(path);
+}
+
+function move(evt){
+	if(path!=null){
+		var d=path.getAttribute('d');
+		var x=evt.clientX;
+		var y=evt.clientY;
+		d= d+ " L "+x+" "+y;
+		path.setAttribute("d",d);
+	}
+}
+
+function stopDraw(evt){
+	path=null;
+}
+
+&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Hello World&lt;/h1&gt;
+
+&lt;svg xmlns="http://www.w3.org/2000/svg" height="400"&gt;
+&lt;g id="target" onmousedown="startDraw(evt)" onmousemove="move(evt)" onmouseup="stopDraw(evt)"&gt;
+&lt;rect x="20" y="20" width="500" height="400" fill="lightgrey"/&gt;
+&lt;/g&gt;
+&lt;/svg&gt;
+&lt;p&gt;You can draw lines with the mouse at the grey rectangle&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+  </pre>
+
+  <a href="."> back to svg </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

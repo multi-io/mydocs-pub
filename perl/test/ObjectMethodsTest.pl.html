@@ -1,0 +1,77 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/ObjectMethodsTest.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/ObjectMethodsTest.pl </h1>
+
+  <a href="ObjectMethodsTest.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+package C;
+
+sub new {
+    my $class = shift;
+    my $objname = shift;
+    bless { name=&gt;$objname }, $class;
+}
+
+
+sub cmethod {
+    print "cmethod called\n";
+}
+
+
+
+
+package main;
+
+use ObjectMethods qw(addMethods);
+
+my $obj = C-&gt;new("myobj");
+
+$obj-&gt;cmethod;
+
+print "obj is a: ",ref $obj, "\n";
+
+addMethods($obj,
+           objmeth1 =&gt; sub { print "objmeth1 called\n"; });
+
+$obj-&gt;objmeth1;
+
+print "obj is a: ",ref $obj, "\n";
+
+addMethods($obj,
+           objmeth2 =&gt; sub($$) {
+               my $obj = shift;
+               print "objmeth2 called on ",$obj-&gt;{name}, " with ",shift,"\n";
+           });
+
+$obj-&gt;objmeth1;
+$obj-&gt;objmeth2(42);
+
+print "obj is a: ",ref $obj, "\n";
+
+print $obj-&gt;isa('C'),"\n";
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

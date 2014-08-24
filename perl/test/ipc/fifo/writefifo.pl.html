@@ -1,0 +1,51 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/ipc/fifo/writefifo.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">perl</a>/<a href="../../.">test</a>/<a href="../.">ipc</a>/<a href=".">fifo</a>/writefifo.pl </h1>
+
+  <a href="writefifo.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl
+
+my $fifoName="theFifo";
+
+while (1) {
+    unless (-p $fifoName) {
+	unlink $fifoName;
+	# Returnwert von system() ist invers, deshalb &amp;&amp; statt ||
+	system("mkfifo",$fifoName) &amp;&amp; die "couldn't mkfifo $fifoName: $!";
+    }
+
+    open(FIFO,"&gt; $fifoName");
+    print STDERR "writing to fifo $fifoName\n";
+    print FIFO "blahblahblubb.\nHello World!\n";
+    close(FIFO);
+    sleep 2;
+    # TODO: Das sleep 2 wird in man perlipc auch benutzt. 
+    # Ohne das sleep komisches Verhalten auf Linux (ein cat auf die fifo
+    # gibt ewig "blahblahblubb.\nHello World!\nblahblahblubb.\nHello World!\nbl..." aus)
+    # Auf Solaris (fox.isst.fhg.de) geht es.
+}
+
+  </pre>
+
+  <a href="."> back to fifo </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

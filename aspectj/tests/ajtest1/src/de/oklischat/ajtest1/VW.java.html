@@ -1,0 +1,62 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./aspectj/tests/ajtest1/src/de/oklischat/ajtest1/VW.java </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../../../.">.</a>/<a href="../../../../../../.">aspectj</a>/<a href="../../../../../.">tests</a>/<a href="../../../../.">ajtest1</a>/<a href="../../../.">src</a>/<a href="../../.">de</a>/<a href="../.">oklischat</a>/<a href=".">ajtest1</a>/VW.java </h1>
+
+  <a href="VW.java">download original</a>
+
+  <pre>
+package de.oklischat.ajtest1;
+
+public class VW extends Car {
+
+    private double inspectionDistance = 200;
+    private int nDoneInspections = 0;
+    
+    public VW(String name, double location, double speed) {
+        super(name, location, speed);
+    }
+
+    public VW(String name) {
+        super(name);
+    }
+
+
+    @Override
+    public void setLocation(double location) {
+        super.setLocation(location);
+        double overDist = location - nDoneInspections * inspectionDistance;
+        if (overDist &gt; 0) {
+            int nNeededInsps = (int)(overDist / inspectionDistance + 1);
+            System.out.println("" + this + ": getting " + nNeededInsps + " inspections");
+            nDoneInspections += nNeededInsps;
+        }
+    }
+    
+    @Override
+    public void driveFor(double time) {
+        super.driveFor(time);
+    }
+}
+
+  </pre>
+
+  <a href="."> back to ajtest1 </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

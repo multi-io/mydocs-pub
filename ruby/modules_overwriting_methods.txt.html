@@ -1,0 +1,81 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/modules_overwriting_methods.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/modules_overwriting_methods.txt </h1>
+
+  <a href="modules_overwriting_methods.txt">download original</a>
+
+  <pre>
+module M
+  def m
+    puts "M#m"
+    super
+  end
+end
+ 
+ 
+class C
+  def m
+    puts "C#m"
+  end
+ 
+  include M
+end
+ 
+c=C.new
+c.m    # =&gt; C#m
+
+
+###############
+
+module M
+  def self.included(mod)
+    mod.module_eval &lt;&lt;-EOS
+      def m
+        puts "M#m"
+        super
+      end
+    EOS
+  end
+end
+
+
+class C
+  def m
+    puts "C#m"
+  end
+
+  include M
+end
+
+c=C.new
+c.m
+
+# =&gt;
+M#m
+NoMethodError: super: no superclass method `m'
+        from (eval):3:in `m'
+        from (irb):22
+        from :0
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

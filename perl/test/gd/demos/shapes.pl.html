@@ -1,0 +1,79 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/gd/demos/shapes.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">perl</a>/<a href="../../.">test</a>/<a href="../.">gd</a>/<a href=".">demos</a>/shapes.pl </h1>
+
+  <a href="shapes.pl">download original</a>
+
+  <pre>
+#!/usr/local/bin/perl
+
+use GD;
+
+$im = new GD::Image(300,300);
+($white,$black,$red,$blue,$yellow) = 
+    (
+     $im-&gt;colorAllocate(255, 255, 255),
+     $im-&gt;colorAllocate(0, 0, 0),
+     $im-&gt;colorAllocate(255, 0, 0),
+     $im-&gt;colorAllocate(0,0,255),
+     $im-&gt;colorAllocate(255,250,205)
+     );
+$im-&gt;transparent($white);	# white color is transparent
+$im-&gt;interlaced(1);		# cool venetian blinds effect
+
+# Create a flat wide rectangle paintbrush
+$brush = new GD::Image(10,10);
+$brush-&gt;colorAllocate(255,255,255); # white
+$brush-&gt;colorAllocate(0,0,0);	# black
+$brush-&gt;transparent($white);	# white is transparent
+$brush-&gt;filledRectangle(0,0,5,2,$black); # a black rectangle
+
+# Draw a friendly title (ha!)
+$im-&gt;string(gdLargeFont,150,10,"Hello world!",$red);
+$im-&gt;string(gdSmallFont,150,28,"Goodbye cruel world!",$blue);
+$im-&gt;stringUp(gdTinyFont,280,250,"I'm climbing the wall!",$black);
+$im-&gt;charUp(gdMediumBoldFont,280,280,"Q",$black);
+
+# Draw an oval
+$im-&gt;setBrush($brush);
+$im-&gt;arc(100,100,100,150,0,360,gdBrushed);
+
+$poly = new GD::Polygon;
+$poly-&gt;addPt(30,30);
+$poly-&gt;addPt(100,10);
+$poly-&gt;addPt(190,290);
+$poly-&gt;addPt(30,290);
+$im-&gt;polygon($poly,gdBrushed);
+
+$im-&gt;fill(132,62,$blue);
+$im-&gt;fill(100,70,$red);
+$im-&gt;fill(40,40,$yellow);
+
+binmode STDOUT;
+
+# print the image to stdout
+print $im-&gt;png;
+
+
+  </pre>
+
+  <a href="."> back to demos </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

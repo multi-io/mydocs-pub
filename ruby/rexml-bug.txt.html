@@ -1,0 +1,59 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/rexml-bug.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/rexml-bug.txt </h1>
+
+  <a href="rexml-bug.txt">download original</a>
+
+  <pre>
+irb(main):001:0&gt; require 'rexml/document'
+=&gt; true
+irb(main):002:0&gt; include REXML
+=&gt; Object
+irb(main):003:0&gt; d=Document.new "&lt;foo/&gt;"
+=&gt; &lt;UNDEFINED&gt; ... &lt;/&gt;
+irb(main):004:0&gt; d.write
+&lt;foo/&gt;=&gt; [#&lt;REXML::XMLDecl:0x4065e5a0 @version="1.0", @writeencoding=false, @parent=nil, @writethis=false, @standalone=nil, @encoding="UTF-8"&gt;, &lt;foo/&gt;]
+irb(main):005:0&gt; d.elements.add "bar"
+RuntimeError: attempted adding second root element to document
+        from /usr/lib/ruby/1.8/rexml/document.rb:81:in `&lt;&lt;'
+        from /usr/lib/ruby/1.8/rexml/element.rb:893:in `add'
+        from /usr/lib/ruby/1.8/rexml/child.rb:21:in `initialize'
+        from /usr/lib/ruby/1.8/rexml/parent.rb:13:in `initialize'
+        from /usr/lib/ruby/1.8/rexml/element.rb:53:in `initialize'
+        from /usr/lib/ruby/1.8/rexml/element.rb:891:in `new'
+        from /usr/lib/ruby/1.8/rexml/element.rb:891:in `add'
+        from (irb):5
+irb(main):006:0&gt; d.write
+&lt;foo/&gt;&lt;NoMethodError: undefined method `empty?' for nil:NilClass
+        from /usr/lib/ruby/1.8/rexml/element.rb:663:in `write'
+        from /usr/lib/ruby/1.8/rexml/document.rb:163:in `write'
+        from /usr/lib/ruby/1.8/rexml/document.rb:161:in `each'
+        from /usr/lib/ruby/1.8/rexml/document.rb:161:in `write'
+        from (irb):6
+irb(main):007:0&gt; 
+
+
+the latter exception is the problem
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

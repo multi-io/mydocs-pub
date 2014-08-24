@@ -1,0 +1,54 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./xgalaga/prizes/Makefile </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">xgalaga</a>/<a href=".">prizes</a>/Makefile </h1>
+
+  <a href="Makefile">download original</a>
+
+  <pre>
+# find . -name '*xpm' | xargs -i basename {} .xpm | xargs -i make-misc {}.png
+
+
+%.pnm: %.xpm
+	xpmtoppm &lt;$&lt; &gt;$@
+
+%.pnm_alpha: %.xpm
+	xpmtoppm --alphaout=- &lt;$&lt; &gt;$@
+
+%.png: %.pnm %.pnm_alpha
+	pnmtopng -alpha $*.pnm_alpha &lt;$*.pnm &gt;$@
+
+# fallback when no .pnm_alpha is available
+%.png: %.pnm
+	pnmtopng &lt;$&lt; &gt;$@
+
+xpms=$(shell echo *.xpm)
+pngs=$(xpms:.xpm=.png)
+
+default: $(pngs)
+
+
+clean:
+	rm -f $(pngs)
+
+  </pre>
+
+  <a href="."> back to prizes </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

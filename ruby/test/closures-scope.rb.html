@@ -1,0 +1,66 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/closures-scope.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/closures-scope.rb </h1>
+
+  <a href="closures-scope.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+
+
+
+n=10
+
+## stack overflow (p calls itself)
+# p=proc{0}
+
+# (0..n).each do |x|
+#   p = proc{ x +p.call}
+# end
+
+
+
+
+# ## works, but clumsy (because of the "superproc")
+# p=proc{0}
+
+# def superproc(x,p)
+#   proc{ x +p.call}
+# end
+
+# (0..n).each do |x|
+#   p = superproc(x,p)
+# end
+
+p=proc{0}
+(0..n).each do |x|
+  pprev = p
+  p = proc{ x + pprev.call }
+end
+
+
+print p.call
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

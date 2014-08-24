@@ -1,0 +1,46 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/arr1.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/arr1.pl </h1>
+
+  <a href="arr1.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+use strict;
+
+
+my @arr1 = ( 8,9,10,"huhu","huifgd");
+my @arr2 = ( "blah","blubb","brabbel","stammel");
+
+my $i=8;
+print "$i\n";
+$i = @arr1;   # "@arr" in Skalar-Kontext ergibt Laenge des Arrays
+print "$i\n";
+
+print "@arr2\n";
+@arr2 = $i;   # "$skal" in Array-Kontext ergibt Array mit dem Skalar als einziges Element
+print "@arr2\n$#arr2\n";
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

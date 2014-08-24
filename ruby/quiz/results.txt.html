@@ -1,0 +1,96 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/quiz/results.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">quiz</a>/results.txt </h1>
+
+  <a href="results.txt">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+members,limit = ARGV.map{|x|x.to_i}
+
+t1=Time.now
+
+#found = (0...members).inject({}){|h,x|h[x]=false;h}
+found={}
+#members.times {
+#  begin n=rand(limit) end while found[n]
+#  found[n]=1
+#}
+while found.size&lt;members
+  found[rand(limit)]=1
+end
+
+t2=Time.now
+sorted=found.keys.sort
+t3=Time.now
+
+puts sorted
+t4=Time.now
+
+
+warn "calc: #{t2-t1}, sort: #{t3-t2}, output: #{t4-t3}"
+
+
+olaf@tack:~/doc/mydocs/ruby/quiz$ time ./sample 500000 100000000 &gt;/dev/null 
+calc: 1.711008, sort: 0.539161, output: 10.19322
+
+real    0m12.456s
+user    0m12.420s
+sys     0m0.040s
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+olaf@tack:~/doc/mydocs/ruby/quiz$ time ./sample 1000000 200000000 &gt;/dev/null 
+calc: 3.684069, sort: 1.125714, output: 37.525631
+
+real    0m42.349s
+user    0m41.870s
+sys     0m0.220s
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+olaf@tack:~/doc/mydocs/ruby/quiz$ time ./sample 2000000 400000000 &gt;/dev/null 
+calc: 7.922936, sort: 2.368247, output: 148.857243
+
+real    2m39.168s
+user    2m36.870s
+sys     0m0.720s
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+
+
+
+
+
+
+
+
+olaf@tack:~/doc/mydocs/ruby/quiz$ ./itest.rb &lt;/tmp/big_sample_joost.txt 
+0.3688032
+olaf@tack:~/doc/mydocs/ruby/quiz$ ./itest.rb &lt;/tmp/big_sample.txt 
+bash: /tmp/big_sample.txt: No such file or directory
+olaf@tack:~/doc/mydocs/ruby/quiz$ ./itest.rb &lt;big_sample.txt 
+0.368865
+olaf@tack:~/doc/mydocs/ruby/quiz$ 
+  </pre>
+
+  <a href="."> back to quiz </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

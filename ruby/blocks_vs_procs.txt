@@ -1,0 +1,103 @@
+05:21 -!- multi_io [~olaf@swangoose.isst.fhg.de] has joined #ruby-lang
+
+13:34 < Luckys> how do I differ a Block and a Proc I can't understand that 
+                thingy at all :(
+13:35 -!- iblechbot [~iblechbot@175.9-dial.augustakom.net] has quit [Success]
+13:36 -!- Fry [none@fry.user] has quit [Read error: 110 (Connection timed out)]
+13:36 -!- ngw [~ngw@d81-211-175-195.cust.tele2.it] has joined #ruby-lang
+13:37 < kig> block is syntax sugar for giving a method a proc as an argument
+13:37 < ngw> hi *
+13:37 < multi_io> you're right, the difference between blocks and procs in Ruby 
+                  is quite non-intuitive (some say it's badly designed)
+13:38 -!- dave_b [~dbalmain@p1248-ipad30hodogaya.kanagawa.ocn.ne.jp] has quit 
+          ["Leaving"]
+13:38 < neoneye> proc is being replaced by lambda
+13:38 < multi_io> right, so blocks are also just anonymous functions, but with 
+                  a more pleasant syntax
+13:39 < Luckys> I'm seeing the examples on Chris Pine's site which are making 
+                me confused
+13:39 < kig> (0..10).each{|i| puts i}  is about the same as  
+             (0..10).each(&proc{|i| puts i})  , the & is used for turning a 
+             proc into a block argument
+13:40 -!- intinig [~intinig@213-92-106-69.f5.ngi.it] has quit []
+13:40 -!- neoneye [~neoneye@0x50c4101e.boanxx9.adsl-dhcp.tele.dk] has quit 
+          ["using sirc version 2.211+KSIRC/1.3.10"]
+13:41 < kig> without blocks the syntax to do the things they do would be more 
+             verbose: (0..10).my_map(proc{|i| i*2}).my_sort(proc{|x,y| y<=>x})
+13:41 < Luckys> kig: I'm just 2 days old in ruby :)
+13:41 < multi_io> kig: one could just make {|args..|body...} the syntax for all 
+                  anonymous functions. problem solved.
+13:42 < kig> multi_io: yeah, i was thinking about the same thing
+13:42 < Luckys> but in all the examples that I worked from this site, none 
+                carry braces {} can they be used the way you guys are saying
+13:43 < kig> the problem that might arise there is disambiguating {1=>2, 3=>4} 
+             and {|args| body}
+13:43 < kig> but now that i look at them, they are visually enough apart from 
+             each other to read properly
+13:44 < multi_io> Luckys: {|args| body} is another syntax for do |args| body end
+13:44 < flgr> multi_io: though that raises a syntax collision with Hashes, more 
+              or less
+13:45 < kig> flgr: it's not a big collision, /\{\s*\|/ vs /\{\s*[^|]/ if you 
+             pardon my regexp
+13:46 < multi_io> {42} is also a proc...
+13:46 < dblack> kig: what about {} ?
+13:46 < kig> oh right
+13:46 < kig> forgot those
+13:47 < multi_io> but just 3=>4 isn'
+13:47 < multi_io> t valid ruby code
+13:48 -!- paul0 [~paulo@200-138-212-076.fnsce7007.dsl.brasiltelecom.net.br] has 
+          quit [Read error: 60 (Operation timed out)]
+13:50 < kig> puts [1,2,3,4]; puts {1=>2, 3=>4};
+13:50 < flgr> kig: what about emtpy argument lists?
+13:50 < flgr> what about { {1 => 2} }
+13:50 < flgr> and so on
+13:50 < flgr> I think it is possible, but not completely simple
+13:50 < flgr> but I doubt that this is the only reason for Ruby not using it
+13:51 < flgr> I'm not using Ruby for a long time and  foo = { 1 + 2 }  already 
+              looks odd for me
+13:51 < kig> yes
+13:51 < flgr> that must be way more intense for matz
+13:51 < flgr> plus there's still the difference between [1, 2, 3].each({ |x| p 
+              x }) and [1, 2, 3].each { |x| p x }
+13:52 < kig> the hash-block syntax collision is happening today too (the puts 
+             example). could it be fixed?
+13:52 < flgr> I think so.
+13:54 -!- dblack [~dblack@ool-44c4fbcd.dyn.optonline.net] has quit ["Leaving"]
+13:54 < kig> one way might be to drop the preceding | from block argument list, 
+             and make the argument list mandatory (though now only one char 
+             long when there are no args). feels kinda ugly though. hrm. each{| 
+             puts "hi!"}, map{x,y| x*y}
+13:56 < kig> or the longer each{|| do stuff}
+13:56 < kig> don't really like either all that much
+13:57 < kig> are literal blocks used more than literal hashes
+13:57 < kig> if yes, then the hash syntax should change, mayhaps
+13:57 < multi_io> I still don't see the problem.. hash literals always contain 
+                  =>, ruby code blocks never do. So they should be 
+                  distinguishable, no?
+14:00 < multi_io> (albeit harder to parse)
+14:00 < kig> can't think of a counterexample, so yeah, i guess. 
+14:00 < kig> it can also be a ",", but that doesn't really pose a problem either
+14:01 < Luckys> I think its enough for today for me understand ruby, leaving 
+                proc and blocks for tomorrow, cuz I'm exhausted as of now
+14:01 < kig> since {1,2} isn't a valid block
+14:01 -!- paul0 [~paulo@200-215-064-023.fnsce7001.dsl.brasiltelecom.net.br] has 
+          joined #ruby-lang
+14:01 < kig> Luckys: sorry for going on a tangent from to proc-block discussion 
+             :I
+14:01 < Luckys> I appreciate the patience you guys have in here
+14:01 < multi_io> Luckys: it's quite esotheric anyway, you'll use blocks 98% of 
+                  the time :=)
+14:01 -!- hynek [hynek@pD9E7E493.dip.t-dialin.net] has joined #ruby-lang
+14:01 < kig> s/to/the
+14:02 < Luckys> kig: may be that made me confused, so I'll leave for tomorrow, 
+                and startup fresh
+14:03 < Luckys> One thing I liked of ruby was of extending the class, its 
+                fairly simple the "self" thing
+14:04 < multi_io> I guess the puts {1=>2, 3=>4} problem is because the ruby 
+                  parser works "1-token-lookahead"
+14:05 < Luckys> how do ruby can be compared with other scripting language(s) 
+                like perl or python
+14:05 < multi_io> i.e. when it sees "{" after a name, it decides that a block 
+                  follows without looking further
+14:06 < multi_io> a parser that distinguishes hash literals from blocks by 
+                  looking for => couldn't be 1-token-lookahead...

@@ -1,0 +1,58 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/closures3.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/closures3.pl </h1>
+
+  <a href="closures3.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+sub accum {
+    my $curr = 0;
+    sub {
+        my $param = shift;
+        $curr += $param;
+    }
+}
+
+
+my $acc1 = accum();
+
+print "a1 ",$acc1-&gt;(3),"\n";
+print "a1 ",$acc1-&gt;(5),"\n";
+
+my $acc2 = accum();
+
+print "a2 ",$acc2-&gt;(1),"\n";
+
+print "a1 ",$acc1-&gt;(2),"\n";
+
+
+print "a2 ",$acc2-&gt;(7),"\n";
+
+print "a1 ",$acc1-&gt;(10),"\n";
+
+print "a2 ",$acc2-&gt;(4),"\n";
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

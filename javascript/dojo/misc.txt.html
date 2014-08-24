@@ -1,0 +1,76 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./javascript/dojo/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">javascript</a>/<a href=".">dojo</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+- base library dojo, widget library dijit
+
+- unified event processing: wiring up using dojo.connect, can connect
+  DOM events as well as dijit widget events
+
+- widget creation:
+
+  - widgets live in a DOM node (the widget's "top-level node";
+    property .domNode)
+
+  - can be created fuly programmatically (no reference in HTML), but
+    most of the times there will be a HTML element containing basic
+    attributes of the widget, which will be parsed by dojo to create
+    the widget at runtime. The required "dojoType" special attribute
+    specifies the dijit type name. Example:
+
+    &lt;button id="showDlgBtn" dojoType="dijit.form.Button"&gt;Click Me!&lt;/button&gt;
+
+    In the JS code, you'd dojo.require("dijit.form.Button"), at which
+    time the Button widget's code is loaded. The HTML will be parsed,
+    the button element found, and the corresponding widget object
+    created. This parsing is done automatically if you have a
+    djConfig="parseOnLoad: true" attribute of the body tag, or it can
+    be initialized programmatically using dojo.parser.parse().
+
+    Once created, a reference to the widget can be obtained using
+    dijit.byId("mydialog"). If you have the DOM node of the widget,
+    you can also get the widget using widget=dijit.byNode(node). (this
+    is the reverse to the widget.domNode property mentioned
+    above). This is useful e.g. in event handlers that get the DOM
+    node the event occured on.
+
+    All widgets currently existing on the page are stored in the
+    dijit.registry.
+
+    - TODO: describe programmatic creation, attributes, ...
+
+  - various overridable callbacks are provided that're at specific
+    points during the widget's initialization/lifecycle
+
+    e.g.
+
+    postMixInProperties: function() {
+        //at this point, attributes from the markup (or from the params hash for programmatic creation)
+        //have been mixed into this instance as properties
+    },
+
+  </pre>
+
+  <a href="."> back to dojo </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

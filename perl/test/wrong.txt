@@ -1,0 +1,18 @@
+evaling:
+$self->print ( q() . $self->quote_expr(scalar( @people )) .q( Kunden habe Schulden:
+) . "");$self->print ( q(
+) . "");$self->print ( "");my $sum = 0;$self->print ( q(
+) . "");$self->print ( q(
+) . "");$self->print ( "");foreach my $k (@people) {$self->print ( q(
+) . "");$self->print ( q(
+) . "");$self->print ( q(Kunde: ) . $self->quote_expr(scalar( $k->{sex} eq 'm'? "Herr" : "Frau")) .q( ) . $self->quote_expr(scalar( $k->{name})) .q( 
+) . "");$self->print ( q(Hat ) . $self->quote_expr(scalar( $k->{debt})) .q( Euro Schulden.
+) . "");$self->print ( q(
+) . "");$self->print ( "");$sum += $k->{debt};$self->print ( q(
+) . "");$self->print ( q(
+) . "");$self->print ( "");}$self->print ( q(
+) . "");$self->print ( q(
+) . "");$self->print ( q(Gesamt: ) . $self->quote_expr(scalar( $sum )) .q( Euro.
+) . "");$self->print ( q(
+) . "");$self->print ( q(Mit freundlichen...
+) . "");

@@ -1,0 +1,157 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/xmlbinding/jibx/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">java</a>/<a href="../.">xmlbinding</a>/<a href=".">jibx</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+core workflow
+-------------
+
++-------------------+
+|                   |
+|                   |
+|  java sources     |
+|                   |
++--------+----------+
+         |
+-------------------
+(      javac       )
+-------------------
+         |
+        \|/
++--------+----------+                      +-----------------------------+
+|                   |                      |                             |
+|                   |                      | binding definition          |
+|  java classes     |                      |                             |
+|                   |                      |     documents               |
++----------------+--+                      |                             |
+                 |                         +--------+--------------------+
+                 |                             |
+                 |                             |
+                 |                             |
+                 |                             |
+                \|/ ------------------------- \|/
+             ----+-/                         \-+----
+         ---/                                       \---
+        /             binding compiler                  \
+       (                                                 )
+        \                                               /
+         ---\                                       /---
+             ------\                         /------
+                    -------------------------
+                                   |
+                                   |
+                                   |
+                                   |
+                                   |
+                                   |
+                                  \|/
+               +-------------------+----------------------+
+               |                                          |                      +--------------------------------------+
+               |                                          |                      |                                      |
+               |   java classes enhanced with bytecode to |                      |                                      |
+               |                                          |                     \|                                      |
+               |     perform marshalling/unmarshalling    |------uses------------+   JiBX runtime                       |
+               |                                          |                     /|                                      |
+               |   of the java classes to/from XML        |                      |                                      |
+               |                                          |                      |                                      |
+               |    according to the binding def. docs    |                      |                                      |
+               |                                          |                      |                                      |
+               |                                          |                      +--------------------------------------+
+               +------------------------------------------+
+
+
+
+
+preparation workflows (optional)
+--------------------------------
+
++-------------------+
+|                   |
+|                   |
+|  java sources     |
+|                   |
++--------+----------+
+         |
+-------------------
+(      javac       )
+-------------------
+         |
+        \|/
++--------+----------+                      +-----------------------------+
+|                   |                      |                             |
+|                   |    -------------     | binding definition          |
+|  java classes     |---(   BindGen   )----+                             |
+|                   |    -------------     |     documents               |
++-------------------+                      |                             |
+                                           +-----------------------------+
+
+-------------------------------
+
+                   +------------------------+
+                   |                        |
+                   |                        |
+                   |       XSD              |
+                   |                        |
+                   |                        |
+                   +------------------------+
+                             |
+                             |
+                            \|/
+                 ------------+--------------
+         -------/                           \-------
+      --/                                           \--
+     (                   CodeGen                       )
+      --\                                           /--
+         -------\                           /-------
+         |       ---------------------------      |
+         |                                        |
+         |                                        |
+         |                                        |
+         |                                        |
+         |                                        |
+        \|/                                      \|/
++--------+----------+                      +------+----------------------+
+|                   |                      |                             |
+|                   |                      | binding definition          |
+|  java sources     |                      |                             |
+|                   |                      |     documents               |
++-------------------+                      |                             |
+                                           +-----------------------------+
+
+
+
+Frontend classes / JARs:
+------------------------
+
+binding compiler: org.jibx.binding.Compile / support.jar,jibx-bind.jar
+
+runtime: ibx-run.jar, xpp3.jar
+
+BindGen: org.jibx.binding.generator.BindGen / jibx-tools.jar,jibx-bind.jar,jibx-schema.jar,jibx-run.jar
+
+CodeGen: org.jibx.schema.codegen.CodeGen / jibx-tools.jar,jibx-bind.jar,jibx-schema.jar,jibx-run.jar
+
+  </pre>
+
+  <a href="."> back to jibx </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

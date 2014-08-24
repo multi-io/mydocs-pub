@@ -1,0 +1,73 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./wwwpublish.d/index.templ </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">wwwpublish.d</a>/index.templ </h1>
+
+  <a href="index.templ">download original</a>
+
+  <pre>
+&lt;!-- -*- html -*- --&gt;
+
+&lt;% no strict 'refs'; no warnings; %&gt;
+
+&lt;% @parents=(); for ($curr=$dir; $curr; $curr=$curr-&gt;{PARENT}) { @parents = ($curr-&gt;{NAME}, @parents); } %&gt;
+
+&lt;head&gt;
+  &lt;title&gt; &lt;%= $dir-&gt;{PATH} %&gt; &lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;h1&gt; &lt;%= $nd=@parents; join("/", map {qq[&lt;a href="${\("../" x ($nd-- -1))}."&gt;$_&lt;/a&gt;]} @parents) %&gt; &lt;/h1&gt;
+
+    &lt;h2&gt;sub-directories&lt;/h2&gt;
+
+    &lt;% $sep = (@{$dir-&gt;{DIRS}}) &lt; 25? "&lt;br/&gt;":"&amp;nbsp;"; %&gt;
+
+    &lt;% foreach my $d (@{$dir-&gt;{DIRS}}) { %&gt;
+
+  &lt;a href="&lt;%= $d-&gt;{NAME} %&gt;"&gt; &lt;%= $d-&gt;{NAME} %&gt;/ &lt;/a&gt; &lt;%=$sep%&gt;
+    &lt;% } %&gt;
+
+    &lt;h2&gt;files&lt;/h2&gt;
+
+    &lt;% $sep = (@{$dir-&gt;{FILES}} &lt; 25)? "&lt;br/&gt;":"&amp;nbsp;"; %&gt;
+
+    &lt;% foreach my $f (@{$dir-&gt;{FILES}}) { %&gt;
+
+      &lt;a href="&lt;%= $f . (htmlizable($f)?".html":"") %&gt;"&gt; &lt;%= $f %&gt; &lt;/a&gt; &lt;%= $sep %&gt;
+    &lt;% } %&gt;
+
+
+&lt;% if ($dir-&gt;{PARENT}) { %&gt;
+   &lt;p/&gt;
+  &lt;a href=".."&gt; back to &lt;%= $dir-&gt;{PARENT}-&gt;{NAME} %&gt; &lt;/a&gt;
+&lt;% } %&gt;
+
+  &lt;p/&gt;
+
+  &lt;font size="-3"&gt;(C) 1998-&lt;%= 1900+(localtime())[5] %&gt; Olaf Klischat  &amp;lt;olaf.klischat@gmail.com&amp;gt; &lt;/font&gt;
+
+&lt;/body&gt;
+
+  </pre>
+
+  <a href="."> back to wwwpublish.d </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+Die API von Linux stellt Funktionen bereit, mit denen Programme
+Informationen in eine sog. Syslog ausgeben koennen (sowas aehnliches wie der
+Event-Viewer unter NT). Der Daemon syslogd faengt diese Ausgaben ab und leitet sie zentral in bestimmte
+Ausgabekanaele weiter.
+Welche das sind, wird in der Konfigurationsdatei /etc/syslog.conf
+festgelegt. Dabei wird zwischen verschiedenen Typen von Nachrichten (z.B. kernel, user, daemon, mail, ...)
+sowie verschiedenen Prioritaetsstufen (z.B. warning, error, alert, ...)
+unterschieden. Jedem Typ von Syslog-Nachricht laesst sich dabei eine andere
+Ausgabedatei zuordnen. Als Ausgabedateien sind auch Geraete aus /dev
+zulaessig, beispielsweise die verschiedenen Terminals /dev/tty*.
+Auch die Standard-Daemonen von Linux (z.B. fingerd, talkd, ...) machen von den
+Moeglichkeiten der Syslog Gebrauch. Hereinkommende finger - oder talk -
+Anfragen werden z.B. standardmaessig in /var/log/secure festgehalten (das ist
+in /etc/syslog.conf so voreingestellt).
+Eine besondere Moeglichkeit stellt das X-Programm xconsole dar. Es stellt in
+einem Fenster standardmaessig alle Ausgaben an das Geraet /dev/console dar
+(dahin werden normalerweise kernel-Nachrichten geschrieben), laesst sich ueber
+den Parameter -file aber auch dazu bringen, Änderungen an beliebigen Dateien
+mitzuprotokollieren.
+
+siehe auch:
+man syslog.conf
+man xconsole

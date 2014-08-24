@@ -1,0 +1,80 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/chained-method-aliases.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/chained-method-aliases.rb </h1>
+
+  <a href="chained-method-aliases.rb">download original</a>
+
+  <pre>
+class C
+
+  def self.uniquely_alias_method(m)
+    namebase = m.to_s; n=1
+    begin
+      name = "_#{namebase}_#{n}".intern
+      n += 1
+    end while method_defined?(name)
+    alias_method name, m
+    name
+  end
+
+  def meth
+    puts "m"
+  end
+
+  def wr1(wrapped_action)
+    puts "wr1 in"
+    self.send wrapped_action
+    puts "wr1 out"
+  end
+
+  def wr2(wrapped_action)
+    puts "wr2 in"
+    self.send wrapped_action
+    puts "wr2 out"
+  end
+
+  wrapped_method = uniquely_alias_method :meth
+
+  class_eval &lt;&lt;-EOS
+    def meth
+      wr1(:#{wrapped_method})
+    end
+  EOS
+
+  wrapped_method = uniquely_alias_method :meth
+
+  class_eval &lt;&lt;-EOS
+    def meth
+      wr2(:#{wrapped_method})
+    end
+  EOS
+
+
+end
+
+
+
+C.new.meth
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

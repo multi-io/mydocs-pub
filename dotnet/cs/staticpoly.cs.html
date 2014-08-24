@@ -1,0 +1,81 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./dotnet/cs/staticpoly.cs </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">dotnet</a>/<a href=".">cs</a>/staticpoly.cs </h1>
+
+  <a href="staticpoly.cs">download original</a>
+
+  <pre>
+using System;
+
+// C#-Generics haben keinen "statischen Polymorphismus" im C++-Sinn:
+
+namespace oklischat.cstest {
+
+    public interface FooHoster {
+        void foo();
+    }
+
+    public class FooHosterImpl1: FooHoster {
+        public void foo() {
+            Console.Out.Write("foo called on {0}\n", this);
+        }
+    }
+
+    public class FooCaller&lt;T&gt; where T: FooHoster, new() {  //ohne das Constraint (where T: FooHoster) compilierts net
+                                                           //(error CS0117: `T' does not contain a definition for `foo')
+        private T t;
+
+        public FooCaller(T t) {
+            this.t = t;
+        }
+
+        public void callfoo() {
+            t.foo();
+        }
+
+        public T createT() {
+            return new T();
+        }
+    }
+
+    public class StaticPoly {
+        public static void Main(string[] args) {
+            FooHosterImpl1 fh = new FooHosterImpl1();
+            FooCaller&lt;FooHosterImpl1&gt; fc = new FooCaller&lt;FooHosterImpl1&gt;(fh);
+            fc.callfoo();
+            fc.createT().foo();
+        }
+    }
+}
+
+
+//Grund wahrscheinlich: Implementation von staischem Polymorphismus
+//wäre nur möglich mit Laufzeit-"Code-Bloat" (Codegenerierung für
+//jedes T, mit dem FooCaller&lt;T&gt; instanziiert wird). C# generiert aber
+//nur einmal Code für alle Instanziierungen von FooCaller&lt;T&gt; mit
+//_Referenztypen_ T. Dieser Code müsste den t.foo()-Aufruf dann über
+//Reflection implementieren (da über T nix bekannt wäre), was nicht
+//getan wird.
+
+  </pre>
+
+  <a href="."> back to cs </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

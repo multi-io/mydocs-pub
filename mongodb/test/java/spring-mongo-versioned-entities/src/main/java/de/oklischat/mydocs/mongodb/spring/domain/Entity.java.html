@@ -1,0 +1,58 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./mongodb/test/java/spring-mongo-versioned-entities/src/main/java/de/oklischat/mydocs/mongodb/spring/domain/Entity.java </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../../../../../../../../../.">.</a>/<a href="../../../../../../../../../../../../.">mongodb</a>/<a href="../../../../../../../../../../../.">test</a>/<a href="../../../../../../../../../../.">java</a>/<a href="../../../../../../../../../.">spring-mongo-versioned-entities</a>/<a href="../../../../../../../../.">src</a>/<a href="../../../../../../../.">main</a>/<a href="../../../../../../.">java</a>/<a href="../../../../../.">de</a>/<a href="../../../../.">oklischat</a>/<a href="../../../.">mydocs</a>/<a href="../../.">mongodb</a>/<a href="../.">spring</a>/<a href=".">domain</a>/Entity.java </h1>
+
+  <a href="Entity.java">download original</a>
+
+  <pre>
+package de.oklischat.mydocs.mongodb.spring.domain;
+
+import java.io.Serializable;
+
+public abstract class Entity implements Serializable {
+	
+	private static final long serialVersionUID = 3138830653909397166L;
+
+	private String id;
+	private Integer version = null;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+
+}
+
+  </pre>
+
+  <a href="."> back to domain </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,326 @@
+C# 2, see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-334.pdf
+
+- imperative language, Java-like syntax
+
+- distinguishes between statements and expressions
+
+- preprocessor similar to the one in C/C++, but without parameterized
+  macros (simple #defines are supported)
+
+- reference/value types, boxing, unboxing, ref parameters, out
+  parameters
+
+  - classes, delegates, arrays are reference types; structs and enums
+    are value types
+
+  - "object" base type of all types, even value types
+
+- "decimal" type (28 decimal digits represented without rounding
+  errors)
+
+- range exceedance on integral types may be handled by either throwing
+  an exception or overflowing, depending on the current "overflow
+  checking context", which is set by the "checked"/"unchecked"
+  statement and expression
+
+   int i=9999999;
+   [un]checked { i*=i; }  //statement
+   i = [un]checked ( i*i );  //expression
+
+- only unchecked exceptions (which is probably a good thing)
+
+  - resource managament / implicit finalization with
+
+     using (ClassImplementingIDisposable o = ...)  { doSomething();... }
+       //always calls o.Dispose() when exiting
+       // (locally or nonlocally) the block
+
+- goto is supported :-)
+
+- classes (single inheritance) and interfaces (multiple inheritance),
+  as in Java
+
+  - "static" (uninstantiatable) classes
+
+     static class C { ... }
+
+- like in Java and C++, classes and methods are not real first-class
+  citizens...
+
+  - "new" is still a predefined (and non-overridable) operator, not a
+    method of the class object as it should be[tm]
+
+- compile-time constants (fields or in block-local scope) defined
+  using "const"
+
+  - no C++ - like "const" methods
+
+- initialization-time constants defined using "readonly" (similar to
+  "final" in Java). Not supported for local variables, parameters or
+  return values :-\
+
+- variable parameter lists: void foo(T1 p1, params T2[] t2s);
+
+- implicit and explicit type conversions: e.g. byte->int is implicit,
+  int->byte is explicit (requires a cast). Generally, conversions are
+  implicit iff the target type's range is a superset of the source
+  type's range
+
+  - can be defined on user-def'd classes/structs using
+    [implicit|explicit] operator OtherType() {....}
+
+- properties
+
+  - allow defining getters and setters for syntactically field-like
+    accesses
+
+     class C { public SomeType foo { get {...} set {..} } }
+
+     C c = ...; SomeType aSomeType = c.foo; c.foo = aSomeType;
+
+    In the setter, "value" is bound to the value to be set.
+
+- "operator overloading" similar to C++
+
+  - i.e. pre-defined operators (+, -, ==, !=, *, /, <<, >>, [] etc.),
+    no user-definable operators / infix functions, no user-definable
+    precedence rules
+
+  - index operator (foo[i]) defined as a special property ("indexer"):
+
+     public SomeType this[i] { get {...} set {..} }
+
+- Java's "super" is called "base"
+
+- type definitions may be spread over multiple files
+
+   partial class C {...}  ... partial class C {...}
+
+- a "delegate" is a method pointer type
+
+  - e.g. delegate void MyEventType(int arg1, double arg2)
+
+  - the class of the method the method pointer points to is not part
+    of the delegate
+
+  - instances point to a method, i.e. they hold object+method (if they
+    point to instance methods) or just method (if they
+    point to class methods)
+
+  - actually, a delegate is a subclass of System.Delegate
+
+  - an instance of a delegate is called a "delegate instance"
+
+  - e.g. (with the "MyEventType" declaration above)
+
+     public void handler(int arg1, double arg2) {...}  //fcn definition
+
+     //define instance of the delegate, point it to handler
+     MyEventType methPointer = new MyEventType(handler);
+     //call it
+     methPointer(100,33.332);
+
+  - a delegate instance can also be defined to point to an anynymous,
+    inline-defined function, e.g.
+
+     MyEventType methPointer = delegate(int i, double d) {....}
+
+    the block is a closure, i.e. it captures all variables accessible
+    at the definition point (exceptions: ref and out parameters,
+    "this" in struct methods)
+
+  - QU: shouldn't there really be a generic, instantiatable "delegate"
+    type? e.g. Delegate<int,double> d = handler; d(100,33.332);
+        
+
+- an "event" is an object that's parameterized with a delegate and
+  holds a list of instances of the delegate (i.e. a list of method
+  pointers) which are called when the event is called
+
+  - e.g. (with the "MyEventType" and "handler" from above)
+
+     public event MyEventType myevt;  //definition of the event
+     ...
+     myevt += new MyEventType(handler);  //add delegates to the event
+     myevt += new MyEventType(someobj.handler);
+
+     myevt(42, 23.55); //call the event (calls all delegates in turn)
+
+- explicit interface members... (see ecma-334, §8.9)
+
+- type and namespace aliases:
+
+  - e.g.
+
+     using MyNS = some.namespace;
+     using MyType = SomeType;
+     using MyType = some.namespace.SomeType;
+
+- methods can be explicitly declared to override or hide a method with
+  the same name in a base class
+
+  - overriding:
+
+     public override void method(...) {...}
+
+  - hiding:
+
+     public new void method(...) {...}
+
+  this helps the compiler find typos, and also facilitates binary
+  compatibility (in cases where name clashes might arise when new
+  methods are later added to the base class)
+
+- "extern aliases" set up separate namespace roots. I.e. there can be
+  more than one namespace hierarchy in the same program. This helps
+  resolving conflicts that would arise if one wants to use several
+  disjunct types from separate assemblies, and all those types have
+  the same fuilly-qualified name
+
+  e.g.
+
+   extern alias X;  
+   extern alias Y;  
+
+   X::some.ns.Type t1;  //or X.some.ns.Type t1;
+   Y::some.ns.Type t2;  //dito
+
+  at link time, the aliases ("X", "Y") are bound to specific
+  assemblies, e.g.
+
+   csc /r:X=a1.dll /r:Y=a2.dll test.cs
+
+- attributes
+
+  - allow user-defined declarative pieces of information to be
+    attached to types or methods
+
+  - e.g.
+
+     //attribute definition
+     [AttributeUsage(AttributeTargets.All)]  //(attr. usage during definition)
+     public class HelpAttribute: Attribute
+     {
+         public HelpAttribute(string url) {
+             this.url = url;
+         }
+
+         public string Topic = null;
+
+         private string url;
+
+         public string Url {
+            get { return url; }
+         }
+     }
+
+     //attribute usage
+     [Help("http://www.mycompany.com/~/Class1.htm")]
+     public class Class1
+     {
+         [Help("http://www.mycompany.com/~/Class1.htm", Topic = "F")]
+         public void F() {}
+     }
+
+  - for each attribute usage, the compiler generates a
+    machine-readable association between the attribute object and the
+    class/method it is attached to. This information can later be
+    queried via reflection. Otherwise, attributes are "passive",
+    i.e. it's not possible to directly define any actions that should
+    take place at attribute usage time (as it could be done in more
+    dynamic languages like Lisp/Ruby etc.). Thus, attributes are
+    mainly useful for providing hints to automatic postprocessors or
+    development tools.
+
+
+- generics (types (and methods) parameterized with types)
+
+  - syntax roughly like templates in C++
+
+  - "constraints" may be declared which the parameter types must
+    comply to
+
+    - e.g. "must implement interface I":
+
+       class MyType<T> where T: I { .... }
+
+      compiler only accepts operations on T that can be statically
+      proven to work with all possible instantiations of T (i.e. there
+      is no "static polymorphy" in the C++ sense -- you can't do "T
+      t=...; t.SomeMethod();" unless "SomeMethod" is defined in I (or
+      object))
+
+      - this also applies when there is no explicit constraint
+        definition (e.g. just class MyType<T> {...}), i.e. in this
+        case you can only perform operations on instances of T that
+        are allowed on any objects
+
+    - compromise: bloat vs. performance:
+
+      the compiler only generates one real implementation of "MyType"
+      for all instantiations of MyType<T> with reference types T (it
+      can easily do this because of the mentioned absence of static
+      polymorphy). However, a separate, optimized implementation of
+      "MyType" *is* generated for each instantiation of MyType<T> with
+      a value type T.
+
+    - possible kinds of constraints: only "must implement
+      interface/class", specified separately for each type parameter
+
+- iterators
+
+  - special case (probably the most common one) of a coroutine
+
+     using System.Collections.Generic;
+
+     public IEnumerable<int> SomeNumbers() {
+         yield return 42; yield return 23; yield break;
+     }
+
+     foreach (int i in SomeNumbers()) { Console.WriteLine("{0}",i); }
+
+     //=> outputs 42\n23\n
+
+    As a special convenience (?), a class can be made "enumerable" by
+    having it implement IEnumerable<SomeType> and and define public
+    IEnumerator<SomeType> GetEnumerator().
+
+    I guess providing general coroutines was deemed too scary...
+
+- value types are "nullable"
+
+  - for each value type T there is a "nullable" type T? whose range is
+    that of T plus null
+
+  - check for whether an instance t of T is currently null: t.HasValue
+    (t==null does the same thing unless operator== was overwritten)
+
+  - for each defined conversion S->T from a value type S to a value
+    type T, the compiler generates "lifted" conversions S?->T?, S->T? 
+    which are "null-propagating" (the result is null if the input was
+    null), and an explicit conversion S?->T which requires a cast and
+    throws a runtime exception if the input was null. Similarly, the
+    compiler generates "lifted", null-propagating versions of
+    non-comparison operators (+, - etc.). Comparison operators
+    (==,!=,>,<,<=,>=) are defined such that null is equal to null and
+    unequal to any non-null value. Also, <,>,<=,>= return false if one
+    or both operands are null (which apparently means that these
+    operations are no longer ordering relations on nullable types --
+    is that a problem?)
+
+  - null coalescing operator "??": provides a kind of
+    shortcut-evaluated "or" for nullable and reference types. The
+    expression "a ?? b", where a has a nullable or reference type and
+    A is the type of a and B is the type of B, evaluates to a if a is
+    non-null, and to b otherwise. The type of the expression is A\null
+    (i.e. the "un-nulled" type of a) -- there must be an implicit
+    conversion from B to A\null. This operator may be used to provide
+    a default value in case the left operand is null.
+
+    E.g.
+
+     int? a = ...;
+     int x = a ?? 42;  //same as int x = a.HasValue? (int)a : 42;
+
+    ?? is right-associative, i.e. e1 ?? e2 ?? ... ?? en evaluates to
+    the first ex that is not null (or to null if all ex are null)

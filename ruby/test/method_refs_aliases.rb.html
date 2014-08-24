@@ -1,0 +1,115 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/method_refs_aliases.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/method_refs_aliases.rb </h1>
+
+  <a href="method_refs_aliases.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+class C
+
+  def m1
+    print "m1\n"
+  end
+
+  def m2
+    print "m2, calling m1\n"
+    m1
+  end
+end
+
+
+
+c=C.new
+
+c.m2
+
+
+
+class C
+
+  def m1
+    print "m1 rewritten\n"
+  end
+
+
+  def m3
+    print "m3, calling m1_old\n"
+    m1_old
+  end
+    
+end
+
+c.m2
+
+
+# output so far:
+#
+# m2, calling m1
+# m1
+# m2, calling m1
+# m1 rewritten
+#
+# =&gt; method reference (from m2 to m1) is "by name",
+#    not "by code reference", unless m1 was
+#    somehow replaced "in place"
+
+begin
+  c.m3
+rescue =&gt; detail
+  print detail.message+":\n"+detail.backtrace.join("\n")+"\n"
+end
+
+class C
+
+  alias_method :m1_old, :m1
+
+  def m1
+    print "m1 new, calling m1 old\n"
+    m1_old
+  end
+
+end
+
+
+c.m2
+
+c.m3
+
+# further output:
+#
+# m3, calling m1_old
+# undefined local variable or method `m1_old' for #&lt;C:0x402a5e90&gt;:
+# ./method_aliases.rb:32:in `m3'
+# ./method_aliases.rb:52
+# m2, calling m1
+# m1 new, calling m1 old
+# m1 rewritten
+# m3, calling m1_old
+# m1 rewritten
+#
+# =&gt; definetely rules out the "by code reference" hypothesis
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

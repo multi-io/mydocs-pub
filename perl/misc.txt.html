@@ -1,0 +1,66 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">perl</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+  DB&lt;48&gt; $a=42
+
+  DB&lt;49&gt; x $a
+0  42
+  DB&lt;50&gt; x ${'a'}
+0  42
+  DB&lt;51&gt; $name='a'
+
+  DB&lt;52&gt; x ${$name}
+0  42
+  DB&lt;53&gt; x 'lalala' =~ /(.)/g
+
+
+Funktioniert aber nicht mit lexikalischen Variablen ("my"), nur mit
+Package-Variablen ("our", was noch?). Für "my"-Variablen "eval"
+benutzen, d.h.
+
+  DB&lt;69&gt; x eval("\$$name")
+0  42
+  DB&lt;70&gt; 
+
+
+-------------------
+
+Einige globale Variablen werden offenbar speziell behandelt: Ihr Name
+bezeichnet immer die entspr. Variable im Package main, es sei denn,
+man gibt explizit was anderes an.
+
+  DB&lt;74&gt; package pkg; print *ARGV;
+*main::ARGV
+  DB&lt;73&gt; package pkg; print *FOOBAR;
+*pkg::FOOBAR
+  DB&lt;75&gt; print *pkg::ARGV;
+*pkg::ARGV
+
+Siehe perlvar, da ist es dokumentiert.
+
+  </pre>
+
+  <a href="."> back to perl </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

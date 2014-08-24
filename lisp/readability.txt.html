@@ -1,0 +1,116 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./lisp/readability.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">lisp</a>/readability.txt </h1>
+
+  <a href="readability.txt">download original</a>
+
+  <pre>
+;; This module provides a general mechanism for setting properties on
+;; matched windows as they're created. It removes much of the need for
+;; manually creating functions to put in before-add-window-hook.
+
+;; For example, doing:
+
+;;	(add-window-matcher 'WM_CLASS "Term" '(place-mode . interactive))
+
+;; makes all terminal windows be placed interactively. Or even better:
+
+;;	(add-window-matcher 'WM_CLASS "Netscape/Navigator"
+;;			    '(ignore-program-position . t))
+
+;; makes netscape windows a lot easier to live with.
+
+
+  ;; List of (MATCH-ELTS . ACTION-ELTS)
+  ;; Each MATCH-ELT is (PROP . REGEXP or NUMBER or SYMBOL)
+  ;; Each ACTION-ELT is (PROP . VALUE)
+  (defcustom match-window-profile nil
+    nil
+    :type match-window
+    :group match-window
+    :require sawfish.wm.ext.match-window)
+
+
+;; (Sawfish match-window.jl)
+
+  (define (add-window-matcher prop value #!rest actions)
+    (catch 'out
+      (let
+	  ((pair (cons prop value))
+	   (add-to (lambda (slot)
+		     (mapc (lambda (action)
+			     (let
+				 ((tem (assq (car action) (cdr slot))))
+			       (if tem
+				   (rplacd tem (cdr action))
+				 (rplacd slot (cons action (cdr slot))))))
+			   actions))))
+	;; does the list already contain a (PROP . VALUE) pair?
+	(mapc (lambda (cell)
+		(when (member pair (car cell))
+		  (add-to cell)
+		  (throw 'out t)))
+	      match-window-profile)
+	;; no
+	(setq match-window-profile (cons (list (cons pair nil))
+					 match-window-profile))
+	(add-to (car match-window-profile)))))
+
+
+
+# 1-to-1 translation (admittedly, the structure of the original code's
+#   "match-window-profile" appears to be exceptionally stupid)
+
+%match_window_profile = (
+   [[WM_CLASS, "Term"], [WND_TITLE, "MyApp"]] =&gt; [[ignore-program-position, 1], [foo,42]],
+   [[WM_CLASS, "Lalala"]] =&gt; [[ignore-program-position, 0]],
+   [[WND_TITLE, "Netscape"], ] =&gt; [[sticky,1], [cyclable,0]],
+);
+
+sub add_window_matcher {
+    my ($prop, $value, @actions) = @_;
+    #....
+}
+
+
+################
+
+# sane translation
+
+#%match_window_profile = (
+#   [WM_CLASS, "Term"] =&gt; $VAR1={ignore-program-position=&gt;1, foo=&gt;42},
+#   [WND_TITLE, "MyApp"] =&gt; $VAR1,
+#   [WM_CLASS, "Lalala"] =&gt; {ignore-program-position=&gt;0},
+#   [WND_TITLE, "Netscape"] =&gt; {sticky=&gt;1, cyclable=&gt;0},
+#);
+
+sub add_window_matcher {
+    my ($prop, $value, %actions) = @_;
+    foreach my $k (keys %actions) {
+        $match_window_profile{[$prop,$value]}-&gt;{$k} = $actions{$k};
+    };
+}
+## doesn't work -- arrays as hash keys don't work...
+
+  </pre>
+
+  <a href="."> back to lisp </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

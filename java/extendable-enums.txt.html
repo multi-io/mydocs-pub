@@ -1,0 +1,56 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/extendable-enums.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">java</a>/extendable-enums.txt </h1>
+
+  <a href="extendable-enums.txt">download original</a>
+
+  <pre>
+05:18 &lt; multi_io&gt; I have another feature request: make enums extendable :-P
+05:18 &lt; ojacobson&gt; multi_io: er.  no.  ew.  don't do that.
+05:19 &lt; r0bby&gt; multi_io: People are going to think you're on crack.
+05:19 &lt; multi_io&gt; why?
+05:19 &lt; Woflborg&gt; multi_io: since you do not bow down and worship the javaness 
+                  as it is!
+05:19 &lt; Woflborg&gt; multi_io: gods by definition are perfect.
+05:19 &lt; ojacobson&gt; switch (someEnum) that satisfies all possible values of 
+                   someEnum's direct class may not satisfy all (or even most) 
+                   values of someEnum's class's descendants
+05:19 &lt; ojacobson&gt; that's an important part of "being an enumeration"
+05:21 &lt; ojacobson&gt; If I wanted a reference type that could have values I don't 
+                   know about I wouldn't have created an enumeration.
+05:21 &lt; multi_io&gt; you have an EventBase class with a method EventBase.Kind 
+                  getKind() where EventBase.King is an enum { foo, bar }, and 
+                  then sub-event classes that want to define additional kinds 
+                  of events...
+05:21 &lt; multi_io&gt; ojacobson: ok, point taken
+05:22 &lt; ojacobson&gt; (I might have used the old "typesafe enum" pattern with a 
+                   protected c'tor and heavy documentation.)
+05:22 &lt; ojacobson&gt; (Or I might just have used a class or interface. :)
+05:22 &lt; multi_io&gt; ojacobson: I did just that
+05:22 &lt; multi_io&gt; there's no other way, basically
+05:29 &lt; ojacobson&gt; (Personally I think enum itself is a little bit of a wart, 
+                   but then, I don't use it much.  I think I've written three 
+                   of them.)
+
+  </pre>
+
+  <a href="."> back to java </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

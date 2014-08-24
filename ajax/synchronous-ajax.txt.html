@@ -1,0 +1,89 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ajax/synchronous-ajax.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ajax</a>/synchronous-ajax.txt </h1>
+
+  <a href="synchronous-ajax.txt">download original</a>
+
+  <pre>
+12:30 -!- multi_io [n=olaf@rosa.physik-pool.TU-Berlin.DE]
+12:30 -!-  ircname  : Olaf Klischat
+12:30 -!-  channels : #xorg-devel #math #emacs ##javascript #physics
+12:30 -!-  server   : brown.freenode.net [Madison, WI, US]
+12:30 -!-           : is identified to services
+12:30 -!-  idle     : 0 days 16 hours 34 mins 15 secs [signon: Sat Feb 24 11:44:00 2007]
+12:30 -!- End of WHOIS
+
+
+19:29 &lt; multi_io&gt; am I right in assuming that there's no way to implement a JS function that fetches and
+                  returns a web page using Ajax? (because XMLHttpRequest can only be used asynchronously, and
+                  the JS engine is single-threaded)
+19:29 &lt; phpboy&gt; multi_io: it is possible
+19:30 &lt; phpboy&gt; VERY possible... lemme paste you a link to help.. hang 10...
+19:30 &lt; multi_io&gt; well, it can be used synchronously, but on some browsers the synchronous call appears to
+                  return before the request is complete
+19:30 &lt; phpboy&gt; multi_io: http://prototype.conio.net/ &lt;--- that should get you started, if I understand what
+                you wanna do correctly
+19:34 &lt; multi_io&gt; phpboy: after skimming http://www.prototypejs.org/learn/introduction-to-ajax , I'd say that
+                  that library only has an an asynchronous programming model, so it wouldn't get around the
+                  problem
+
+
+19:44 &lt; multi_io&gt; there's no sleep() function in JS that allows events to be processed while it blocks, is
+                  there?
+
+
+19:46 &lt; chupacabra2&gt; multi_io: setTimeout. Create an anonymous function that would finish your processing job,
+                     and setTimeout it for whatever amount of time you want
+19:47 &lt; multi_io&gt; chupacabra2: I know setTimeout, but that's not what I want, because it's asynchronous
+19:48 &lt; chupacabra2&gt; multi_io: but how can you have synchronous and "allow events to be processed"?
+19:48 &lt; chupacabra2&gt; multi_io: "allow events to be processed" is asynchronous by definition :)
+19:48 &lt; multi_io&gt; not necessarily
+19:48 &lt; multi_io&gt; it could switch stacks internally
+19:49 &lt; chupacabra2&gt; multi_io: Please elaborate on what result you want to get :)
+19:49 &lt; multi_io&gt; think of functions like messageBox() or getMessage() in GUI APIs, if you've ever used those
+19:50 &lt; chupacabra2&gt; Ah - they fire away, your main execution flow is blocked, but other stuff may happen.
+                     Whenever "something" occurs, your main execution flow takes place again. Like that?
+19:50 &lt; multi_io&gt; messageBox("Hello!") displays the box and blocks until the user has clicked OK, but still,
+                  events are processed while the box is displayed
+19:51 &lt; multi_io&gt; there are different strategies to implement that, even when using only a single thread
+19:51 &lt; chupacabra2&gt; Yea, doing that right now. Lots of callbacks ;)
+19:52 &lt; multi_io&gt; one would be that messageBox() again polls the event queue internally and runs your event
+                  handlers (so they're executed on the same call stack as the messageBox() call)
+19:52 &lt; chupacabra2&gt; But how does one apply that to sleep()? (which does not need to return a result, and
+                     which should sleep for some fixed time and does not react to anything happening)
+19:53 &lt; multi_io&gt; stop polling the event queue when the sleep time has run out
+19:54 &lt; chupacabra2&gt; So setTimeout is not acceptable, since things
+                     might come out of setTimeout in wrong order?
+19:54 &lt; multi_io&gt; setTimeout is acceptable, but it'S more inconvenient to use
+19:54 &lt; multi_io&gt; asynchronous programming is inconvenient
+19:54 &lt; fatbrain&gt; javascript is synchronous by nature
+19:55 &lt; multi_io&gt; it's essentially impossible to implement something like
+                  pageContent=fetchPage("http://myhost.com/x/y")
+19:56 &lt; chupacabra2&gt; multi_io: you can, if they ship their data as JS file
+19:56 &lt; chupacabra2&gt; otherwise, xss will stop you
+19:56 &lt; multi_io&gt; you'd always have a programming model like asyncFetchPage("http://myhost.com/x/y",
+                  function(pageContent){.....})
+19:57 &lt; chupacabra2&gt; multi_io: yea
+
+  </pre>
+
+  <a href="."> back to ajax </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

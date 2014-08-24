@@ -1,0 +1,19 @@
+(heuristic approach)
+
+example: http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/index.html
+
+
+1.
+
+wget http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/index.html
+
+
+
+2.
+
+cat index.html | perl -ne 'for (m!href="(.*?)[#"]!ig) { print $_, "\n" unless($found{$_}); $found{$_}=1; }' >files.txt
+
+
+3.
+
+cat files.txt | xargs -i /bin/sh -c 'html2ps http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/{} | lpr -Pbw717pap2'

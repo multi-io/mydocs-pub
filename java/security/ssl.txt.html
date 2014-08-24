@@ -1,0 +1,126 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/security/ssl.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">java</a>/<a href=".">security</a>/ssl.txt </h1>
+
+  <a href="ssl.txt">download original</a>
+
+  <pre>
+http://www.heise.de/foren/go.shtml?read=1&amp;msg_id=7636447&amp;forum_id=44545
+
+18. März 2005 4:39
+Re: SSL Connection?
+Olaf Klischat
+
+ManiacC schrieb am 16. März 2005 12:02
+
+&gt; Hey,
+&gt;
+&gt; einfache frage: wie baue ich eine SSL Verbindung zu einem server auf?
+&gt; Ich versuche es mit ClientHttpRequest, aber sobald ich post() aufrufe
+&gt; bekomme ich eine sslhandshakeexception.
+&gt; Also muss ich dazu irgentwie nen 'handshake ausführen'?
+
+Offenbar willst du nicht nur einfach eine SSL-Verbindung aufmachen,
+sondern dann auch HTTP darüber laufen lassen (und dort dann
+File-Uploads machen). HTTP und SSL sind zwei komplett verschiedene
+Dinge, allerdings sieht eine SSL-Verbindung für die darüberliegenden
+Schichten genauso aus wie eine normale TCP-verbindung, sodass man
+problemlos HTTP (genauso wie jedes andere TCP-basierte Protokoll)
+drüber laufen lassen kann -- das heißt dann "HTTPS".
+
+Eine TCP-artige Verbiundung (ob mit oder ohne SSL) wird in Java in
+einer Instanz der Klasse java.net.Socket (oder einer von deren
+Subklassen) gekapselt.
+
+Du hast also zwei Probleme:
+
+1. Eine SSL-Verbindung zu einem Server herstellen (und die Verbindung
+in ein java.net.Socket kapseln)
+
+2. Über ein gegebenes java.net.Socket HTTP machen.
+
+
+Zu 1.: SSL benutzt Public-Key-Kryptographie, wobei meistens nur in
+eine Richtung authentifiziert wird (der Server authentifiziert sich
+gegenüber dem Client). Das geht so, dass der Server dem CLient ein
+"Zertifikat" präsentiert, dem der Client vertraut (oder auch nicht).
+Wenn der Client dem Zertifikat vertraut, überprüft er mit einem
+speziellen Verfahren (Challenge-Response...), ob der Server
+tatsächlich dieses Zertifikat besitzt. Ist die Überprüfung
+erfolgreich, wird die Verbindung aufgebaut. Das ganze Prozedere nennt
+man "Handshake". Ist alles schon komplett in der
+Java-Standardbibliothek implementiert. Was man noch selbst tun muss,
+ist, sagen, dass man dem Zertifikat des gewünschten Servers xyz.com
+vertraut. Bei Zertifikaten, die von der Java-Bibliothek bekannten
+"certificate authorities" wie Verisign, Thawte etc. unterschrieben
+sind, ist das automatisch der Fall. Dann kriegt man das Socket
+einfach mit
+
+Socket s = SSLSocketFactory.getDefault().createSocket("xyz.com",443);
+((SSLSocket) s).startHandshake();
+
+Andernfalls muss man dem Zertifikat manuell vetrauen, indem man es in
+eine Java-Keystore-Datei importiert und diese dem JDK bekannt macht.
+Dazu kann man das Zertifikat herunterladen udn in einer Datei
+speichern (z.B. mit "openssl s_client -host xyz.com -port 443" -- und
+dann den "CERTIFICATE"-Abschnitt rauskopieren), und diese mit
+"keytool -import -rfc -file diedatei -keystore servercert.jks" in die
+erwähnte Java-Keystore-Datei (servercert.jks) umwandeln. Anschließend
+macht man diese Datei dem System bekannt und erzeugt das Socket. In
+etwa (aus altem Projekt, ungetestet):
+
+//servercert.jks ist die Datei mit dem Keystore
+
+KeyStore keystore = KeyStore.getInstance("JKS");
+keystore.load(new FileInputStream("servercert.jks"),
+"passwort".toCharArray());
+
+TrustManagerFactory tmf =
+TrustManagerFactory.getInstance("SunX509","SunJSSE");
+tmf.init(keystore);
+
+SSLContext sslc = SSLContext.getInstance("SSLv3");
+sslc.init(null, tmf.getTrustManagers(), null);
+Socket s = sslc.getSocketFactory().createSocket("xyz.com",443);
+((SSLSocket) s).startHandshake();
+
+
+Einzelheiten sind z.B. hier zu finden:
+
+http://java.sun.com/products/jsse/doc/guide/API_users_guide.html
+
+
+
+Zu 2.: Man sollte meinen, dass die von dir erwähnten Klassen
+(HttpClientRequest) für sowas geeignet sind. Als ich mich letztmalig
+damit auseinandergesetzt habe, waren sie das aber eher nicht. Die
+Schnittstellen sind äußerst -- ähm -- bescheiden designt; man hat
+irgendwie keine explizite Kontrolle über HTTP-Requests und
+-Responses. Für einfache Sachen (HTML-Seite laden) reicht es noch;
+für das, was du vorhast (Uploads), solltest du wohl eher die hier
+schon erwähnten Bibliotheken aus dem Apache-Prjekt oder was anderes
+benutzen (oder HTTP selber implementieren -- so kompliziert ist das
+garnicht).
+
+  </pre>
+
+  <a href="."> back to security </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

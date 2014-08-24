@@ -1,0 +1,372 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./apt/apt-build.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">apt</a>/apt-build.txt </h1>
+
+  <a href="apt-build.txt">download original</a>
+
+  <pre>
+things done during a successful run of
+
+apt-build install pkg [pkg...] :
+
+cd /var/cache/apt-build/build/
+
+for each pkg {
+    $pkg_version = "Candidate:" from apt-cache policy &lt;pkg&gt;
+    $src_version = first "Verson:" from apt-cache show &lt;pkg&gt;
+    $src_name = last "Source:" from apt-cache show &lt;pkg&gt; where "Version:" is $pkg_version
+                  (actually, (new AptPkg::Source '/etc/apt/sources.list')-&gt;{&lt;pkg&gt;}-&gt;[xx]-&gt;{Package},
+                   which should be the same thing)
+    $deb_file = "&lt;pkg&gt;_$pkg_version_&lt;i386 or whatever architecture&gt;.deb";
+                   ($pkg_version is taken without a possible &lt;number&gt;: ("Epoch") at the beginning)
+
+    if /var/cache/apt-build/build/$deb_file exists and --rebuild was not given
+    {
+	    print "Package $pkg_name already built.";
+	    push(@pkgs, $deb_file);
+	    move_to_repository(@pkgs);
+	    build_repository();
+    }
+    else, if /var/cache/apt-build/repository/$deb_file exists and --rebuild was not given
+    {
+	    print "Package $pkg_name already in repository.";
+	    push @pkgs, $deb_file;
+    }
+    else 
+    {
+        push @pkgs, $deb_file;  
+
+        apt-get @apt_args build-dep &lt;pkg&gt;
+        apt-get @apt_args update   if --noupdate was not given
+	apt-get @apt_args source &lt;pkg&gt;=$src_version
+
+        $upver = $AptPkg::Config::_config-&gt;system-&gt;versioning-&gt;upstream($src_version)
+        $maintver = [everything behind "$upver-" in $src_version, if anything]
+
+           e.g. with $src_version = '2.8.20-3', $upver is 2.8.20, $maintver is 3
+
+        # build($src_name, $upver, $maintver)
+
+        cd /var/cache/apt-build/build/$src_name-$upver
+        apply patch(es) specified with --patch &lt;file&gt;, if any
+        dpkg-buildpackage -b -us -uc   (overridable with --build_command)
+        debclean unless --nocleanup was given
+
+        mv /var/cache/apt-build/build/*.deb /var/cache/apt-build/repository/
+	#&amp;build_repository;
+        cd /var/cache/apt-build/repository/
+        my $arch = $_config-&gt;get("APT::Architecture");
+
+        (following cmds only run if respective files don't exist yet)
+        ln -s . main
+        ln -s . apt-build
+        ln -s . dists
+        ln -s . binary-&lt;i386 or...&gt;
+        make_release_file()
+
+        apt-ftparchive packages . | gzip -9 &gt; Packages.gz
+
+        cd /var/cache/apt-build/build
+
+
+        if --remove-builddep was given,
+           apt-get @apt_args remove &lt;packages installed during apt-get
+                                     @apt_args build-dep &lt;pkg&gt; above&gt;
+
+          TODO: the list of those packages is (or should be) filled
+                into @builddep by sub builddep, but IMHO that fcn is
+                buggy and fails to fill the @builddep array. Haven't
+                tested it though
+
+    }
+
+
+}
+
+if --build-only was not given
+{
+    apt-get @apt_args update  unless --noupdate was given
+    apt-get -t apt-build @apt_args install pkg [pkg...]  (pkgs given on cmdline)
+}
+
+
+
+Most convenient call is probably
+
+apt-build --noyes --noupdate --nocleanup install pkg [pkg...]
+
+ (asks before deleting packages, doesn't run apt-get update, doesn't
+  clean the object files after build)
+
+
+
+
+
+tack:/usr/local/src# apt-build install libgtk2.0-0 libglib2.0-0 libpango1.0-0
+-----&gt; Installing build dependencies (for gtk+2.0) &lt;-----
+Reading package lists... Done
+Building dependency tree... Done
+The following NEW packages will be installed:
+  chrpath gnome-pkg-tools
+The following held packages will be changed:
+  chrpath gnome-pkg-tools
+0 upgraded, 2 newly installed, 0 to remove and 1238 not upgraded.
+Need to get 29.9kB of archives.
+After unpacking 160kB of additional disk space will be used.
+E: There are problems and -y was used without --force-yes
+E: Failed to process build dependencies
+-----&gt; Updating package lists &lt;-----
+Ign file: apt-build Release.gpg
+Get:1 file: apt-build Release [89B]
+Ign file: apt-build/main Packages
+Get:2 http://tick testing Release.gpg [189B]
+Get:3 http://tick unstable Release.gpg [189B]
+Get:4 http://tick testing/updates Release.gpg [189B]
+Get:5 http://tick etch Release.gpg [189B]
+Get:6 http://tick sid Release.gpg [189B]
+Get:7 http://tick testing Release.gpg [189B]
+Ign http://tick binary/ Release.gpg
+Ign http://tick source/ Release.gpg
+Get:8 http://tick testing Release.gpg [189B]
+Get:9 http://tick unstable Release.gpg [189B]
+Hit http://tick testing Release
+Hit http://tick unstable Release
+Hit http://tick testing/updates Release
+Get:10 http://tick etch Release [5560B]
+Hit http://tick sid Release
+Hit http://tick testing Release
+Hit http://tick binary/ Release
+Hit http://tick source/ Release
+Hit http://tick testing Release
+Hit http://tick unstable Release
+Hit http://tick testing/main Packages
+Hit http://tick testing/contrib Packages
+Hit http://tick testing/non-free Packages
+Hit http://tick testing/main Sources
+Hit http://tick testing/contrib Sources
+Hit http://tick testing/non-free Sources
+Hit http://tick unstable/main Packages
+Hit http://tick unstable/contrib Packages
+Hit http://tick unstable/non-free Packages
+Hit http://tick unstable/main Sources
+Hit http://tick unstable/contrib Sources
+Hit http://tick unstable/non-free Sources
+Hit http://tick testing/updates/main Packages
+Hit http://tick testing/updates/contrib Packages
+Hit http://tick testing/updates/non-free Packages
+Hit http://tick testing/updates/main Sources
+Hit http://tick testing/updates/contrib Sources
+Hit http://tick testing/updates/non-free Sources
+Hit http://tick etch/main Packages
+Hit http://tick sid/main Packages
+Ign http://tick testing/main Packages
+Ign http://tick binary/ Packages
+Ign http://tick source/ Sources
+Ign http://tick testing/non-free Packages
+Ign http://tick unstable/non-free Packages
+Hit http://tick testing/main Packages
+Hit http://tick binary/ Packages
+Hit http://tick source/ Sources
+Hit http://tick testing/non-free Packages
+Hit http://tick unstable/non-free Packages
+Fetched 7161B in 17s (419B/s)
+Reading package lists... Done
+-----&gt; Downloading source gtk+2.0 (2.8.20-3) &lt;-----
+Reading package lists... Done
+Building dependency tree... Done
+Need to get 18.4MB of source archives.
+Get:1 http://tick testing/main gtk+2.0 2.8.20-3 (dsc) [2003B]
+Get:2 http://tick testing/main gtk+2.0 2.8.20-3 (tar) [18.2MB]
+Get:3 http://tick testing/main gtk+2.0 2.8.20-3 (diff) [184kB]
+Fetched 18.4MB in 1m51s (165kB/s)
+gpg: Signature made Sat 14 Oct 2006 09:23:45 AM CEST using DSA key ID 2B0920C0
+gpg: Can't check signature: public key not found
+dpkg-source: extracting gtk+2.0 in gtk+2.0-2.8.20
+dpkg-source: unpacking gtk+2.0_2.8.20.orig.tar.gz
+dpkg-source: applying ./gtk+2.0_2.8.20-3.diff.gz
+-----&gt; Building gtk+2.0 &lt;-----
+dpkg-buildpackage: source package is gtk+2.0
+dpkg-buildpackage: source version is 2.8.20-3
+dpkg-buildpackage: source changed by root &lt;root@tack&gt;
+dpkg-buildpackage: host architecture i386
+dpkg-buildpackage: source version without epoch 2.8.20-3
+dpkg-checkbuilddeps: Unmet build dependencies: gnome-pkg-tools chrpath
+dpkg-buildpackage: Build dependencies/conflicts unsatisfied; aborting.
+dpkg-buildpackage: (Use -d flag to override.)
+----&gt; Cleaning up object files &lt;-----
+Cleaning in directory .
+dpkg-checkbuilddeps: Unmet build dependencies: gnome-pkg-tools chrpath
+You do not appear to have all build dependencies properly met.
+If you have the pbuilder package installed, you can run
+/usr/lib/pbuilder/pbuilder-satisfydepends as root to install the
+required packages, or you can do it manually using dpkg or apt using
+the error messages just above this message.
+Error while building libgtk2.0-0!
+Sorry, no package to install.
+-----&gt; Installing build dependencies (for glib2.0) &lt;-----
+Reading package lists... Done
+Building dependency tree... Done
+The following packages will be REMOVED:
+  bittorrent dia dia-common gimp-python hplip python-cairo python-glade2 python-gtk2 python-gtk2-dev python-htmlgen python-matplotlib
+  python-netcdf python-numeric python-numeric-ext python-numeric-tutorial python-pyogg python-pyopenssl python-pyvorbis python-scientific
+  python-twisted python-twisted-conch python-twisted-core python-twisted-lore python-twisted-mail python-twisted-names python-twisted-news
+  python-twisted-runner python-twisted-web python-twisted-words python-zopeinterface skencil sketch streamtuner tla-buildpackage
+The following NEW packages will be installed:
+  gnome-pkg-tools
+The following held packages will be changed:
+  bittorrent debhelper gnome-pkg-tools python-cairo python-central python-htmlgen python-netcdf python-numeric python-numeric-ext
+  python-numeric-tutorial python-numpy python-numpy-ext python-pisock python-pyogg python-pyopenssl python-pyvorbis python-scientific
+  python-support python-twisted python-twisted-conch python-twisted-lore python-twisted-mail python-twisted-names python-twisted-news
+  python-twisted-runner python-twisted-web python-twisted-words python-zopeinterface skencil sketch tla-buildpackage
+The following packages will be upgraded:
+  debhelper python-central python-numpy python-numpy-ext python-pisock python-support
+6 upgraded, 1 newly installed, 34 to remove and 1232 not upgraded.
+Need to get 2226kB of archives.
+After unpacking 63.8MB disk space will be freed.
+E: There are problems and -y was used without --force-yes
+E: Failed to process build dependencies
+-----&gt; Updating package lists &lt;-----
+Ign file: apt-build Release.gpg
+Get:1 file: apt-build Release [89B]
+Ign file: apt-build/main Packages
+Get:2 http://tick testing Release.gpg [189B]
+Get:3 http://tick unstable Release.gpg [189B]
+Get:4 http://tick testing/updates Release.gpg [189B]
+Get:5 http://tick etch Release.gpg [189B]
+Get:6 http://tick sid Release.gpg [189B]
+Get:7 http://tick testing Release.gpg [189B]
+Ign http://tick binary/ Release.gpg
+Ign http://tick source/ Release.gpg
+Get:8 http://tick testing Release.gpg [189B]
+Get:9 http://tick unstable Release.gpg [189B]
+Hit http://tick testing Release
+Hit http://tick unstable Release
+Hit http://tick testing/updates Release
+Get:10 http://tick etch Release [5560B]
+Hit http://tick sid Release
+Hit http://tick testing Release
+Hit http://tick binary/ Release
+Hit http://tick source/ Release
+Hit http://tick testing Release
+Hit http://tick unstable Release
+Hit http://tick testing/main Packages
+Hit http://tick testing/contrib Packages
+Hit http://tick testing/non-free Packages
+Hit http://tick testing/main Sources
+Hit http://tick testing/contrib Sources
+Hit http://tick testing/non-free Sources
+Hit http://tick unstable/main Packages
+Hit http://tick unstable/contrib Packages
+Hit http://tick unstable/non-free Packages
+Hit http://tick unstable/main Sources
+Hit http://tick unstable/contrib Sources
+Hit http://tick unstable/non-free Sources
+Hit http://tick testing/updates/main Packages
+Hit http://tick testing/updates/contrib Packages
+Hit http://tick testing/updates/non-free Packages
+Hit http://tick testing/updates/main Sources
+Hit http://tick testing/updates/contrib Sources
+Hit http://tick testing/updates/non-free Sources
+Hit http://tick etch/main Packages
+Hit http://tick sid/main Packages
+Ign http://tick testing/main Packages
+Ign http://tick binary/ Packages
+99% [Working]                                                                                                                      24.4kB/s 0s-----&gt; Downloading source glib2.0 (2.12.4-1) &lt;-----
+Reading package lists... Done
+Building dependency tree... Done
+Need to get 3857kB of source archives.
+0% [Waiting for headers]-----&gt; Building glib2.0 &lt;-----
+Can't chdir(glib2.0-2.12.4): No such file or directory at (eval 1) line 3
+        main::__ANON__('glib2.0-2.12.4') called at /usr/bin/apt-build line 288
+        main::build('glib2.0', 2.12.4, 1) called at /usr/bin/apt-build line 510
+        main::install called at /usr/bin/apt-build line 82
+tack:/usr/local/src#
+
+
+
+use AptPkg::Config qw/$_config/;                    # see libapt-pkg-perl
+use AptPkg::System qw/$_system/;                    #
+use AptPkg::Version;
+use AptPkg::Source;
+use AptPkg::Cache;
+
+
+x @{$_source-&gt;{'libgtk2.0-0'}};
+
+
+$_system = $_config-&gt;system;
+$_config-&gt;{quiet} = 2;
+$_cache = new AptPkg::Cache;
+$_version = $_system-&gt;versioning;
+$_source = new AptPkg::Source '/etc/apt/sources.list';
+$_pkg_infos = $_cache-&gt;packages;
+
+
+
+
+
+
+above problem ("E: There are problems and....") reproduced:
+
+tack:# apt-get --yes build-dep libgtk2.0-0
+Reading package lists... Done
+Building dependency tree... Done
+The following NEW packages will be installed:
+  chrpath gnome-pkg-tools
+The following held packages will be changed:
+  chrpath gnome-pkg-tools
+0 upgraded, 2 newly installed, 0 to remove and 1238 not upgraded.
+Need to get 29.9kB of archives.
+After unpacking 160kB of additional disk space will be used.
+E: There are problems and -y was used without --force-yes
+E: Failed to process build dependencies
+tack:#
+
+?????
+what "problems"??
+
+
+tack:# apt-get build-dep libgtk2.0-0
+Reading package lists... Done
+Building dependency tree... Done
+The following NEW packages will be installed:
+  chrpath gnome-pkg-tools
+The following held packages will be changed:
+  chrpath gnome-pkg-tools
+0 upgraded, 2 newly installed, 0 to remove and 1238 not upgraded.
+Need to get 29.9kB of archives.
+After unpacking 160kB of additional disk space will be used.
+Do you want to continue [Y/n]?
+Get:1 http://tick testing/main chrpath 0.13-2 [13.6kB]
+Get:2 http://tick testing/main gnome-pkg-tools 0.7 [16.3kB]
+Fetched 29.9kB in 6s (4417B/s)
+(Reading database ... 300272 files and directories currently installed.)
+Unpacking chrpath (from .../chrpath_0.13-2_i386.deb) ...
+Unpacking gnome-pkg-tools (from .../gnome-pkg-tools_0.7_all.deb) ...
+Setting up chrpath (0.13-2) ...
+Setting up gnome-pkg-tools (0.7) ...
+
+tack:#
+
+  </pre>
+
+  <a href="."> back to apt </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

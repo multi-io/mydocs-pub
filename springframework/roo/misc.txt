@@ -1,0 +1,39 @@
+Die Controller haben jeweils eine autogenerierte Methode (im Beispiel: SubjectController):
+
+
+        @RequestMapping(params = "form", method = RequestMethod.GET)  //TODO: was macht 'params="form"' genau? Welches "form"?
+    public String createForm(Model model) {
+                Subject subject = new Subject();
+                subject.setStudy(Context.getContextStudy());  //von uns eingefügt
+        model.addAttribute("subject", subject);
+        List<String[]> dependencies = new ArrayList<String[]>();
+        if (Site.countSites() == 0) {
+            dependencies.add(new String[]{"site", "sites"});
+        }
+        model.addAttribute("dependencies", dependencies);  //s.u.
+        return "subjects/create";
+    }
+
+wird aufgerufen, wenn die create-Form neu (leer) angezeigt werden
+soll, leitet weiter an das create-Form-View.
+
+Es wird das leere Default-Objekt (hier: new Subject()) angelegt, das
+wohl anschließend z.B. im create-Form-View angezeigt wird
+
+Die "dependencies"-Liste wird in den autogenerierten form-Tags
+(insb. form:dependency) verwendet, um ggf. "The following dependencies
+need to be created first:" - Listen auszugeben: Im create-View steht:
+
+      <form:create id="fc_de_sofd_goodclinica_domain_Subject" modelAttribute="subject" path="/subjects" render="${empty dependencies}" z="X3SqLhIgL27Cuv8Mzp9uowRW3e0=">
+        .......
+     </form:create>
+     <form:dependency dependencies="${dependencies}" id="d_de_sofd_goodclinica_domain_Subject" render="${not empty dependencies}" z="bzXGhqV8TqNQA0+FcQbIfvhIy0o="/>
+
+      das render-Attribut bewirkt, dass die Form nur ausgegeben wird,
+      wenn die dependencies-Liste leer ist. Darunter wird dann
+      ggf. die dependencies-Liste (wenn sie nicht leer ist)
+      ausgegeben.
+
+      modelAttribute verweist auf das von der Form anzuzeigende Objekt
+      -- hier das Subject, das in createForm() mit
+      model.addAttribute("subject", subject) hinzugefügt wurde.

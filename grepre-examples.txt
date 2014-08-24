@@ -1,0 +1,79 @@
+/sbin/ifconfig ppp0 | grepre 'inet addr:(.*?)\s'
+
+swangoose:~# history | grep grepre
+ 2364  cp /home/olaf/bin/grepre /usr/local/bin/
+ 2735  ff . 'IBM' '*.c' | grep Copyright | grepre '^(:*?):'
+ 2737  ff . 'IBM' '*.c' | grep Copyright | grepre '^(:*?):'
+ 2738  ff . 'IBM' '*.c' | grep Copyright | grepre '^(*?):'
+ 2739  ff . 'IBM' '*.c' | grep Copyright | grepre '^(.*?):'
+ 2740  ff . 'IBM' '*.c' | grep Copyright | grepre '^(.*?):' >ibmfiles.txt
+ 2744  ff . 'Alan Cox' '*.c'  | grepre '^(.*?):' 
+ 2745  ff . 'Alan Cox' '*.c'  | grepre '^(.*?):' | sort | uniq >coxfiles.txt
+ 2747  ff . 'Linus Torvalds' '*.c'  | grepre '^(.*?):' | sort | uniq >linusfiles.txt
+ 2906  apt-cache showpkg perl-tk | /home/olaf/bin/grepre '(.*?),perl-tk'
+ 2907  dpkg -p `apt-cache showpkg perl-tk | /home/olaf/bin/grepre '(.*?),perl-tk'`
+ 2908  dpkg -p `apt-cache showpkg perl-tk | /home/olaf/bin/grepre '(.*?),perl-tk'` | less
+ 2909  dpkg -p `apt-cache showpkg perl-gtk | /home/olaf/bin/grepre '(.*?),perl-gtk'` | less
+ 2913  dpkg -p `apt-cache showpkg libgtk-perl | /home/olaf/bin/grepre '(.*?),libgtk-perl'` | less
+ 2914  dpkg -p `apt-cache showpkg libgtk-perl | /home/olaf/bin/grepre '(.*?),libgtk-perl'` | less
+ 4742  cat /proc/7343/environ | grepre 
+ 4743  cat /proc/7343/environ | grepre '(LANG=.*)'
+ 4994  history | grep grepre
+swangoose:~# 
+
+[root@tick ~]# history | grep grepre
+   34  cat /var/log/messages | grepre 'DPT=(.*?) '
+   35  cat /var/log/messages | grepre 'DPT=(.*?)'
+   36  cat /var/log/messages | grepre 'DPT=(.*?) '
+   38  cat /var/log/messages | grepre 'DPT=(.*?) '
+   39  cat /var/log/messages | grepre 'DPT=(.*?) '
+   40  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { print "$_ bla\n"; }'
+   41  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; print "$_ bla\n"; }'
+   42  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; ++$num{$_}; } print %num;'
+   43  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; ++$num{$_}; } map { print "$_: $num{$_}\n" }, keys %num;'
+   44  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; ++$num{$_}; } map { print "$_: $num{$_}\n" } keys %num;'
+ 1001  history | grep grepre
+[root@tick ~]# 
+
+cat /var/log/messages | grepre 'DPT=(.*?) ' | sort | uniq -c | sort
+-rn
+
+olaf@tack:~$ history | grep grepre
+  501  find . -path '*org/apache/*java' | grepre '^(.*?)/org/apache'
+  502  find . -path '*org/apache/*java' | grepre '^(.*?)/org/apache' | sort | uniq
+  505  find . -path '*org/apache/*.java' | grepre '^(.*?)/org/apache' | sort | uniq
+  506  echo "find . -path '*org/apache/*.java' | grepre '^(.*?)/org/apache' | sort | uniq" >find-sourcepaths.sh
+  553  find . -path '*/javax/*.java' | grepre '^(.*?)/javax' | sort | uniq
+  554  find . -path '*/javax/*.java' | grepre '^(.*?)/javax' | sort | uniq >>sourcepaths.txt
+  556  find . -path '*/javax/*.java' | grepre '^(.*?)/javax' | sort | uniq >>sourcepaths.reduced.txt
+  557  find . -path '*/javax/*.java' | grepre '^(.*?)/javax' | sort | uniq 
+  558  find . -path '*/javax/*.java' | grepre '^(.*?)/javax' | sort | uniq 
+  559  find . -path '*/javax/*.java' | grepre '^(.*?)/javax' | sort | uniq >>sourcepaths.reduced.txt
+ 1002     34  cat /var/log/messages | grepre 'DPT=(.*?) '
+ 1003     35  cat /var/log/messages | grepre 'DPT=(.*?)'
+ 1004     36  cat /var/log/messages | grepre 'DPT=(.*?) '
+ 1005     38  cat /var/log/messages | grepre 'DPT=(.*?) '
+ 1006     39  cat /var/log/messages | grepre 'DPT=(.*?) '
+ 1007     40  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { print "$_ bla\n"; }'
+ 1008     41  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; print "$_ bla\n"; }'
+ 1009     42  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; ++$num{$_}; } print %num;'
+ 1010     43  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; ++$num{$_}; } map { print "$_: $num{$_}\n" }, keys %num;'
+ 1011     44  cat /var/log/messages | grepre 'DPT=(.*?) ' | perl -e 'while (<>) { chomp; ++$num{$_}; } map { print "$_: $num{$_}\n" } keys %num;'
+ 1014  history | grep grepre
+olaf@tack:~$ 
+
+tack:~# history | grep grepre
+  148  cat tmp.txt | grepre '^(.*?):'
+  149  cat tmp.txt | grepre '^(.*?):' | sort | uniq | less
+  998  history | grep grepre
+tack:~# 
+
+cvs diff 2>/dev/null | grepre '^RCS file: (.*?),v$'
+
+grepre 'PATH=(.*?)\0' </proc/23663/environ 
+
+cdrecord -scanbus 2>/dev/null | grep DVDRAM | grepre '^\s*(\S+)'
+
+
+apt-get install --yes --force-yes --print-uris gnome >uris.txt
+<uris.txt grepre "^'(.*?)'" | xargs -l ncftpget

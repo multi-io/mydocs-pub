@@ -1,0 +1,71 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./javascript/dojo/dojo/oop-mof.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">javascript</a>/<a href="../.">dojo</a>/<a href=".">dojo</a>/oop-mof.txt </h1>
+
+  <a href="oop-mof.txt">download original</a>
+
+  <pre>
+- MOF / class creation: dojo.declare
+
+
+
+
+Mixins:
+
+SomeClass.extend({
+    m2: function(){
+        this.inherited(arguments);
+        console.log("B.m2");
+    }
+});
+
+
+(or dojo.safeMixin(SomeClass, {...}))
+
+
+snippets:
+
+(with: &gt;&gt;&gt;
+dojo.declare("dojox.grid.DataGrid", dojox.grid._Grid, {
+...
+});
+
+grid = new dojox.grid.DataGrid(...)
+&lt;&lt;&lt;)
+
+
+
+grid.declaredClass
+=&gt; "dojox.grid.DataGrid"
+
+
+// "dojox.grid.DataGrid" =&gt; dojox.grid.DataGrid
+dojo.getObject("dojox.grid.DataGrid") === dojox.grid.DataGrid
+=&gt; true
+
+
+grid.isInstanceOf(dijit._Widget)
+=&gt; true
+
+  </pre>
+
+  <a href="."> back to dojo </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

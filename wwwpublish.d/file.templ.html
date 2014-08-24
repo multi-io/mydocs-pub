@@ -1,0 +1,57 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./wwwpublish.d/file.templ </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">wwwpublish.d</a>/file.templ </h1>
+
+  <a href="file.templ">download original</a>
+
+  <pre>
+&lt;!-- -*- html -*- --&gt;
+
+&lt;% no strict 'refs'; no warnings; %&gt;
+
+&lt;% @parents=(); for ($curr=$dir; $curr; $curr=$curr-&gt;{PARENT}) { @parents = ($curr-&gt;{NAME}, @parents); } %&gt;
+
+&lt;head&gt;
+  &lt;title&gt; &lt;%= $fqsrcname %&gt; &lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;h1&gt; &lt;%= $nd=@parents; join("/", map {qq[&lt;a href="${\("../" x ($nd-- -1))}."&gt;$_&lt;/a&gt;]} @parents) %&gt;/&lt;%= $f %&gt; &lt;/h1&gt;
+
+  &lt;a href="&lt;%= $f %&gt;"&gt;download original&lt;/a&gt;
+
+  &lt;pre&gt;
+&lt;%= htmlescape $text %&gt;
+  &lt;/pre&gt;
+
+  &lt;a href="."&gt; back to &lt;%= $dir-&gt;{NAME} %&gt; &lt;/a&gt;
+
+  &lt;p/&gt;
+
+  &lt;font size="-3"&gt;(C) 1998-&lt;%= 1900+(localtime())[5] %&gt; Olaf Klischat  &amp;lt;olaf.klischat@gmail.com&amp;gt; &lt;/font&gt;
+
+&lt;/body&gt;
+
+  </pre>
+
+  <a href="."> back to wwwpublish.d </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

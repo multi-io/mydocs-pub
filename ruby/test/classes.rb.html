@@ -1,0 +1,92 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/classes.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/classes.rb </h1>
+
+  <a href="classes.rb">download original</a>
+
+  <pre>
+def callf(obj)
+  obj.f
+end
+
+def runtest
+
+  s = "hello"
+  class &lt;&lt;s
+    def f
+      "I am s.f"
+    end
+  end
+
+  callf(s)
+end
+
+
+
+# error: "class definition in method body"
+# def defclass
+#   class DefdClass
+#     def f
+#       "DefdClass.f"
+#     end
+#   end
+# end
+
+
+
+class CDefsTest
+
+  def initialize
+    def self.m
+      "CDefsTest.m"
+    end
+  end
+
+end
+
+
+class C1
+  class C2
+  end
+end
+# =&gt; C1::C2
+
+
+# error: nested method definition
+# def m1
+#   def m2
+#     "m2"
+#   end
+#   "m1"
+# end
+
+def m3
+  def self.m4
+    "m4"
+  end
+  "m3"
+end
+
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

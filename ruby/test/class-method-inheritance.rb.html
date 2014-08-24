@@ -1,0 +1,74 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/class-method-inheritance.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/class-method-inheritance.rb </h1>
+
+  <a href="class-method-inheritance.rb">download original</a>
+
+  <pre>
+# 17:15 &lt; multi_io&gt; could it be that class methods defined in modules are not 
+#                   inherited by classes which include that module?
+# 17:15 &lt; multi_io&gt; s/in modules/in a module/
+# 17:15 &lt; chris2&gt; multi_io: correct
+# 17:16 &lt; multi_io&gt; chris2: hm. Is there a special reason for that?
+# 17:16 &lt; chris2&gt; probably, but i dont know
+
+module M
+    
+  def self.cm1
+    p "&gt;&gt;cm1"
+  end
+
+
+  ## this is the workaround
+  def self.append_features(base) #:nodoc:
+    super
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def cm2
+      p "&gt;&gt;cm2"
+    end
+  end
+
+end
+
+
+class B
+  def self.cm3
+    p "&gt;&gt;cm3"
+  end
+end
+
+
+
+class C &lt; B
+  include M
+
+  cm2   # works
+  cm3   # works
+  cm1   # doesn't work ("undefined local variable or method `cm1' for C:Class")
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

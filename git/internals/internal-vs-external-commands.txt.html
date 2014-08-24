@@ -1,0 +1,63 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./git/internals/internal-vs-external-commands.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">git</a>/<a href=".">internals</a>/internal-vs-external-commands.txt </h1>
+
+  <a href="internal-vs-external-commands.txt">download original</a>
+
+  <pre>
+(git.c)
+
+int main(int argc, const char **argv)  //argv = {"git", [global options...], "command", options...}
+     
+  =&gt; static int run_argv(int *argcp, const char ***argv)  //*argv = {"command", options...}
+     {
+         [...]
+         while (1) {
+             /* See if it's an internal command */
+             handle_internal_command(*argcp, *argv);  //exits if successful
+             [...]
+             /* .. then try the external ones */
+             execv_dashed_external(*argv);  //exits if successful
+             [...]
+         }
+         [...]
+     }
+
+		handle_internal_command(*argcp, *argv);
+
+          =&gt; run_builtin(p, argc, argv)  //struct cmd_struct p, z.B. { name: "add", fn: cmd_add, options: RUN_SETUP | NEED_WORK_TREE }
+              
+              =&gt; p-&gt;fnfn(argc, argv, &lt;name of CWD relative to worktree root, if any&gt;)
+
+		------
+
+        execv_dashed_external(*argv);
+
+          =&gt; {
+               argv[0] = "git-" + argv[0];
+               run_command_v_opt(argv, RUN_SILENT_EXEC_FAILURE | RUN_CLEAN_ON_EXIT);
+                 =&gt; run (fork/exec+wait)  {"git-command", options...} with git's installation directory up front in $PATH
+             }
+
+  </pre>
+
+  <a href="."> back to internals </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

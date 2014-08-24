@@ -1,0 +1,86 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./javascript/drawing/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">javascript</a>/<a href=".">drawing</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+15:10 &lt; multi_io&gt; and as I said, I don't think it solves my problem. My problem is this: I get
+          a mouse click/move event on an SVG element. The coordinates in the event
+          (clientX/clientY) are relative to the browser window (or, in the case of
+          layerX/layerY, relative to the rendered HTML page). I want them to be relative to
+          the SVG element the event occured on. So I need the upper-left corner of that
+          element in the page. How do I obtain that?
+
+
+15:44 &lt; raxor&gt; multi_io: still around
+15:45 &lt; raxor&gt; ?
+15:45 &lt; multi_io&gt; raxor: yeah
+15:45 &lt; raxor&gt; getBBox is not in Firefox, you are right
+15:45 &lt; raxor&gt; There are two ways of doing it
+15:45 &lt; raxor&gt; one is to think about the getTransformToElement...
+15:46 &lt; raxor&gt; the other is to think about the getScreenCTM
+15:46 &lt; tor&gt; getBBox is definitely in firefox
+15:46 &lt; raxor&gt; gah
+15:46 &lt; raxor&gt; sorry
+15:46 &lt; raxor&gt; I mean... it is not in firefox onload!
+15:46 &lt; tor&gt; you can't currently use it at onload time, but it should work in other
+             circumstances
+15:47 &lt; raxor&gt; tor is always right on these things multi_io :)
+15:47 &lt; raxor&gt; tor is getScreenCTM in FF?
+15:47 &lt; raxor&gt; or getCTM?
+15:48 &lt; raxor&gt; multi_io: my guess is that you are trying to do something like drag a box
+               around a box or figure out the coords relative to a container for mapping...
+               right?
+15:48 &lt; tor&gt; yes to both (on trunk at least, don't have a branch tree around to check)
+15:48 &lt; tor&gt; ok, I've just made ff trunk pickier about the transform attribute
+15:48 &lt; multi_io&gt; raxor: a freehand drawing application, sort of
+15:49 &lt; raxor&gt; okay... are you expecting to have nested transforms?
+15:49 &lt; raxor&gt; e.g., &lt;svg&gt; within &lt;svg&gt;, or &lt;g transform="...."&gt;
+15:49 &lt; multi_io&gt; yes, probably.
+15:49 &lt; raxor&gt; then it gets really fun :)
+15:50 &lt; multi_io&gt; I'm not scared of matrices or anything
+15:50 &lt; raxor&gt; Good good... it is more the variance in implementations you should be worried
+               about :)
+15:50 &lt; multi_io&gt; hm yeah, I think I'm getting a glimpse of that already :)
+15:51 &lt; raxor&gt; It is better now...
+15:51 &lt; raxor&gt; but when you have ASV3 in the mix it is tough
+15:51 &lt; multi_io&gt; incidentally, all the freehand apps I could find on the web get it wrong too
+                  -- see http://lamp2.fh-stpoelten.ac.at/~lbz/beispiele/ws2006/draw/index.xml
+15:52 &lt; raxor&gt; I ended up writing a whole js layer for coord transforms so I could eliminate
+               those idiosyncracies
+15:52 &lt; raxor&gt; there is still some debate over the "correct" implementation... so I chose my
+               theory
+15:52 &lt; raxor&gt; http://research.pdmagic.com/svg/
+15:52 &lt; raxor&gt; http://research.pdmagic.com/svg/coords.js
+15:54 &lt; multi_io&gt; thanks raxor
+15:54 &lt; raxor&gt; Basically you need to override var svgRoot = null; var svgDoc = null; var
+               svgWindow = null; then you can call getScreenCTM
+15:55 &lt; raxor&gt; In any event... looking at the code (for getScreenCTM) will give you an idea of
+               how to translate the coords...
+15:55 &lt; raxor&gt; if it is FF only, I think you can just use their built in function
+15:56 &lt; raxor&gt; let me know what you go with and I can try to help some more...
+15:57 &lt; multi_io&gt; ok
+
+  </pre>
+
+  <a href="."> back to drawing </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

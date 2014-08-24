@@ -1,0 +1,74 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/generics-with-value-parameters.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">java</a>/generics-with-value-parameters.txt </h1>
+
+  <a href="generics-with-value-parameters.txt">download original</a>
+
+  <pre>
+//if they were supported (they're not, are they?), they could be used
+//  e.g. like this:
+
+enum EventType{MOUSE_MOVED, MOUSE_CLICKED, KEY_PRESSED};
+
+interface &lt;value EventType eventType&gt; Listener { }
+
+interface MouseMovedListener extends Listener&lt;MOUSE_MOVED&gt; { void mouseMoved(...); }
+interface MouseClickedListener extends Listener&lt;MOUSE_CLICKED&gt; { void mouseClicked(...); }
+interface KeyPressedListener extends Listener&lt;KEY_PRESSED&gt; { void keyPressed(...); }
+
+
+class MyComponent {
+    void &lt;value EventType eventType&gt; registerListener(eventType type, Listener&lt;eventType&gt; listener) {
+        .....
+    }
+}
+
+
+
+usage e.g.
+
+MyComponent myComponent = ....;
+myComponent.registerListener(MOUSE_CLICKED, new MouseClickedListener() {.....});
+
+compiler checks that 2nd argument to registerListener matches the 1st argument.
+
+
+
+...or maybe even just:
+
+class MyComponent {
+    void &lt;value EventType eventType&gt; registerListener(Listener&lt;eventType&gt; listener) {
+        .....
+    }
+}
+
+MyComponent myComponent = ....;
+myComponent.registerListener&lt;MOUSE_CLICKED&gt;(new MouseClickedListener() {.....});
+
+
+
+
+no?
+
+  </pre>
+
+  <a href="."> back to java </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

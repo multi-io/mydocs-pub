@@ -1,0 +1,52 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/texturemapping/texture-units.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">opengl</a>/<a href=".">texturemapping</a>/texture-units.txt </h1>
+
+  <a href="texture-units.txt">download original</a>
+
+  <pre>
+15:49 &lt; multi_io&gt; does glTexParameter() influence the currently bound texture only? Or the whole texture target?
+17:14 &lt; MatthiasM&gt; multi_io: bound texture on that target
+17:50 &lt; multi_io&gt; MatthiasM: ...and also only the current texture unit on that target, right?
+17:50 &lt; MatthiasM&gt; no
+17:50 &lt; MatthiasM&gt; it is applied to the bound texture
+17:54 &lt; multi_io&gt; I thought one could have one bound texture per (texture state, texture unit)?
+17:54 &lt; multi_io&gt; eerm
+17:54 &lt; MatthiasM&gt; yes, but glTexParameter applies a value to the bound texture
+17:54 &lt; multi_io&gt; one bound texture per (target, texture unit)?
+17:54 &lt; MatthiasM&gt; yes
+17:57 &lt; multi_io&gt; ok, so one can say that the "currently bound texture" for a target always belongs to a texture unit of that target
+17:58 &lt; multi_io&gt; (which can be set by calling glActiveTexture() before glBindTexture())
+17:58 &lt; multi_io&gt; correct?
+17:58 &lt; MatthiasM&gt; yes
+17:59 &lt; MatthiasM&gt; but you can bind a texture to several texture units
+18:01 &lt; multi_io&gt; ok
+18:05 &lt; multi_io&gt; do you know why the OpenGL inventors decided that the target itself is not part of the GL state (but must be supplied in 
+                  each call), but the texture unit is?
+18:08 &lt; multi_io&gt; my current impression is that when they added texture units/multitexturing to OpenGL, they didn't want to change existing 
+                  calls, so they added the "current texture unit" as an additional state
+18:40 &lt; MatthiasM&gt; yes
+
+
+  </pre>
+
+  <a href="."> back to texturemapping </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

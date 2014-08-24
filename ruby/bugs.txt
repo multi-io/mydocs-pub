@@ -1,0 +1,22 @@
+olaf@tack:~$ irb
+irb(main):001:0> 'foo"bar"baz' =~ /\".*?\"/
+=> 3
+irb(main):002:0> 'foo"bar"baz' =~ /\"(.*?\)"/
+SyntaxError: compile error
+(irb):2: unmatched (: /\"(.*?\)"/
+        from (irb):2
+irb(main):003:0> 'foo"bar"baz' =~ /\"(.*?)\"/
+=> 3
+irb(main):004:0> /\"(.*?)\"/.class.instance_methods
+=> ["send", "options", "object_id", "singleton_methods", "__send__", "equal?", "taint", "frozen?", "instance_variable_get", "kind_of?", "to_a", "method", "instance_eval", "kcode", "type", "protected_methods", "extend", "eql?", "display", "instance_variable_set", "~", "hash", "is_a?", "to_s", "match", "class", "tainted?", "private_methods", "untaint", "source", "id", "inspect", "==", "===", "clone", "public_methods", "respond_to?", "freeze", "__id__", "=~", "methods", "nil?", "dup", "instance_variables", "casefold?", "instance_of?"]
+irb(main):005:0> /\"(.*?)\"/.match('foo"bar"baz')
+=> #<MatchData:0x40309150>
+irb(main):006:0> /\"(.*?)\"/.match('foo"bar"baz').to_a
+=> ["\"bar\"", "bar"]
+irb(main):007:0> /\"(.*?)\"/.match('foo"bar"baz')[1]
+=> "bar"
+/usr/lib/ruby/1.8/irb.rb:273: [BUG] Segmentation fault
+ruby 1.8.2 (2005-04-11) [i386-linux]
+
+Aborted (core dumped)
+olaf@tack:~$ 

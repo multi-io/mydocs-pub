@@ -1,0 +1,45 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/codegen.cc </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/codegen.cc </h1>
+
+  <a href="codegen.cc">download original</a>
+
+  <pre>
+#include &lt;stdio.h&gt;
+
+template&lt;bool bnValue&gt;
+void DoStupidPrint()
+{
+   if (bnValue) printf("Hallo Isch bin ein Berliner!");
+}
+
+int main()
+{
+   DoStupidPrint&lt;true&gt;();
+   DoStupidPrint&lt;false&gt;();
+   bool b = false;
+   //DoStupidPrint&lt;b&gt;();
+}
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

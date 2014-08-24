@@ -1,0 +1,71 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/test/coil/linalg.h </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">opengl</a>/<a href="../.">test</a>/<a href=".">coil</a>/linalg.h </h1>
+
+  <a href="linalg.h">download original</a>
+
+  <pre>
+#ifndef LINALG_H
+#define LINALG_H
+
+#include &lt;GL/gl.h&gt;
+
+typedef GLdouble Matrix3D[16];  // column-major, as OpenGL functions expect it
+
+void fillZeros(GLdouble *m);
+
+void fillIdentity(GLdouble *m);
+
+/**
+ * Like glRotated with a being the previous and res becoming the
+ * following top-of-stack
+ */
+void fillRotation(const GLdouble *a,
+                  GLfloat  	angle, 
+                  GLfloat  	x, 
+                  GLfloat  	y, 
+                  GLfloat  	z,
+                  GLdouble *res);
+
+void fillTranslation(const GLdouble *a,
+                     GLfloat  	tx, 
+                     GLfloat  	ty, 
+                     GLfloat  	tz,
+                     GLdouble *res);
+
+void fillMultiplication(const GLdouble *a, const GLdouble *b, GLdouble *res);
+
+void copyMatrix3D(const GLdouble *src, GLdouble *dest);
+
+void cross(const GLdouble *a, const GLdouble *b, GLdouble *dest);
+
+void multiply(GLdouble s, const GLdouble *v, GLdouble *dest);
+
+GLdouble length(const GLdouble *v);
+
+void norm(const GLdouble *v, GLdouble *dest);
+
+#endif
+
+  </pre>
+
+  <a href="."> back to coil </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/texturemapping/mem_usage_discussion.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">opengl</a>/<a href=".">texturemapping</a>/mem_usage_discussion.txt </h1>
+
+  <a href="mem_usage_discussion.txt">download original</a>
+
+  <pre>
+01:57 -!- multi_io [n=olaf@port-87-193-172-154.static.qsc.de] has joined ##OpenGL
+
+03:55 &lt; multi_io&gt; is it possible to simultaneously (in a single frame) render more textures than fit into the 
+                  OpenGL implementation's (i.e., the GPU's) texture RAM?
+03:56 &lt; multi_io&gt; (e.g. by creating new textures as necessary directly in the display() routine)
+03:56 &lt; _Auron_&gt; I imagine that would be unforgivenly slow
+03:58 -!- WolfDogDesigns [n=WolfDogD@cpc3-norw3-0-0-cust174.pete.cable.ntl.com] has quit ["Leaving"]
+04:01 &lt; multi_io&gt; that depends, I guess
+04:11 -!- bl4ckb1t_ [n=bl4ckb1t@unaffiliated/bl4ckb1t] has joined ##OpenGL
+04:14 -!- reprore_ [n=reprore@ntkngw356150.kngw.nt.ftth.ppp.infoweb.ne.jp] has quit [Read error: 54 (Connection 
+          reset by peer)]
+04:15 -!- CVirus [n=Satan@41.130.236.55] has left ##OpenGL ["I was somebody who, is no business of yours !"]
+04:22 &lt; RTFM_FTW&gt; - VRAM is virtualized... so ultimately this is a meaningless question to ask...
+04:22 &lt; RTFM_FTW&gt; - paging is completely transparent to the client
+04:23 -!- bl4ckb1t [n=bl4ckb1t@unaffiliated/bl4ckb1t] has quit [Read error: 110 (Connection timed out)]
+04:23 -!- bl4ckb1t_ is now known as bl4ckb1t
+04:23 &lt; RTFM_FTW&gt; - you only have fairly indirect control over this (i.e. upload fewer / smaller textures etc. 
+                  in order to reduce paging)
+04:27 -!- squi [i=Squishy@114-36-49-165.dynamic.hinet.net] has quit [" Ping Timeout"]
+04:43 -!- GinoMan [n=quassel@c-76-124-139-231.hsd1.pa.comcast.net] has quit [Read error: 104 (Connection reset 
+          by peer)]
+04:50 -!- dv_ [n=dv@85-127-129-221.dynamic.xdsl-line.inode.at] has quit ["Verlassend"]
+04:53 -!- Limoto_ [n=quassel@server.limoto.ifrit.eu] has quit [Client Quit]
+04:53 -!- Limoto [n=quassel@server.limoto.ifrit.eu] has joined ##OpenGL
+04:55 -!- BlueThen [n=bluethen@68-184-245-251.dhcp.stls.mo.charter.com] has quit []
+04:58 &lt; multi_io&gt; RTFM_FTW: so you're saying that the GL implementation will also use the normal RAM to keep 
+                  textures?
+04:58 &lt; multi_io&gt; is that what can be distinguished using glAreTexturesResident() ?
+04:59 &lt; multi_io&gt; (i.e. resident = in VRAM)
+05:04 &lt; RTFM_FTW&gt; - *what* the underlying GL implementation does (i.e. fallback to GART -&gt; system memory or some 
+                  other storage) in these cases is completely implementation dependent
+05:04 &lt; RTFM_FTW&gt; - and you have absolutely, positively zero control over (or knowledge of) this...
+05:05 &lt; multi_io&gt; yeah, I understand that. I mean the common implementations I guess :-P e.g. the NVidia driver 
+                  under Linux, it looks like it does use system memory
+05:05 &lt; RTFM_FTW&gt; - AreTexturesResident is a meaningless call anymore
+05:05 &lt; multi_io&gt; ok
+05:05 &lt; RTFM_FTW&gt; - its not going to tell you anything useful about this
+05:05 &lt; multi_io&gt; this brings me back to my earlier question:
+05:06 &lt; RTFM_FTW&gt; - and I've already answered that
+05:07 &lt; multi_io&gt; 02:02 &lt; multi_io&gt; is it normal that a texture that you once succesfully created, bound, 
+                  applied and unbound, will no longer be available at a later time without you explicitly 
+                  removing it? So that if you  later try to bind and apply it again, the primitive is just drawn 
+                  without the texture?
+05:07 &lt; multi_io&gt; that one?
+05:07 &lt; multi_io&gt; so I guess this should not happen?
+05:08 &lt; multi_io&gt; ..rather, you would at some point no longer be able to create new textures without first 
+                  deleting some others?
+05:08 &lt; RTFM_FTW&gt; - unbinding doesn't do *anything* to the underlying texture data... at least as far as the API 
+                  is concerned
+05:09 &lt; RTFM_FTW&gt; - if you don't want it around *at all* then you need to delete it directly (via DeleteTextures)
+05:09 &lt; multi_io&gt; yeah, ok
+05:09 &lt; RTFM_FTW&gt; - anything beyond this falls into implementation dependent territory
+05:09 &lt; RTFM_FTW&gt; - which you cannot concern yourself with
+05:10 &lt; multi_io&gt; so, once I've succesfully created a texture, I should be able to bind/unbind it at any later 
+                  time
+05:10 &lt; multi_io&gt; ...until I explicitly delete it
+05:10 &lt; RTFM_FTW&gt; - whether or not a texture is paged out of &lt; GART, local VRAM, ... &gt; when unbound a completely 
+                  transparent process
+05:10 &lt; RTFM_FTW&gt; - duh... the spec covers this BTW
+05:10 &lt; multi_io&gt; I understand that, thanks :-P
+05:11 &lt; RTFM_FTW&gt; - note my handle
+05:11 &lt; RTFM_FTW&gt; - seriously A
+05:11 &lt; RTFM_FTW&gt; - heheh
+05:14 &lt; multi_io&gt; is the whole texture proxying stuff meaningless too?
+05:15 &lt; multi_io&gt; (texture priorization)
+05:15 &lt; RTFM_FTW&gt; - texture proxy != texture prioritization
+05:15 &lt; multi_io&gt; ok, texture priorization I mean
+05:15 &lt; multi_io&gt; *prioritization
+05:19 &lt; RTFM_FTW&gt; - if you are looking for control over texture prioritization (i.e. user control over texture 
+                  purging for example) then you need to look at GL_APPLE_object_purgeable i.e. 
+                  http://developer.apple.com/graphicsimaging/opengl/extensions/apple_object_purgeability.html
+05:19 &lt; RTFM_FTW&gt; - also GL_APPLE_client_storage, GL_APPLE_texture_range
+05:19 &lt; RTFM_FTW&gt; - if you are looking for control over texture prioritization (i.e. user control over texture 
+                  purging for example) then you need to look at GL_APPLE_object_purgeable i.e. 
+                  http://developer.apple.com/graphicsimaging/opengl/extensions/apple_object_purgeability.html
+05:19 &lt; RTFM_FTW&gt; - also GL_APPLE_client_storage, GL_APPLE_texture_range
+05:20 &lt; RTFM_FTW&gt; - yes these are vendor specific (i.e. specific to Mac OS X) and no another equivalent "vendor 
+                  neutral" path (at least for the first extension) exists in GL
+05:20 &lt; RTFM_FTW&gt; - http://www.opengl.org/registry/specs/APPLE/client_storage.txt 
+                  http://www.opengl.org/registry/specs/APPLE/texture_range.txt
+05:20 &lt; multi_io&gt; nice
+05:20 &lt; RTFM_FTW&gt; - quite
+05:21 &lt; multi_io&gt; thanks
+05:22 &lt; RTFM_FTW&gt; - what makes you think you need this level of control?
+05:23 &lt; RTFM_FTW&gt; - beyond the fact that you aren't going to find it in Linux :P
+05:23 &lt; RTFM_FTW&gt; - or Windows for that matter :P
+05:24 &lt; multi_io&gt; I'm trying to do some medical (2D) imaging visualization here
+05:24 &lt; multi_io&gt; with images getting very large, e.g. 10 MB or more
+05:25 &lt; multi_io&gt; ...and many of them, 1000 for example
+05:25 &lt; RTFM_FTW&gt; - manually implement a LRU cache on the client side
+05:26 &lt; multi_io&gt; trying to display them in a kind of list control, with, in the worst case, something like 50 
+                  images visible at a time
+05:26 &lt; RTFM_FTW&gt; - if you really want to do this in a vendor independent manner
+05:26 &lt; RTFM_FTW&gt; - careful use of LOD will help you as well
+05:27 &lt; RTFM_FTW&gt; - along with the usual suspects (i.e. non-FP data, texture compression, trimming components 
+                  etc. etc.)
+05:27 &lt; RTFM_FTW&gt; - *trimming or packing components
+05:29 &lt; multi_io&gt; I guess I wouldn't need the Apple extension, but the overview is an interesting read
+05:30 &lt; multi_io&gt; answers some of my questions :-)
+05:31 &lt; RTFM_FTW&gt; - well if you want to do this right APPLE_object_purgeable is a good path to take...
+05:31 &lt; RTFM_FTW&gt; - along with all of the other approaches specified earlier
+05:32 -!- firefly2442 [n=patrick@173-26-254-65.client.mchsi.com] has quit [Read error: 54 (Connection reset by 
+          peer)]
+05:35 -!- torchie [n=torchie@adsl-11-182-104.mia.bellsouth.net] has quit []
+05:35 &lt; multi_io&gt; as to LRU caching -- I had written sth. like that already, but it does look like the nvidia 
+                  driver uses system RAM for texture storage, which suggests one should maybe use GL's 
+                  create/deleteTexture as the cache's backend
+05:37 &lt; RTFM_FTW&gt; - this: "... but it does look like the nvidia driver uses system RAM for texture storage ... " 
+                  is implementation dependent ... the behavior you might have found here is not guaranteed 
+                  anywhere else... or even from ASIC to ASIC / driver to driver for the same vendor
+05:37 &lt; RTFM_FTW&gt; - I'd suggest keeping this in mind
+
+  </pre>
+
+  <a href="."> back to texturemapping </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/1stclass-regexps.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">perl</a>/1stclass-regexps.txt </h1>
+
+  <a href="1stclass-regexps.txt">download original</a>
+
+  <pre>
+Regular expressions can be used as "first-class-citizens"
+(i.e. created and pre-compiled at run-time):
+
+  DB&lt;1&gt; $pat='ATH.*?in';
+
+  DB&lt;7&gt; $re=qr/$pat/ r
+
+  DB&lt;8&gt; x $re
+0  (?-xism:ATH.*?in)
+   -&gt; qr/(?-xism:ATH.*?in)/
+  DB&lt;9&gt; x ref $re
+0  'Regexp'
+  DB&lt;10&gt; open(F,"&lt;/home/olaf/.bash_profile")
+
+  DB&lt;11&gt; x grep /$re/, &lt;F&gt;
+0  'PATH=.:$HOME/bin:$PATH:/usr/local/ocs-2.3f.beta/bin
+'
+  DB&lt;12&gt; 
+
+qr// precopiles its argument as a regular expression. See perlop for
+details.
+
+For also choosing the options string at runtime, the syntax
+"qr/(?$opts:$pat)/" appears to work:
+
+
+  DB&lt;148&gt; $pat = 'ath.*?in'; $opts = 'i'
+
+  DB&lt;152&gt; x $regexp=qr/(?$opts:$pat)/
+0  (?-xism:(?i:ath.*?in))
+   -&gt; qr/(?-xism:(?i:ath.*?in))/
+  DB&lt;153&gt; x 'ATHABCDIN' =~ /$regexp/
+0  1
+  DB&lt;154&gt; 
+
+This is (somewhat) documented in perlre.
+
+  </pre>
+
+  <a href="."> back to perl </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./gnus/msgid-hack.eli </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">gnus</a>/msgid-hack.eli </h1>
+
+  <a href="msgid-hack.eli">download original</a>
+
+  <pre>
+X-Gnus-Agent-Meta-Information: mail nil
+Sender: olaf@localhost.localdomain
+To: olaf.klischat@isst.fhg.de
+Subject: msgid1
+From: Olaf Klischat &lt;klischat@cs.tu-berlin.de&gt;
+Date: 08 Dec 2000 06:33:31 +0100
+Message-ID: &lt;m28zprbhp0.fsf@localhost.localdomain&gt;
+User-Agent: Gnus/5.0807 (Gnus v5.8.7) XEmacs/21.1 (Bryce Canyon)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Lines: 7
+Xref: localhost.localdomain queue:1
+
+Test...
+
+-- 
+Olaf Klischat            | TU Berlin      computer science
+Oberfeldstrasse 132      |
+12683 Berlin, Germany    |
+phone: +49 30 54986231   | eMail: klischat@cs.tu-berlin.de
+
+
+;; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, first visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.
+
+
+
+(save-restriction
+  (message-narrow-to-headers)
+  ;; Insert some headers.
+;  (let ((message-deletable-headers
+;	 (if news nil message-deletable-headers)))
+;    (message-generate-headers message-required-mail-headers))
+  ;; Let the user do all of the above.
+;;  (run-hooks 'message-header-hook)
+  (message-fetch-field "Message-ID"))
+
+(save-restriction
+  (message-narrow-to-headers)
+  (message-add-header "blah: blubb"))
+
+(save-restriction
+  (message-narrow-to-headers)
+  (re-search-forward "^\\(Message-ID:[ \\t]*&lt;[^@]*@\\).*$")
+  (replace-match "\\1blahblubb&gt;"))
+
+
+(save-restriction
+  (message-narrow-to-headers)
+  (re-search-forward "^\\(Message-ID:[ \\t]*&lt;[^@]*@\\).*$")
+  (replace-match (concat "\\1" mail-host-address "&gt;")))
+
+
+
+
+
+
+
+"&lt;m28zprbhp0.fsf@localhost.localdomain&gt;"
+
+  </pre>
+
+  <a href="."> back to gnus </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

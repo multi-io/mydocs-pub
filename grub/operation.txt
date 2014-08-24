@@ -1,0 +1,264 @@
+(2010-05-29)
+
+15:47 -!- multi_io [~olaf@port-87-193-172-154.static.qsc.de] has joined #grub
+
+15:49 < multi_io> are the following observations correct:
+15:49 < multi_io> the grub legacy documentation sucks, the grub2 documentation doesn't exist.
+15:49 < multi_io> ?
+15:50 < youpi> the grub2 documentation is incomplete, but it exists
+15:51 < multi_io> is there a description of how the different components of grub operate?
+15:51 < multi_io> i.e. what's the input data, what does it do
+15:51 < multi_io> all the docs I found are just tutorial-style
+15:53 < multi_io> e.g. is the code that gets written into the MBR identical in all installations of the same 
+                  grub version?
+15:53 < multi_io> (and then parameterized by config files in /boot/grub)
+15:53 < multi_io> ?
+15:56 < multi_io> if it's not identical, then what exactly may be different per-installation?
+15:58 < arand> multi_io: Well, the mbr loads the embedded part, and it's likely in the embedded bit the 
+               largest diff will be seen between systems, unless the partition layout is *exactly* identical
+15:58 < multi_io> I mean not just the code, the whole binary image
+15:58 < arand> multi_io: mbr=boot.img embedded part=core.img
+15:59 < arand> multi_io: the embedded part is a ~25-30k large binary image which is placed directly after 
+               the mbr
+16:00 < multi_io> so /boot/grub/boot.img is only used for installing grub, not at startup time
+16:00 < arand> multi_io: boot.img should be the exact same data which is currently written to your mbr.
+16:00 < multi_io> ok
+16:01 < multi_io> so /boot/grub/core.img isn't loaded at runtime (i.e. system startup time)?
+16:02 < multi_io> instead, it is written behind the mbr at install time?
+16:02 < multi_io> and loaded from there at runtime?
+16:05 < arand> multi_io: In a normal install, the data in that file is also written to the "embedded" part, 
+               which is the last bart of the first track (I think) of the HD, and what the mbr (boot.img) 
+               does is simply read the mebedded part directly on the first track (data is same as core.img), 
+               which loads a more complete environment, which can for example know about partitions, and 
+               easily load the grub.cfg module-loader config, and "menu-creator" without the n
+16:06 < arand> (At least that's what I've come to understand, I fully agree that the documentation is 
+               lacking..)
+16:07 < arand> multi_io: In answer to last three Qs: Yes
+16:09 < multi_io> arand: thanks. your first reply didn't get through completely, it ends at ...and 
+                  "menu-creator" without the n
+16:10 < arand> multi_io: ..."menu-creator" without the need to speify the place it resides just by disk 
+               geometry, it can actually specify a partition and filename, which is much more reliable, 
+               since it does not reqire the files themselves to be perfectly static physically, on the HD.
+16:14 < multi_io> how does the embedded part know the filesystem on which it should access /boot/grub/*
+16:14 < multi_io> ?
+16:15 < multi_io> is that information written into the binary embedded part by grub-install?
+16:15 < arand> multi_io: I frankly have no idea, might be...
+16:20 -!- phcoder [~phcoder@81.62.187.187] has joined #grub
+16:21 < multi_io> alright, thank you, let's assume this is the case then. What files in /boot/grub are 
+                  accessed at runtime? Only menu.lst?
+16:21 < multi_io> (grub legacy)
+16:23 < phcoder> multi_io: topic
+16:24 < arand> multi_io: (What I've said was all about grub2 by the way), for legacy, I've not looked into 
+               that really, there's the thing with stage 1, 1.5 and 2 there...
+16:25 < arand> But yea, not grub-legacy support here
+16:29 < multi_io> ok, so, in grub2: What files in /boot/grub are accessed at runtime? Only menu.lst?
+16:29 < phcoder> multi_io: grub2 has no menu.lst
+16:30 < multi_io> ah
+16:30 -!- xeon-enouf [~xeon-enou@unaffiliated/xeon-enouf] has quit [Read error: Operation timed out]
+16:32 -!- JrCs [~JrCs@mar06-2-88-175-100-234.fbx.proxad.net] has quit [Remote host closed the connection]
+16:32 < multi_io> so what other files are accessed at runtime (i.e. system startup time) then?
+16:33 < arand> multi_io: grub.cfg, which in turn (via e.g. "insmod ext2/gfxterm" etc.) loads additional 
+               modules if needed.
+16:33 < phcoder> "system startup" usually refers to the process which starts after kernel load
+16:34 < multi_io> phcoder: I mean the process that loads the kernel
+16:34 < phcoder> multi_io: what's your problem and goal?
+16:34 < multi_io> arand: where does the shell that interprets that file come from? Is it embedded in the 
+                  embedded part? (core.img)
+16:35 < multi_io> phcoder: I want to know how grub operates. Since there's no documentation to speak of 
+                  (only some tutorial-style fragments), I came here
+16:35 < phcoder> it's in normal.mod and sh.mod
+16:36 < multi_io> so it acceeses thos files too?
+16:36 < phcoder> *.mod are used in grub
+16:37 < multi_io> alright
+16:38 < multi_io> phcoder: is the binary image that gets written into the MBR and the region after it 
+                  (embedded part, outside any filesystem) binary identical across all grub installation with 
+                  the same grub version on the same architecture?
+16:39 < multi_io> if not, what parametrization of it happens at install time
+16:39 < multi_io> ?
+16:39 < phcoder> no. core.img contains compressed kernel.img + disk module + partition module + FS module
+16:41 < multi_io> aren't those parts all constant over all installations per-architecture?
+16:42 < multi_io> e.g. kernel.img is part of my grub debian package here
+16:42 < phcoder> No. You can install with e.g. ata+XFS+GPT or with biosdisk+fat+msdos.
+16:44 < multi_io> ok
+16:46 < multi_io> so those modules will all be merged into the binary part that gets written after the mbr, 
+                  i.e. outside any filesystem?
+16:47 < multi_io> (the "embedded part" as it's apparently named)
+16:48 < multi_io> or does that embedded part only contain a list of module names, which are then accessed at 
+                  runtime in /boot/grub in the filesystem?
+16:50 < phcoder> first one
+16:50 < phcoder> you need those modules to find other modules
+16:51 < phcoder> and there are few config variables in second block of core.img
+16:53 < multi_io> can you give an example of a modules that "finds" another module?
+16:53 < phcoder> you need embeded modules to access fs, modules don't "search for another modules" (except 
+                 some autoloading hooks in normal.mod)
+16:55 < multi_io> so by "you need those modules to find other modules" you meant you need those modules to 
+                  do things like accessing the filesystem?
+16:56 < phcoder> yes
+16:57 -!- jerone-mobile [~jerone@adsl-71-145-129-122.dsl.austtx.sbcglobal.net] has joined #grub
+16:57 < multi_io> alright, thanks. Now, what are those "few config variables in second block of core.img"?
+16:57 < multi_io> maybe there's documentation on them?
+16:58 < phcoder> they are in source
+16:58 < phcoder> in startup.S
+16:59 < multi_io> i.e. not modifiable by grub users?
+17:01 < phcoder> they are patched in by grub-mkimage. Only prefix is to be modifeid by users
+17:01 < phcoder> normally you shoul use only grub-install which does the rest
+17:04 < multi_io> VARIABLE(grub_prefix) /* to be filled by grub-mkimage */
+17:06 < multi_io> so gets written into that?
+17:07 < multi_io> the identification of the drive on which the /boot filesystem is to be accessed?
+17:08 < multi_io> s/drive/partition/ or whatever
+17:08 < multi_io> ah, only the directory name
+17:09 < multi_io> right?
+17:12 < phcoder> multi_io: generally yes
+17:14 < multi_io> phcoder: how does the embedded part know the filesystem on which it should access 
+                  /boot/grub/* then?
+17:14 < multi_io> is that information also patched into it?
+17:15 < phcoder> multi_io: yes
+17:18 < multi_io> phcoder: ...and that information corresponds to the <install_device> in  grub-install 
+                  <install_device> I assume?
+17:19 < phcoder> multi_io: no, it corresponds to /boot driver
+17:20 < multi_io> (fear of using under-documented software that wants to write into you hard dist MBR is 
+                  completely rational)
+17:21 < phcoder> multi_io: rather than blaming lack of documentation you could, you know, write it
+17:25 < multi_io> phcoder: seems like you're knowledgeable enough to write it youself much better
+17:25 < multi_io> but maybe I'll post this conversation online. It's a better documentation than any I've 
+                  found.
+17:25 < multi_io> (thanks for that btw)
+17:25 < phcoder> multi_io: I have no time for it.
+17:31 < multi_io> phcoder: why are so many *.mod files written into /boot/grub if they're not used at 
+                  runtime?
+17:32 < multi_io> (you said that the modules are embedded into the embedded part at install time)
+17:33 < phcoder> multi_io: only modules needed to access /boot.
+17:33 < phcoder> other modules are loaded as-needed
+17:33 < phcoder> only small portion of modules are actually loaded on any given configuration
+17:38 < multi_io> ok, thanks. Now, again, how does the embedded part (or more specifically, the "/boot 
+                  driver" part of it, as you named it) know the filesystem on which to access /boot/grub?
+17:39 < phcoder> it's a field in second sector of core.img
+17:40 < multi_io> ok. And it gets patched into that by who?
+17:40 < multi_io> and from what user-supplied information?
+17:42 < phcoder> by grub-setup. It's autodetected
+17:43 -!- lyhana8 [~quassel@122-117-35-27.HINET-IP.hinet.net] has quit [Remote host closed the connection]
+17:43 < phcoder> g2g
+17:44 < phcoder> or rather g2r
+17:44 -!- phcoder [~phcoder@81.62.187.187] has quit [Quit: Leaving.]
+17:44 < multi_io> phcoder: you mean it's autodetected at runtime from something like "(hd0,1)"?
+17:45 < multi_io> (hope he reads that one day)
+17:48 < arand> multi_io: Hmm, when you run grub-install or grub-setup you need to specify where the grub 
+               files (i.e. where /boot/grub is/)are located/installed, so I assume it's figured out from 
+               that.
+17:49 -!- phcoder [~phcoder@81.62.187.187] has joined #grub
+17:49 < multi_io> arand: yeah, that's what I thought
+17:49 < multi_io> hah, you're back phcoder 
+17:49 < phcoder> R stands for Reboot
+17:50 < multi_io> I see
+17:50 -!- Karwan [zyckde@gateway/shell/blinkenshell.org/x-xpzsggsymsbbhxpg] has quit [Ping timeout: 260 
+          seconds]
+17:51 < arand> multi_io: For example if I run grub-probe /boot/grub I get response "ext2", which I guess 
+               means I could use the ext2 module to access it. So it's placed in core.img in that case?
+17:51 < multi_io> phcoder: you said the information on filesystem the /boot/grub is gets patched into a 
+                  field in the 2nd sector of core.img by grub-setup and is then "autodetected".
+17:52 < multi_io> phcoder: you mean it's autodetected at runtime from something like "(hd0,1)"?
+17:52 < phcoder> no, autodetected by grub-setup and patched in.
+17:52 < multi_io> aha
+17:53 < multi_io> so that's a problem if the maching you're running grub-install on isn't the same as the 
+                  machine you're going to boot on?
+17:53 < multi_io> e.g. hard disk for embedded machine, mounted via USB on laptop for installation
+17:53 < phcoder> it's not a problem. Partition stays the same. And disk is detected from BIOS
+17:54 < multi_io> detected from BIOS on the laptop?
+17:54 < multi_io> (i.e. the machine you're running grub-install on)
+17:54 < phcoder> No. Detected on runtime
+17:55 < multi_io> that's what I meant above with 'autodetected at runtime from something like "(hd0,1)"'
+17:55 < phcoder> No
+17:56 < phcoder> Detected from %dl and a variable in 2nd sector.
+17:56 < multi_io> so grub-install doesn't autodetect anything, it just writes "(hd0,1)" into that field in 
+                  some abstract, machine/arch-independent format?
+17:56 < multi_io> (or grub-setup)
+17:56 < phcoder> It detects which partition /boot is on.
+17:57 < phcoder> There is much of autodetection under the hood
+17:57 < phcoder> you don't see it and it's exactly the goal
+17:59 < multi_io> can it be overridden?
+17:59 < phcoder> What do you want to do?
+18:00 < multi_io> i.e. can I tell grub-install "assume that what's now /dev/sda is going to be (hd0,1) at 
+                  runtime, so write that into the field"?
+18:00 < multi_io> I probably didn't really understand what you said in your last three lines
+18:01 < phcoder> Most of autodetections aren't overridable since it brings nothing to be able to override it 
+                 except giving user the ability to destroy their data by incorrect guess.
+18:01 < phcoder> grub has no problem with drives changing name
+18:01 < phcoder> it uses %dl
+18:04 < multi_io> that's passed into it at runtime by the bios?
+18:04 < phcoder> yes
+18:06 < multi_io> so grub will at runtime always use a filesystem on the same drive that it was loaded from?
+18:07 < phcoder> No, we support cross-disks installs too. In that case we use UUIDs.
+18:08 < multi_io> ..so no %dl in that case.
+18:13 < multi_io> so in that case the uuid would be read by grub-install, patched into core.img, and then 
+                  used from there at runtime to locate the disk in the system?
+18:30 < multi_io> ...and the uuid grub-install writes out would be the one of the disk the --root-directory 
+                  is located on (which is what grub-install "auto-detects")?
+
+[...]
+
+20:24 < multi_io> somebody should prolly separate grub_install from the whole autodetection machinery, and 
+                  just have the former read a config file that the latter generates.
+20:25 < multi_io> (unless I misunderstand what this thing really does)
+20:26 < phcoder> clausen: because you can't know X in (hdX,1) for sure
+20:26 < clausen> yeah, I get that
+20:26 < clausen> that you don't know it for sure
+20:26 < clausen> but I don't understand why that function was deprecated
+20:26 < phcoder> multi_io: it's pointless
+
+[...]
+
+21:10 < multi_io> so, to summarize, /usr/sbin/grub-install --root-directory=/mnt/newtick /dev/sda   ran 
+                  through,
+21:10 < multi_io> with /mnt/newtick/boot/grub/device.map containing (hd1)/dev/sda.
+21:10 < multi_io> ..which is correct right now (install time), but won't be at runtime.
+21:11 < multi_io> (at which time what is now /dev/sda will be hd0)
+21:11 < multi_io> is this installation going to work?
+21:12 < multi_io> or do I have to modify /mnt/newtick/boot/grub/device.map to contain (hd0) /dev/sda ?
+
+21:35 < multi_io> must device.map contain the configuration as it is at grub-install time or at system 
+                  startup time?
+21:36 < arand> multi_io: I have no idea, if you use --recheck it should create one, which presumably should 
+               be correct..
+21:36 < phcoder_> multi_io: doesn't matter. I already told you that.
+21:38 < multi_io> if it doesn't matter, why does the file exist?
+21:38 < multi_io> (sorry, that was probably a devil's advocate question)
+21:39 < phcoder_> multi_io: we're in progress of removing it
+21:39 < multi_io> arand: that would give me the configuration as it is at grub-install time I guess
+21:40 < multi_io> phcoder_: really?
+21:40 < multi_io> so both variants will work in my case?
+21:40 < phcoder_> yes
+21:41 < multi_io> so it would use that information only as a fallback at runtime (i.e. normally it won't use 
+                  it at all)?
+21:41 < phcoder_> yes
+21:41 < multi_io> I see. Thanks.
+
+
+----
+
+read at runtime (= system startup time):
+
+- /boot/grub/grub.cfg
+
+  - shell script-like program source code (interpreted at runtime by
+    grub). contains menu entry definitions. Example:
+
+menuentry 'Debian GNU/Linux, with Linux 2.6.24' --class debian --class gnu-linux
+ --class gnu --class os {
+        insmod msdos
+        insmod ext2
+        set root='(/dev/hdb,1)'
+        search --no-floppy --fs-uuid --set 9d74ffed-ebbc-463f-8935-177d5ad177d6
+        echo    'Loading Linux 2.6.24 ...'
+        linux   /boot/vmlinuz-2.6.24 root=/dev/hdb1 ro console=ttyS0,19200n8 acp
+i=off 
+}
+
+    the "insmod" module names refer to grub modules,
+    e.g. /boot/grub/ext2.mod for reading ext2 filesystems. "insmod"
+    loads such modules at runtime, and they may then be used to
+    perform specific tasks. They have nothing to do with Linux kernel
+    modules.
+
+
+- /boot/grub/grub.cfg is generated at setup time from
+  /etc/default/grub and /etc/grub.d/* by update-grub

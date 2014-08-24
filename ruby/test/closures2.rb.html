@@ -1,0 +1,59 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/closures2.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/closures2.rb </h1>
+
+  <a href="closures2.rb">download original</a>
+
+  <pre>
+class C
+
+  def initialize
+    @x=42
+  end
+
+  def cl
+    proc {
+      print "#{@x}\n"
+    }
+  end
+
+end
+
+
+
+
+c=C.new
+cl=c.cl
+
+
+cl.call
+
+@x = 23
+
+cl.call
+
+
+# prints 42\n42\n
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

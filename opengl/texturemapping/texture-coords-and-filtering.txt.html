@@ -1,0 +1,56 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/texturemapping/texture-coords-and-filtering.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">opengl</a>/<a href=".">texturemapping</a>/texture-coords-and-filtering.txt </h1>
+
+  <a href="texture-coords-and-filtering.txt">download original</a>
+
+  <pre>
+20:41 &lt; multi_io&gt; in this nvidia document I'm reading here (http://www.nvidia.com/docs/IO/40049/TB-04631-001_v02.pdf), they're 
+                  converting unnormalized, unsigned 16-bit grayscale input texel values (internalFormat GL_ALPHA16UI_EXT), 
+                  containing 12-bit values, to normalized (0..1) values in the shader.
+20:41 &lt; multi_io&gt; they do that by doing normalized = unnormalized/4096.0
+20:42 &lt; multi_io&gt; shouldn't that be normalized = unnormalized/4095.0 ?
+20:42 &lt; multi_io&gt; is that just common sloppiness?
+20:42 &lt; multi_io&gt; or am I wrong?
+20:42 &lt; MatthiasM2&gt; it's probably a lot cheaper to avoid the 1.0
+20:43 &lt; MatthiasM2&gt; as dividing by 4096 is just a subtraction of 14 :)
+20:43 &lt; multi_io&gt; hm, they use the normalized value for a lookup in a 1D texture afterwards
+20:43 -!- delt0r_ [~delt0r@188-22-160-169.adsl.highway.telekom.at] has quit [Ping timeout: 260 seconds]
+20:43 &lt; MatthiasM2&gt; should still be ok
+20:43 &lt; multi_io&gt; if you avoid the 1.0, you'll never lookup the maximum values from the 1D texture
+20:43 &lt; multi_io&gt; that can't be right...
+20:44 &lt; multi_io&gt; those are medical image visualization tasks
+20:44 &lt; MatthiasM2&gt; 0.0 and 1.0 can't be both inside the texture :)
+20:44 &lt; MatthiasM2&gt; 1.0 is the same texel as 0.0 when you use wrap around addressing
+20:44 &lt; multi_io&gt; hm
+20:45 &lt; MatthiasM2&gt; and when you draw a 2d quad you use (texX + width) / texWidth as right texture coordinate - which would also 
+                    be wrong except that the right border of a quad is exclusive
+20:45 &lt; multi_io&gt; so if you have a 1D texture with 4096 texels, which input coordinate would get you exactly the first texel?
+20:45 &lt; MatthiasM2&gt; 0.0
+20:45 &lt; multi_io&gt; and the last texel?
+20:46 &lt; MatthiasM2&gt; 4095 / 4096.0
+20:46 &lt; multi_io&gt; I see
+20:46 &lt; multi_io&gt; well, then normalized = unnormalized/4096.0 would be right
+
+  </pre>
+
+  <a href="."> back to texturemapping </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

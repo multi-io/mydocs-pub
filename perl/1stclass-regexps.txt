@@ -1,0 +1,36 @@
+Regular expressions can be used as "first-class-citizens"
+(i.e. created and pre-compiled at run-time):
+
+  DB<1> $pat='ATH.*?in';
+
+  DB<7> $re=qr/$pat/ r
+
+  DB<8> x $re
+0  (?-xism:ATH.*?in)
+   -> qr/(?-xism:ATH.*?in)/
+  DB<9> x ref $re
+0  'Regexp'
+  DB<10> open(F,"</home/olaf/.bash_profile")
+
+  DB<11> x grep /$re/, <F>
+0  'PATH=.:$HOME/bin:$PATH:/usr/local/ocs-2.3f.beta/bin
+'
+  DB<12> 
+
+qr// precopiles its argument as a regular expression. See perlop for
+details.
+
+For also choosing the options string at runtime, the syntax
+"qr/(?$opts:$pat)/" appears to work:
+
+
+  DB<148> $pat = 'ath.*?in'; $opts = 'i'
+
+  DB<152> x $regexp=qr/(?$opts:$pat)/
+0  (?-xism:(?i:ath.*?in))
+   -> qr/(?-xism:(?i:ath.*?in))/
+  DB<153> x 'ATHABCDIN' =~ /$regexp/
+0  1
+  DB<154> 
+
+This is (somewhat) documented in perlre.

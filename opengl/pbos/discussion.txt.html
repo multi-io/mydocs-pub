@@ -1,0 +1,186 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/pbos/discussion.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">opengl</a>/<a href=".">pbos</a>/discussion.txt </h1>
+
+  <a href="discussion.txt">download original</a>
+
+  <pre>
+[08:39:13] *** multi_io has joined #lwjgl
+
+[15:19:52] &lt;multi_io&gt; do the glTextImage* functions store the data (DataBuffer) pointer that you pass to them?
+[15:20:17] &lt;MatthiasM2&gt; no
+[15:21:10] &lt;multi_io&gt; so they copy the data to an internal buffer, and you can discard the passed buffer after the call?
+[15:21:34] &lt;MatthiasM2&gt; the data is copied to an OpenGL texture
+[15:22:25] &lt;multi_io&gt; I thought it uses the data buffer potentially whenever it needs the texture data again
+[15:22:52] &lt;multi_io&gt; (unless it copied it to VRAM, but I thought that's implementation-specific)
+[15:23:07] &lt;MatthiasM2&gt; www.opengl.org/sdk
+[15:24:55] &lt;multi_io&gt; yeah, I read the glTextimagve2D manpage there, but it apparently doesn't explicitly say whether or not it copies the data
+[15:25:48] &lt;MatthiasM2&gt; multi_io: it says what it does
+[15:25:54] &lt;MatthiasM2&gt; you just have to read it
+[15:27:24] &lt;MatthiasM2&gt; multi_io: compare the wording with glVertexPointer
+[15:28:43] *** Diablo-D3 has quit IRC
+[15:30:45] &lt;multi_io&gt; hm, ok
+[15:32:40] &lt;multi_io&gt; so if you wanted to upload a setof textures into the GL to have them all available  there to bind to, you'd preferably supply them in DataBuffers and then release the DataBuffer immediately afterwards if you wanted to save memory?
+[15:33:01] &lt;MatthiasM2&gt; or use PBOs
+[15:39:28] *** delt0r_ has quit IRC
+[15:39:49] *** delt0r_ has joined #lwjgl
+[15:48:21] * multi_io is reading http://www.songho.ca/opengl/gl_pbo.html
+[15:50:37] *** HaBaLeS has joined #lwjgl
+[15:55:17] &lt;hanrock&gt; multi_io as far as i know the image data that you supply to an opengl will be copied to some opengl managed memory and will be re-used from there whenever needed, you'll effectively end up having at least two copies of the same data, one in your programs memory managed by opengl and one in video memory
+[15:55:53] &lt;hanrock&gt; though as to whether pbo methods do the same (copy data to opengl managed buffers) i unknown to me. i'd assume that to be the case. though someone knownledgeable about this could confirm this
+[15:57:44] &lt;hanrock&gt; hmm but the dma.. maybe pbo methods rely on the buffer you supply as the last buffer before video ram.. then what happens if opengl references them when they have been freed - for example, when it needs to re-upload that texture to video ram?
+[15:59:05] &lt;MatthiasM&gt; OpenGL is free to do what it wants with the memory behind PBOs
+[15:59:21] &lt;MatthiasM&gt; so it could keep a reference to it as texture backing store
+[15:59:22] *** Archon has quit IRC
+[15:59:45] &lt;MatthiasM&gt; but for that you need to upload in a native texture format (eg not RGB)
+[16:01:34] &lt;hanrock&gt; ABGR was it. at least that was directed as the "best" format for image data for speediest transfers by nvidia pdf
+[16:01:50] &lt;MatthiasM&gt; or DXT1/3/5
+[16:02:20] &lt;hanrock&gt; but but, if it's in native format and opengl keeps just a reference to the memory, lwjgl re-uses that memory buffer and then what? in the re-upload case the texture will be some random data?
+[16:02:52] &lt;MatthiasM&gt; when you use PBO you have to map it, GL will decide what pointer to return
+[16:03:19] &lt;MatthiasM&gt; that's why you should map it as write only
+[16:03:46] &lt;MatthiasM&gt; so that GL doesn't have to provide valid data in that buffer
+[16:06:33] &lt;MatthiasM&gt; hanrock: also LWJGL doesn't do anything - it's your app and OpenGL, LWJGL is just an wrapper
+[16:07:16] &lt;hanrock&gt; i did something with nio buffers passed to it, re-using old buffers if they were not direct or something
+[16:08:13] &lt;hanrock&gt; if they are direct all hell breaks loose when they dont get freed accordingly as you go happy about using new direct bytebuffers for texture data and discarding the old - and in the case opengl stores a reference to that direct bytebuffer, you cant re-use it for old textures.
+[16:08:18] &lt;hanrock&gt; am i right?
+[16:08:36] &lt;MatthiasM&gt; no
+[16:08:40] &lt;hanrock&gt; explain please
+[16:08:48] *** HaBaLeS has quit IRC
+[16:08:53] &lt;MatthiasM&gt; I already did - read the links I gave to multi_io
+[16:09:28] &lt;hanrock&gt; i rather stick to real people helping me
+[16:09:48] &lt;MatthiasM&gt; hanrock: if you can't read then get lost
+[16:09:50] &lt;hanrock&gt; sorry, not too intrigued to read the whole sdk without some pointers. not that your pointers are always all so helpful.
+[16:10:14] &lt;hanrock&gt; can't. i'll wait for when you go to sleep and ask again.
+[16:10:24] &lt;MatthiasM&gt; lol
+[16:10:41] &lt;MatthiasM&gt; if multi_io was able to figure it out in a few minutes - why can't you?
+[16:11:00] &lt;hanrock&gt; he's not looking for what i'm looking
+[16:11:03] &lt;hanrock&gt; +for
+[16:11:09] &lt;MatthiasM&gt; he was
+[16:11:18] &lt;hanrock&gt; too bad. then we speak another language
+[16:15:22] *** SleepwalkR has joined #lwjgl
+[16:15:39] &lt;MatthiasM&gt; not sure what language you speak - but we used English here
+[16:18:36] &lt;kappaOne&gt; hmm, got two methods that do the same thing, which would be faster/better to use?
+[16:18:37] &lt;kappaOne&gt; http://lwjgl.pastebin.com/d7467d5b9
+[16:19:08] &lt;kappaOne&gt; first create a varible to store result, second does the maths twice
+[16:19:12] *** SleepwalkR has quit IRC
+[16:19:13] &lt;MatthiasM&gt; kappaOne: doesn't matter
+[16:19:21] &lt;MatthiasM&gt; use what looks nicer
+[16:19:40] &lt;kappaOne&gt; that'll be the second then :)
+[16:20:54] &lt;MatthiasM&gt; but I would use if timeStep &lt; 1
+[16:21:14] &lt;kappaOne&gt; ah, nice, didn't think of that
+
+
+
+----
+
+
+
+01:53 &lt; multi_io_&gt; MatthiasM2: I can now definitely say that it is the native glTexSubImage2D function call that takes 100 ms.
+01:53 &lt; multi_io_&gt; i.e. no Java code
+01:53 &lt; NoobFukaire&gt; what kind of data?
+01:53 &lt; MatthiasM2&gt; what texture format?
+01:54 &lt; NoobFukaire&gt; PNG is much slower than DXT1 for example
+01:54 &lt; MatthiasM2&gt; NoobFukaire: this has nothing to do with PNG
+01:54 &lt; MatthiasM2&gt; as nthe decoding is already done before the upload
+01:54 &lt; NoobFukaire&gt; You could load via PBO, which won't fix the performance itself but will make it less noticable
+01:54 &lt; NoobFukaire&gt; yeah but with PNG mipmaps have to be generated (possibly)
+01:55 &lt; NoobFukaire&gt; also I didn't mean the PNG loading from disk takes long
+01:55 &lt; MatthiasM2&gt; ok, that can be the case if you use GL_GENERATE_MIPMAPS
+01:55 &lt; NoobFukaire&gt; also PNG are generally going to be larger than compressed textures
+01:56 &lt; MatthiasM2&gt; let's just say DXT compressed textures vs uncompressed textures :)
+01:57 &lt; multi_io_&gt; I'm using a library to create the texture from a BufferedImage. I'll have to look at what parameters 
+                   are actually passed down to the native call
+01:57 &lt; NoobFukaire&gt; Java's image stuff sucks
+01:57 &lt; NoobFukaire&gt; it's feature rich but slow as fuck
+01:59 &lt; MatthiasM2&gt; multi_io_: use the PNGDecoder from TWL
+01:59 &lt; MatthiasM2&gt; it can decode into a native format for OpenGL
+01:59 &lt; MatthiasM2&gt; so you don't have to copy the data several times
+02:00 &lt; NoobFukaire&gt; MatthiasM's PNG loader is great
+02:00 &lt; MatthiasM2&gt; it got 8bit palette support recently too
+02:01 -!- Gwinnell [n=Ashley@cpc1-pool2-0-0-cust61.sotn.cable.ntl.com] has quit [Read error: 110 (Connection timed out)]
+02:06 &lt; multi_io_&gt; hm
+02:08 &lt; MatthiasM2&gt; multi_io_: anyway don't send data as GL_RGB
+02:08 &lt; multi_io_&gt; problem is, the source data is DICOM (medical image format), and I have a library that reads that into 
+                   BufferedImages.
+02:09 &lt; MatthiasM2&gt; then be sure to convert it into GL_ABGR
+02:10 &lt; multi_io_&gt; ok
+02:14 -!- Sajber^ [n=Sajber@h-142-12.A213.priv.bahnhof.se] has quit [Read error: 104 (Connection reset by peer)]
+02:19 &lt; multi_io_&gt; the parameters that the library passes down to the native glTexSubImage2D call are: 
+                   target=GL_TEXTURE_2D, level=0, xoffset=yoffset=0, width=819, height=999, format=GL_LUMINANCE, 
+                   type=GL_UNSIGNED_BYTE
+02:19 &lt; MatthiasM2&gt; urgs - the size is an issue
+02:19 &lt; MatthiasM2&gt; try to align the linesize to a multiple of say 32 byte
+02:19 &lt; multi_io_&gt; GL_LUMINANCE kind of makes sense; the ingoing BufferedImage is a 16-bit grayscale one
+02:20 &lt; MatthiasM2&gt; and use GL_TEXTURE_RECTANGLE
+02:20 &lt; multi_io_&gt; "linesize"=width?
+02:21 &lt; multi_io_&gt; width/8
+02:21 &lt; MatthiasM2&gt; not directly: stride == width * bytesPerPixel
+02:21 &lt; NoobFukaire&gt; is this some kind of image viewer or are you streaming data to the gpu every frame?
+02:22 &lt; MatthiasM2&gt; and that should be a multiple of at least 4 bytes
+02:24 &lt; multi_io_&gt; NoobFukaire: yes it's gonna be an image viewer, displaying maybe 25 images at a time out of 2000 (all 
+                   of the size of the one above)
+02:25 &lt; multi_io_&gt; I can't reasonably load all those textures up-front I think
+02:25 &lt; NoobFukaire&gt; k, you're probably going to want to do the texture upload with PBO and then the texture submission 
+                     calls will be very cheap from PBO -&gt; texture
+02:26 &lt; multi_io_&gt; so right now I'm loading the textures into GL when they're being displayed the first time, so the 
+                   display() methods is delayed by those 100 ms (times the number of new textures to be displayed)
+02:26 &lt; NoobFukaire&gt; with PBO you can be uploading in a different thread
+02:27 &lt; NoobFukaire&gt; and then you just need to notify your display code about upload state (i.e. loading bar or whatever)
+02:27 &lt; multi_io_&gt; yeah I was thinking of something like that, I'm afraid of triggering dozens of driver bugs when calling 
+                   GL from multiple threads :P
+02:28 &lt; NoobFukaire&gt; mapped buffers are safe, it's like the only reliable way to do asynchronous stuff with GL
+02:50 &lt; multi_io_&gt; so I would then basically use the same GL context (and, in it, the same PBOs) from multiple threads, 
+                   right?
+02:51 &lt; multi_io_&gt; and use Java synchronization to ensure that I won't do things like initializing a PBO in one thread and 
+                   at the same time already drawing it in another thread
+02:52 &lt; NoobFukaire&gt; well, you map the buffer to client memory from the GL thread
+02:52 &lt; NoobFukaire&gt; then you hand it off to your IO thread which can copy the data independently
+02:53 &lt; NoobFukaire&gt; then when that thread is finished, you'd do like you said, with some kind of synchronized 
+                     notification system to tell GL thread it's okay to unmap the buffer and use it in the GL thread
+02:53 &lt; NoobFukaire&gt; the PBO creation is all still done in the GL thread
+02:57 &lt; MatthiasM2&gt; multi_io_: GL stays single threaded, you only pass a ByteBuffer to the other thread - use 
+                    java.util.concurrent queues for that
+
+
+
+
+02:53 &lt; multi_io_&gt; RTFM_FTW: the glTexSubImage2D call that takes 100 ms is called with: target=GL_TEXTURE_2D, level=0, 
+                   xoffset=yoffset=0, width=819, height=999, format=GL_LUMINANCE, type=GL_UNSIGNED_BYTE
+02:53 -!- Lemml [n=andreas@pD9E52D16.dip.t-dialin.net] has joined ##OpenGL
+02:54 &lt; multi_io_&gt; is that a "native" format/type combination?
+02:55 &lt; RTFM_FTW&gt; - LUMINANCE should be native but I'm wondering WTF are you attempting to SubImage with &lt; 819, 999 &gt; NPOT 
+                  dimensions...
+02:56 &lt; RTFM_FTW&gt; that is just nasty...
+02:56 &lt; RTFM_FTW&gt; - heh
+02:57 -!- gonsor [n=quassel@p57A8AA7D.dip0.t-ipconnect.de] has quit [Read error: 110 (Connection timed out)]
+02:57 &lt; multi_io_&gt; the people in #lwgl were asking that too :P
+02:57 &lt; RTFM_FTW&gt; - and the answer would be?
+02:58 &lt; multi_io_&gt; it's a medical image viewer; those are the dimensions of the image...  the glTexSubImage2D call is done 
+                   by a library which I use to read those images into GL
+02:58 &lt; NoobFukaire&gt; you can pad the texture to ^2 and "fix" things with texture coordinates
+03:00 &lt; RTFM_FTW&gt; - yup
+03:01 &lt; RTFM_FTW&gt; - in this case I'd definitely recommend padding the data
+03:02 &lt; multi_io_&gt; ok, I understand
+
+  </pre>
+
+  <a href="."> back to pbos </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

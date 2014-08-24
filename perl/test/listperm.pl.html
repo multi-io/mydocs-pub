@@ -1,0 +1,59 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/listperm.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/listperm.pl </h1>
+
+  <a href="listperm.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+use strict;
+
+
+sub listPerms {
+    my $size = 1 + $#_;
+    if ($size &lt;= 1) {
+        return [@_];
+    }
+    else {
+        my $firstEl = $_[0];
+        my @subPermRefs = listPerms(@_[1 .. $size-1]);
+        my @result = ();
+        foreach my $subPermRef (@subPermRefs) {
+            for (my $i=0; $i&lt;$size; $i++) {
+                push @result, [(@{$subPermRef}[0 .. $i-1], $firstEl, @{$subPermRef}[$i .. $size-2])];
+            }
+        }
+        return @result;
+    }
+}
+
+
+my @permRefs = listPerms(@ARGV);
+
+foreach my $permRef (@permRefs) {
+    print "@$permRef\n";
+}
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

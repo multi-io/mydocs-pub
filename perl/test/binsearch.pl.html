@@ -1,0 +1,60 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/binsearch.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/binsearch.pl </h1>
+
+  <a href="binsearch.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl
+
+sub binsrch_r($$$$$) {
+    my ($arr,$value,$compfunc,$startidx,$stopidx) = @_;
+    return $startidx if ($startidx==$stopidx);
+    my $divide = int(($startidx+$stopidx)/2);
+    if (1==$compfunc-&gt;($value,$arr-&gt;[$divide])) {
+        return binsrch_r($arr,$value,$compfunc,$divide+1,$stopidx);
+    } else {
+        return binsrch_r($arr,$value,$compfunc,$startidx,$divide);
+    }
+}
+
+
+sub binsrch($$$) {
+    my ($arr,$value,$compfunc) = @_;
+    binsrch_r($arr,$value,$compfunc,0,$#$arr);
+}
+
+
+
+
+my $arr = [4,7,8,10,13,14,16,20,25];
+
+sub comp($$) {
+    my ($a,$b) = @_;
+    $a &lt;=&gt; $b;
+}
+
+print binsrch($arr,12,\&amp;comp), "\n";
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

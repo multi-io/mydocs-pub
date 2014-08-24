@@ -1,0 +1,71 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/streams.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/streams.rb </h1>
+
+  <a href="streams.rb">download original</a>
+
+  <pre>
+#infinite streams, 1st try (using Enumerable)
+
+
+class AllNats
+  include Enumerable
+
+  def each
+    x=0
+    while 1
+      yield(x)
+      x += 1
+    end
+  end
+
+end
+
+
+class TakeN
+  include Enumerable
+
+  def initialize(n,input)
+    @n = n
+    @input = input
+  end
+
+  def each
+    i=0
+    @input.each \
+    { | x |
+      yield(x) if i&lt;@n
+      i += 1
+      # runs infinitely...
+      # need a way to "abort" blocks...
+      # Enumerables have no "cursor"
+    }
+  end
+
+end
+
+
+
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

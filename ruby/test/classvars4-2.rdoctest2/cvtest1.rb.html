@@ -1,0 +1,48 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/classvars4-2.rdoctest2/cvtest1.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">ruby</a>/<a href="../.">test</a>/<a href=".">classvars4-2.rdoctest2</a>/cvtest1.rb </h1>
+
+  <a href="cvtest1.rb">download original</a>
+
+  <pre>
+module M
+  @@cv = 42
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+ 
+  ClassMethods = Module.new do
+    def cm
+      puts @@cv
+    end
+  end
+end
+ 
+class C
+  include M
+  cm
+end
+
+  </pre>
+
+  <a href="."> back to classvars4-2.rdoctest2 </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,136 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./emacs/encodings-discussion.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">emacs</a>/encodings-discussion.txt </h1>
+
+  <a href="encodings-discussion.txt">download original</a>
+
+  <pre>
+08:47 &lt; multi_io&gt; what kind of encoding is this: utf-8, with each multi-byte
+                  sequence preceded by c2 81?
+08:51 &lt; dalias&gt; wtf
+08:51 &lt; dalias&gt; c2 81 = U+0081
+08:51 &lt; dalias&gt; which is a control character
+08:51 &lt; multi_io&gt; yeah, Emacs saved the file that way
+08:52 &lt; dys`&gt; maybe an utf-8 multi-byte sequence interpreted as latin-1 and
+              then encoded in utf-8 a second time?
+08:52 &lt; dalias&gt; dys`, nope, shouldn't cause that
+08:52 &lt; dalias&gt; multi_io, can you give a better description / more context?
+08:52 &lt; dalias&gt; if you described it slightly wrong dys` might be correct
+08:54 &lt; multi_io&gt; I don't know the exact circumstances, unfortunately
+08:55 &lt; dalias&gt; i mean just show me some more bytes of context around the
+                corrupt data
+08:56 &lt; multi_io&gt; well, the locale was en_US.UTF-8, the file was only ever
+                  edited with Emacs, no other tools, and I didn't do anything
+                  unusual [tm]
+08:56 &lt; multi_io&gt; dalias: wait
+08:56 &lt; multi_io&gt; dalias: can you read German?
+08:56 &lt; dalias&gt; i can't tell the meaning, but i can examine the characters..
+08:57 &lt; dalias&gt; and i might could guess the meaning
+09:02 &lt; multi_io&gt; well, dys` is prolly right somewhat
+09:03 &lt; dalias&gt; if he's right then repairing it is not so hard
+09:03 &lt; dalias&gt; but i could tell you better if i could see an excerpt
+09:03 &lt; multi_io&gt; the word is "Einflussgrößen" ("influencing variables"), the
+                  sequence is 45 69 6e 66 6c 75 73 73 67 72 c2 81 c3 b6 c2 81
+                  c3 9f 65 6e
+09:03 &lt; multi_io&gt; without the two c2 81's that would be the correct
+                  utf-8 AFAICT
+09:04 &lt; dalias&gt; hmm it looks like your system is NOT utf-8
+09:04 &lt; dalias&gt; because the text you sent over irc was latin1..
+09:04 &lt; multi_io&gt; um yeah, I typed it manually
+09:04 &lt; dalias&gt; ?
+09:05 &lt; multi_io&gt; oh, that you mean
+09:05 &lt; dalias&gt; ya
+09:05 &lt; multi_io&gt; nah, the IRC client runs on a FreeBSD with locale
+                  de_DE.ISO8859-15
+09:05 &lt; multi_io&gt; but that's not where the Emacs runs
+09:05 &lt; dalias&gt; ah
+09:07 &lt; multi_io&gt; I think I did this: I copied the word from a file that
+                  already looked broken in Emacs into a new buffer to "examine
+                  it seperately"! When saving that new buffer, the c2 81's
+                  appeared
+09:07 &lt; dalias&gt; ah
+09:08 &lt; dalias&gt; well what are you trying to do now?
+09:08 &lt; dalias&gt; just discover what happened?
+09:08 &lt; dalias&gt; or fix important data?
+09:09 &lt; multi_io&gt; in the original file, the word was encoded as 45 69 6e 66 6c
+                  75 73 73 67 72 81 f6 81 df 65 6e
+09:09 &lt; multi_io&gt; which is totally bogus, AFAICS
+09:10 &lt; multi_io&gt; it's not legal UTF-8 according to
+http://software.hixie.ch/utilities/cgi/unicode-decoder/utf8-decoder
+09:10 &lt; dalias&gt; that has nothing to do with utf-8
+09:10 &lt; dalias&gt; it's latin-1 with bogus 0x81 characters inserted
+09:12 &lt; multi_io&gt; I copied the file from another system (on which it looks good
+                  in Emacs), then opened it here in Emacs, and the word is
+                  displayed as Einflussgr\201ö\201ßen
+09:12 &lt; multi_io&gt; it's not important data, it'S just an annoyance :-P
+09:15 &lt; dys`&gt; i get the above byte sequence by yanking "Einflussgrößen" into a
+              new buffer and saving it with C-x RET c emacs-mule RET C-x C-s
+09:16 &lt; dalias&gt; multi_io, bleh send utf-8 on irc not latin-1 :P
+09:16 &lt; dalias&gt; anyway
+09:16 &lt; dalias&gt; i figured out what the encoding is
+09:16 &lt; dalias&gt; 0x81 is the C1 control code for "high octet present"
+09:17 &lt; dalias&gt; that is, in a (nasty broken legacy) environment where bit 8
+                means meta, 0x81 is the meta-control code indicating that the
+                next byte should be interpreted as a character with the high
+                bit set, and not as meta+lowchar
+09:18 &lt; multi_io&gt; dys`: thanks, I can reproduce that
+09:19 &lt; dalias&gt; ah does emacs-mule encoding use that nastiness?
+09:19 &lt; dys`&gt; dalias: looks like it
+09:19 &lt; multi_io&gt; dalias: thanks. Does that mean that "emacs-mule" is a "nasty
+                  broken legacy environment" ? :-P
+09:19 &lt; dalias&gt; yes
+09:19 &lt; dalias&gt; very much so
+09:25 &lt; multi_io&gt; alright then, thanks. Now, could I convert that file from
+                  emacs-mule to UTF-8?
+09:32 &lt; dalias&gt; multi_io, sure i don't see why not
+09:32 &lt; dalias&gt; as long as you make sure emacs _loads_ it as emacs-mule encoding
+09:33 &lt; dalias&gt; and not as latin-1
+09:33 &lt; dalias&gt; if emacs loads it as latin-1, then 0x81 is just U+0081
+09:34 &lt; dalias&gt; and it will get saved like that when you save as utf-8
+09:35 &lt; multi_io&gt; heh, opening it with C-x RET c emacs-mule C-x C-f filename
+                  works
+09:35 &lt; dalias&gt; :)
+09:35 &lt; dalias&gt; and please, let's let emacs-mule encoding die... :) we have
+                utf-8 for a reason
+09:36 &lt; multi_io&gt; well, I never requested it!  I use a UTF-8 locale like a good
+                  boy :-P
+09:36 &lt; dalias&gt; heh
+09:37 &lt; dalias&gt; the history of character encoding is really a nasty matter
+09:38 &lt; dalias&gt; back around the beginning of the 90's there were two equally
+                idiotic philosophies
+09:38 &lt; dalias&gt; the iso-2022/mule/etc. one of using escape codes and stateful
+                encoding to "switch" between different national character sets
+09:39 &lt; dalias&gt; that was also the ucs(iso10646) philosophy at the time
+09:40 &lt; dalias&gt; and the unicode philosophy, of throwing away the whole internet
+                and unix and whatnot and redefining "char" to be 16bit
+09:41 &lt; dalias&gt; all it took to fix the idiocy of both was the brilliance of ken
+                thompson
+09:41 &lt; dalias&gt; but both continued to fight against sanity and simplicity for
+                the next ~10 years...
+09:42 &lt; dalias&gt; it's a real shame. had they realized back then, linux would
+                have been all-utf-8 from day one
+09:42 &lt; dalias&gt; oh i'm sorry, day 365 or so
+09:43 &lt; dalias&gt; linux is about a year older than utf-8
+
+  </pre>
+
+  <a href="."> back to emacs </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

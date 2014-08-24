@@ -1,0 +1,156 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./springframework/mvc/filters.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">springframework</a>/<a href=".">mvc</a>/filters.txt </h1>
+
+  <a href="filters.txt">download original</a>
+
+  <pre>
+full trace of sample controller invocation:
+
+	FormTemplateController.showJson(Long) line: 434	
+	FormTemplateController$$FastClassByCGLIB$$70143e0d.invoke(int, Object, Object[]) line: not available	
+	MethodProxy.invoke(Object, Object[]) line: 191	
+	Cglib2AopProxy$DynamicAdvisedInterceptor.intercept(Object, Method, Object[], MethodProxy) line: 617	
+	FormTemplateController$$EnhancerByCGLIB$$eb0401d.showJson(Long) line: not available	
+	GeneratedMethodAccessor99.invoke(Object, Object[]) line: not available	
+	DelegatingMethodAccessorImpl.invoke(Object, Object[]) line: 25	
+	Method.invoke(Object, Object...) line: 597	
+	AnnotationMethodHandlerAdapter$ServletHandlerMethodInvoker(HandlerMethodInvoker).invokeHandlerMethod(Method, Object, NativeWebRequest, ExtendedModelMap) line: 176	
+	AnnotationMethodHandlerAdapter.invokeHandlerMethod(HttpServletRequest, HttpServletResponse, Object) line: 426	
+	AnnotationMethodHandlerAdapter.handle(HttpServletRequest, HttpServletResponse, Object) line: 414	
+	DispatcherServlet.doDispatch(HttpServletRequest, HttpServletResponse) line: 790	
+	DispatcherServlet.doService(HttpServletRequest, HttpServletResponse) line: 719	
+	DispatcherServlet(FrameworkServlet).processRequest(HttpServletRequest, HttpServletResponse) line: 644	
+	DispatcherServlet(FrameworkServlet).doGet(HttpServletRequest, HttpServletResponse) line: 549	
+	DispatcherServlet(HttpServlet).service(HttpServletRequest, HttpServletResponse) line: 621	
+	DispatcherServlet(HttpServlet).service(ServletRequest, ServletResponse) line: 728	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 305	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	ContextStudyFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 44	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 243	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	DomainSecurityFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 69	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 243	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 343	
+	FilterSecurityInterceptor.invoke(FilterInvocation) line: 109	
+	FilterSecurityInterceptor.doFilter(ServletRequest, ServletResponse, FilterChain) line: 83	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	ExceptionTranslationFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 97	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	SessionManagementFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 100	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	AnonymousAuthenticationFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 78	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	SecurityContextHolderAwareRequestFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 54	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	RequestCacheAwareFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 35	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	BasicAuthenticationFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 177	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	UsernamePasswordAuthenticationFilter(AbstractAuthenticationProcessingFilter).doFilter(ServletRequest, ServletResponse, FilterChain) line: 188	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	LogoutFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 105	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	SecurityContextPersistenceFilter.doFilter(ServletRequest, ServletResponse, FilterChain) line: 79	
+	FilterChainProxy$VirtualFilterChain.doFilter(ServletRequest, ServletResponse) line: 355	
+	FilterChainProxy.doFilter(ServletRequest, ServletResponse, FilterChain) line: 149	
+	DelegatingFilterProxy.invokeDelegate(Filter, ServletRequest, ServletResponse, FilterChain) line: 237	
+	DelegatingFilterProxy.doFilter(ServletRequest, ServletResponse, FilterChain) line: 167	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 243	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	HiddenHttpMethodFilter.doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) line: 77	
+	HiddenHttpMethodFilter(OncePerRequestFilter).doFilter(ServletRequest, ServletResponse, FilterChain) line: 76	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 243	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	OpenEntityManagerInViewFilter.doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) line: 113	
+	OpenEntityManagerInViewFilter(OncePerRequestFilter).doFilter(ServletRequest, ServletResponse, FilterChain) line: 76	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 243	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	CharacterEncodingFilter.doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) line: 88	
+	CharacterEncodingFilter(OncePerRequestFilter).doFilter(ServletRequest, ServletResponse, FilterChain) line: 76	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 243	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	AjaxSecurityFilter.doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) line: 68	
+	AjaxSecurityFilter(OncePerRequestFilter).doFilter(ServletRequest, ServletResponse, FilterChain) line: 76	
+	ApplicationFilterChain.internalDoFilter(ServletRequest, ServletResponse) line: 243	
+	ApplicationFilterChain.doFilter(ServletRequest, ServletResponse) line: 210	
+	StandardWrapperValve.invoke(Request, Response) line: 222	
+	StandardContextValve.invoke(Request, Response) line: 123	
+	NonLoginAuthenticator(AuthenticatorBase).invoke(Request, Response) line: 472	
+	StandardHostValve.invoke(Request, Response) line: 171	
+	ErrorReportValve.invoke(Request, Response) line: 99	
+	AccessLogValve.invoke(Request, Response) line: 953	
+	StandardEngineValve.invoke(Request, Response) line: 118	
+	CoyoteAdapter.service(Request, Response) line: 408	
+	Http11Processor(AbstractHttp11Processor&lt;S&gt;).process(SocketWrapper&lt;S&gt;) line: 1023	
+	Http11Protocol$Http11ConnectionHandler(AbstractProtocol$AbstractConnectionHandler&lt;S,P&gt;).process(SocketWrapper&lt;S&gt;, SocketStatus) line: 589	
+	JIoEndpoint$SocketProcessor.run() line: 310	
+	ThreadPoolExecutor$Worker.runTask(Runnable) line: 886	
+	ThreadPoolExecutor$Worker.run() line: 908	
+	TaskThread(Thread).run() line: 619	
+
+
+(servlet container is tomcat. The ApplicationFilterChain thing is the
+Tomcat thing that processes the sequence of web.xml-defined servlet
+filters)
+
+- web.xml: the first filter-mapping in web.xml becomes "outermost" at
+  runtime (i.e the one that gets to call all the other servlet
+  filters), last filter-mapping becomes "innermost" at runtime
+  (i.e. the one that calls no other servlet filters)
+
+- usually the last one of the last (innermost) servlet filters is
+  DelegatingFilterProxy, which is a servlet filter that delegates on
+  to a spring bean configured in the spring context (the bean's name
+  should correspond to the DelegatingFilterProxy's filter-name in
+  web.xml). The bean must apparently be a subclass of Spring's
+  GenericFilterBean, which is a servlet filter and a spring bean at
+  the same time. It will reference a list of other filter beans,
+  configured via the spring context rather than in web.xml. These
+  spring-configured filter beans must also be servlet filters. They're
+  configured via spring to gain better spring integration, among other
+  advantages. From the DelegatingFilterProxy API doc:
+
+ * &lt;p&gt;&lt;code&gt;web.xml&lt;/code&gt; will usually contain a DelegatingFilterProxy definition,
+ * with the specified &lt;code&gt;filter-name&lt;/code&gt; corresponding to a bean name in
+ * Spring's root application context. All calls to the filter proxy will then
+ * be delegated to that bean in the Spring context, which is required to implement
+ * the standard Servlet 2.3 Filter interface.
+ *
+ * &lt;p&gt;This approach is particularly useful for Filter implementation with complex
+ * setup needs, allowing to apply the full Spring bean definition machinery to
+ * Filter instances. Alternatively, consider standard Filter setup in combination
+ * with looking up service beans from the Spring root application context.
+
+  The most frequently used (and default) filter bean is probably
+  org.springframework.security.web.FilterChainProxy.
+
+- the dispatch to the controller/view is NOT done by a servlet filter,
+  but by spring's org.springframework.web.servlet.DispatcherServlet,
+  which must be set up in web.xml to catch all requests. The
+  DispatcherServlet will invoked after all filters have run.
+
+
+  </pre>
+
+  <a href="."> back to mvc </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

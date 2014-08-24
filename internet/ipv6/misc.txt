@@ -1,0 +1,298 @@
+(see also http://www-uxsup.csx.cam.ac.uk/courses/ipv6_basics/x84.html,
+http://www.tcpipguide.com/free/t_IPv6NDOverviewHistoryMotivationandStandards.htm)
+
+IPv6 transport over Ethernet (RFC 2464)
+=======================================
+
+- IPv6 packet packed into ethernet frame payload, the ethertype of the
+  frame is set to 86dd (with IPv4 it was 0800)
+
+- ...
+
+
+IPv6 multicast, transport over Ethernet, Neighbor discovery
+============================================================
+
+- IPv6 multicast addresses are all addresses in ff00::/8
+
+- ethernet multicast addresses are ones whose first byte's least
+  significant bit is 1. E.g. 33-33-FF-68-12-CB is a multicast MAC
+  address, while 00-C0-4F-68-12-CB is not.
+
+  - the ethernet broadcast address FF-FF-FF-FF-FF-FF is just a special
+    multicast address
+
+  - TODO: which devices will listen for frames with a given multicast
+    MAC address?
+
+  - various groups of ethernet multicast addresses (multicast groups)
+    are well-known; see
+    http://www.cavebear.com/archive/cavebear/Ethernet/multicast.html. For
+    example:
+
+    Ethernet          Ethertype	
+    Address	             Field  Usage
+
+    01-00-0C-CC-CC-CC	-802-	CDP (Cisco Discovery Protocol), VTP (Virtual Trunking Protocol)
+
+    01-00-5E-00-00-00	0800	DoD Internet Multicast (RFC-1112)
+    through
+    01-00-5E-7F-FF-FF
+
+    01-80-C2-00-00-10	-802-	Bridge Management
+
+    33-33-00-00-00-00	86DD	IPv6 Neighbor Discovery  (see below)
+    through
+    33-33-FF-FF-FF-FF
+
+    An ethernet device is probably set up (by the driver, normally) to
+    listen to multicast address groups (in addition to its own unique
+    unicast MAC address).
+
+    For example, an ethernet device that has one or more IPv6
+    addresses assigned to it would probably listen to the IPv6
+    Neighbor Discovery multicast group 33-33-xx-xx-xx-xx (or at least
+    to some portions of it?)
+
+- to send an IPv6 multicast packet over Ethernet, one simply takes the
+  last 32 bits of the destination IPv6 address, prepends 33-33- and
+  uses that as the destination Ethernet address. Any host which is
+  interested in packets for that IPv6 address is expected to be
+  listening for the corresponding Ethernet address.
+
+- various well-known IPv6 multicast groups have been defined (see also
+  RFC 2373, 2375). Examples:
+
+   FF02:0:0:0:0:0:0:1     All Nodes Address   (link-local)
+   FF02:0:0:0:0:0:0:2     All Routers Address (link-local)
+
+   FF02::1:FFXX:XXXX     Solicited-Node Address (see below)
+
+   FF05:0:0:0:0:0:0:2       All Routers Address (site-local)
+
+   FF05:0:0:0:0:0:1:3       All-dhcp-servers (site-local)
+   FF05:0:0:0:0:0:1:4       All-dhcp-relays  (site-local)
+
+  actually, the two nibbles after the FF (e.g. 01,05,08) are
+  standardized too -- the 0 in the first nibble means "well-known
+  (permanently assigned) multicast address", and for the second
+  nibble, which is called the "scope" of the multicast address, 1
+  means "node-local", 2 means "link-local", 5 means "site-local", 8
+  means "organization-local", E means "global"
+
+  and actually, the part after the FFXX (i.e. the lower 112 bits of
+  the address) is commonly called the "group id" of the address, as it
+  defines the actual multicast group that's being addressed, and it is
+  defined for all scopes, i.e. any scope can be combined with any
+  group id. So in the above examples, 0:0:0:0:0:0:2 is the group id
+  for the "all routers" group, and it is combined with the link-local
+  scope (2) to address all router on the local link
+  (FF02:0:0:0:0:0:0:2), and with the site-local scope (5) to adress
+  all routers in the local site (FF05:0:0:0:0:0:0:2). So theoretically
+  you could address all routers globally by using the global scope
+  (E), giving FF0E:0:0:0:0:0:0:2.
+
+  RFC 2373 / section 2.7.2 says that, at least for permanently
+  assigned / "well known" multicast groups, the upper 80 bits of the
+  group ID should actually be set to 0, and only the lower 32 be used,
+  because then all group IDs differ only in the lower 32 bits, which
+  means that each of them maps to a different (unique) Ethernet MAC
+  address, as per the IPv6-Ethernet multicast address conversion rule
+  given above.
+
+- Problem with globally scoped multicast addresses is that, in all
+  likelyhood, no public router will route them, since doing so would
+  potentially explode routing tables. :-P
+
+- TODO: RFC 3306
+
+
+Neighbor discovery (ND) (RFC 2461)
+==================================
+
+Set of tasks that routers and hosts must perform, related to router
+and host discovery and configuration etc. To implement those tasks, ND
+defines a multitude of types of ND messages, e.g. neighbor
+solicitations, neighbor advertisements, router
+advertisements/solicitations. Some of the tasks will be described in
+more detail in the next sections, along with the related ND
+messages.
+
+ND is implemented on top of ICMPv6 -- each ND message type corresponds
+to a specific ICMP message type. For example, router advertisements
+have ICMP type 134.
+
+layer 2 address resolution
+--------------------------
+
+- IPv6 equivalent of ARP. Used for discovering the layer2 (MAC etc.)
+  address corresponding to a given IPv6 destination address.
+
+- to find the MAC address for a given IPv6 address A, the discovering
+  host sends an ICMPv6 packet containing a corresponding query
+  ("neighbor solicitation") to the "solicited-node multicast address"
+  of A, which is FF02::1:FF<last 24 bits of A>. (I guess that this
+  would in turn be packed into an ethernet frame and sent to the
+  ethernet multicast address 33-33-FF-<last 24 bits of A>, as per the
+  IPv6-Ethernet multicast address conversion rule given above). (this
+  scheme is chosen in order to ensure that hosts don't get disturbed
+  by neighbour solicitations that aren't either for them or for a host
+  with a very similar IPv6 address)
+
+  The host with address A must listen to that multicast address. It
+  receives the query and sends back its response (a neighbor
+  advertisement), identifying its own layer2 address.
+
+
+Address Autoconfiguration (RFC 2461/2462)
+-----------------------------------------
+
+- after being switched on (or after an interface is activated etc.), a
+  host assigns a "link-local" IPv6 address to each interface that IPv6
+  is enabled on, using only information that's available locally. This
+  address is prefixed with fe80; the suffix is generated from the
+  hardware (e.g. MAC) address of the interface. Before assigning this
+  address, the host will check whether it is unique on the whole
+  link-local (L2) network by sending out a "neighbor solicitation" to
+  the adress's corresponding solicited-node multicast address as
+  defined above (FF02::1:FF<last 24 bits of the address>), with the
+  exact target address in the payload of the packet (the source
+  address will be set to the "unspecified" address: ::). If the target
+  address is NOT unique, i.e. if a host on the link has the target
+  address, it'll send a "neighbor advertisement" in reply to the
+  neighbor solicitation (using the all-hosts multicast address as the
+  target address of the reply packet). In such a case,
+  autoconfiguration generally stops for the sending host and manual
+  configuration (or stateful configuration via DHCPv6) is required.
+
+  - An address that a host is currently still checking for uniqueness
+    is called a "tentative" address of that host/interface.
+
+    A host can also send a neighbor advertisement on its own, without
+    having received a neighbor solicitation message before (this is
+    called an "unsolicited" neighbor advertisement). This is normally
+    done to inform peers that the link-layer address of the host has
+    changed.
+
+  - the process apparently is not free of races (e.g. multiple hosts
+    trying to check for the same address at the same time). This is
+    alleviated by the requirement that hosts wait for some random time
+    before attempting the uniqueness test, and by the requirement that
+    hosts that currently check for the uniqueness of an address also
+    listen to and process neighbor solicitations coming in from other
+    hosts for that same address at the same time
+
+- after the assignment of link-local addresses has succeeded, hosts on
+  the same layer 2 network will have IP connectivity.
+
+- once that's the case, stateless autoconfiguration may ensue to set
+  up globally unique addresses for the hosts. The general way this
+  works is that a router multicasts router advertisement messages
+  specifying the network prefix of the to-be-generated global
+  addresses, and a lifetime of that prefix. A host receives the
+  advertisement and generates the corresponding host part ("interface
+  identifier") of the address using the layer2 address of the
+  interface. The resulting address is set up as the globally unique
+  address of the host.
+
+  - routers send out router advertisements (RAs) to the all-hosts
+    multicast address by themselves periodically ("unsolicited"
+    RAs). A host that doesn't want to wait for the next regularly sent
+    advertisement may send a "router solicitation" to the all-routers
+    multicast address, to which routers must react by immediately
+    sending their router advertisements ("solicited" RAs).
+
+  - link prefix length (from RA) + interface identifier length MUST be
+    128 bit, otherwise the RA is ignored. The interface identifier
+    length (and thus, the prefix length as well) is 64 bit for most
+    layer2 protocol types, even for things like 48-bit ethernet
+    addresses (the expansion to 64 bits is done using something called
+    EUI-64). This may not be the case for all layer2 protocols though.
+
+  - router advertisements also contain two (optinally infinite)
+    lifetime values for the prefix -- the "preferred" and the "valid"
+    lifetime. The preferred lifetime must be <= the valid one. For the
+    preferred lifetime, the address generated for the prefix is called
+    the "preferred" address, and should be used for new connections
+    (e.g. TCP) in the system. When the preferred lifetime is over and
+    a new RA was received, resulting in the creation of a new,
+    different preferred address, that address is to be preferred for
+    new connections, and the previous (now "deprecated") address
+    should only be used for existing connections or other
+    communication if switching them to the preferred address would
+    result in service disruption. (there may be more than one globally
+    unique IPv6 address assigned to the same interface). Of course,
+    this only applies if the routing infrastructure actually supports
+    and routes more than one prefix simultaneously for a "transition"
+    period when switching to a new prefix.
+
+  - router advertisements may also contain hop limit (TTL) values that
+    hosts should use when generating packets
+
+  - hosts should check the uniqueness of autoconfigures global
+    addresses as well, unless the layer 2 address portion was already
+    tested during link-local address setup
+
+- DNS configuration via RA/ND was not supported initially, but now
+  there's RFC 6106 that specifies it
+
+
+16:44 < multi_io> can the DNS server IP only be configured via DHCPv6, not via ND?
+16:44 < multi_io> (apart from static configuration)
+16:45 < ardya> theres rdnss
+16:45 < jercos> RA has rdnss
+16:45 < ardya> its a part of RA
+16:45 < jercos> Er, yes.
+16:45 < ardya> but not widely supported
+16:45 < jercos> Works fine on all my systems ;)
+16:46 < jercos> resolvconf + rdnssd
+16:48 < multi_io> hm, ok...
+16:49 -!- MissionCritical [~MissionCr@unaffiliated/missioncritical] has quit [Ping timeout: 240 seconds]
+16:49 < fly23_> hm, avahi-daemon has an option to publish dns-servers
+16:49 < multi_io> jercos: does rdnssd then also support the normal link prefix configuration via RA?
+16:50 < fly23_> at least all those desktop linux systems  are running avahi by default
+16:50 < jercos> multi_io: no, it does not. But it doesn't *block* said autoconfiguration, thus it still happens.
+16:51 < jercos> multi_io: that's kinda like, ya know, does apache support ssh? Of course not... But it doesn't stop you running an SSHd. They 
+                work in tandem, as seperate systems.
+16:51 < jercos> Wheras with DHCP, the whole thing is unified.
+16:52 -!- HRH_H_Crab [~crab@kowloontong.dim-sum.org] has quit [Read error: Operation timed out]
+16:53 -!- CRCinAU is now known as CRCinAU[a]
+16:53 < multi_io> jercos: so you're also running something like radvd?
+16:54 < jercos> Ah, vice versa. radvd is serving rdnss broadcasts, and rdnssd is picking them up and putting them into client resolv.conf files, 
+                via resolvconf.
+16:54 < jercos> radvd supports rdnss, client machines just don't magically work with rdnss.
+16:54 < multi_io> ah! I see.
+16:54 < jercos> (Depending on various factors, i think networkmanager might do something with them... dunno)
+16:55 < jercos> NetworkManager is evil, so I don't touch it :p
+
+
+TODO: describe other ND message types, split/rename this document
+
+17:33 < multi_io> hm, I noticed that during autoconfiguration (with radvd on the router), my host set up a default route via the router's 
+                  link-local ip
+17:33 < multi_io> it did not set up a 2000::/3 route
+17:33 < multi_io> ardya: ^^^
+17:34 < multi_io> is that normal?
+17:34 < }dec3pti0n{> i think it is but I'm no expert
+17:34 < }dec3pti0n{> on mine is the same thing 
+17:34 < }dec3pti0n{> it sets the default route via the ll ip of my router
+17:35 < multi_io> I thought it would set up a route to 2000::/3 via the host's global IP
+17:35 < ardya> yes its normal
+17:38 < multi_io> ok
+
+========
+
+02:05 < multi_io> why does the Linux IPv6 HOWTO tell you to point the default route to 2000::/3?
+02:05 < multi_io> shouldn't it just be ::/0 ?
+02:06 < Simon-> no
+02:06 < multi_io> (i.e. the target network)
+02:06 < Simon-> 2000::/3 is allocated to global unicast
+02:06 < Simon-> not ::/0
+02:06 < Simon-> ff00::/8 is multicast
+02:07 < Simon-> they're treated differently, but ::/0 is wrong.. although it's still used as the default 
+                route after a router advert is received :/
+02:08 < multi_io> so all global unicast host IPs ever assigned will be in 2000::/3 ?
+02:08 < Simon-> no, there's another 6 /3s after that that will be assigned when that one runs out
+
+(111 in the first 3 bits belongs to the mentioned ff00::/8 multicast
+address space, so 2^3-2=6 /3 networks are still unassigned)

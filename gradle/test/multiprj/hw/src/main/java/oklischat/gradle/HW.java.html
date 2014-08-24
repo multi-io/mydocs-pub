@@ -1,0 +1,47 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./gradle/test/multiprj/hw/src/main/java/oklischat/gradle/HW.java </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../../../../../.">.</a>/<a href="../../../../../../../../.">gradle</a>/<a href="../../../../../../../.">test</a>/<a href="../../../../../../.">multiprj</a>/<a href="../../../../../.">hw</a>/<a href="../../../../.">src</a>/<a href="../../../.">main</a>/<a href="../../.">java</a>/<a href="../.">oklischat</a>/<a href=".">gradle</a>/HW.java </h1>
+
+  <a href="HW.java">download original</a>
+
+  <pre>
+package oklischat.gradle;
+
+import oklischat.gradle.multiprjtest.common.WiseCracker;
+import oklischat.gradle.multiprjtest.calc.Calculator;
+import org.apache.log4j.Logger;
+
+public class HW {
+
+    static final Logger log = Logger.getLogger(HW.class);
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("HW! " + WiseCracker.getWisdom());
+        System.out.println("  direct calc: 1+1=" + Calculator.add(1,1));
+        log.info("direct log4j (which is a dependency of calc)");
+    }
+
+}
+
+  </pre>
+
+  <a href="."> back to gradle </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

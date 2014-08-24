@@ -1,0 +1,40 @@
+big, messy
+
+lots of global variables
+
+"The nnfolder directory" nnfolder-directory (used by
+e.g. nnfolder-generate-active-file) -- huh? Should be per server.
+
+e.g.
+(let ((nnfolder-directory "~/Mail/archive/archive"))
+  (nnfolder-generate-active-file))
+
+creates the active file for the "first" nnfolder server (don't know
+the exact criteria, but it's always the same server, no matter what
+the value of nnfolder-directory is)
+
+
+-----
+
+No clean separation of components. E.g. the "nnml" backend appears to
+do lots of thigs that a backend isn't supposed to do. From the manual:
+
+| Getting Started Reading Mail
+| ----------------------------
+| 
+|    It's quite easy to use Gnus to read your new mail.  You just plonk
+| the mail backend of your choice into `gnus-secondary-select-methods',
+| and things will happen automatically.
+| 
+|    For instance, if you want to use `nnml' (which is a "one file per
+| mail" backend), you could put the following in your `.gnus' file:
+| 
+|      (setq gnus-secondary-select-methods
+|            '((nnml "private")))
+| 
+|    Now, the next time you start Gnus, this backend will be queried for
+| new articles, and it will move all the messages in your spool file to
+| its directory, which is `~/Mail/' by default.  The new group that will
+| be created (`mail.misc') will be subscribed, and you can read it like
+| any other group.
+| 

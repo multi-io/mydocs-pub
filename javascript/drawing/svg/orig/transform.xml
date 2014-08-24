@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+	<head>
+		<title>KevLinDev - Tutorials - SVG - Transformations</title>
+		<link href="../../../../common/kevlindev.css" type="text/css" rel="stylesheet" />
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	</head>
+
+	<body>
+		<div id="logo"></div>
+		<p id="path"><a href="../../../../index.htm">Home</a> :: <a href="../../../index.htm">Tutorials</a> :: <a href="../../index.htm">SVG</a> :: Transformations</p>
+		<div id="simple-content">
+			<p>This example shows how you can accumulate all transformations that lead to the final rendering of an element. Using the inverse of this transformation and by taking the current zoom and pan into account, you can convert the current mouse position to a coordinate within the element's coordinate space.</p>
+			<p>The image below shows the same rectangle with various transformations applied to it. The untransformed rectangle is defined with the following SVG:</p>
+			<pre>&lt;rect x=&quot;-2&quot; y=&quot;0&quot; width=&quot;10&quot; height=&quot;10&quot;/&gt;
+</pre>
+			<p>Based on this rectangle's definition, the x user coordinates should range from [-2, 8] and the y user coordinates should range from [0,10].</p>
+			<p>Try different zoom levels and panning. The mouse coordinates will reflect the current zoom and pan settings, but the user coordinates should remain within the intervals listed above. I have noticed slight errors with the rotated and skewed versions of the rectangle. I welcome any suggestions on how I can improve the accuracy of these calculations.</p>
+			<p>A future version of this example will take the viewBox into account.</p>
+			<hr />
+		</div>
+		<div align="center">
+                        Hello World!!!
+			<embed width="402" height="402" src="transformCursor.svg" type="image/svg+xml" />
+                </div>
+		<div id="footer">
+			<p class="copyright">Copyright 2000-2003, Kevin Lindsey</p>
+		</div>
+	</body>
+
+</html>

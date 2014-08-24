@@ -1,0 +1,52 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/array-splicing.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/array-splicing.txt </h1>
+
+  <a href="array-splicing.txt">download original</a>
+
+  <pre>
+18:24 &lt; multi_io&gt; why doesn't splicing arrays into argument lists work in the 
+                  middle of the list, e.g. foo(1,2,*args,8,9) ?
+18:28 &lt; multi_io&gt; splicing arrays into the middle of other arrays doesn't work 
+                  either, e.g. [1,2,*arr,8,9] :(
+18:29 &lt; ThreeDayMonk&gt; multi_io: a1[2,a2.length] = a2 ?
+18:29 -!- wnorrix [~warren@202.68.158.180] has quit [Read error: 60 (Operation 
+          timed out)]
+18:29 &lt; ThreeDayMonk&gt; oh,that replaces it... I see what you mean
+18:30 &lt; ThreeDayMonk&gt; the trick is to use length 0
+18:30 &lt; ThreeDayMonk&gt; multi_io: a1[2,0] = a2
+18:32 &lt; ThreeDayMonk&gt; nedric: are you trapping INT in webrick?
+18:33 &lt; ThreeDayMonk&gt; it works on my debian
+18:34 &lt; multi_io&gt; ThreeDayMonk: hm, ok thanks. But it still uglifies my code a 
+                  bit. I don't have a name for a1, so I'd like to create the 
+                  whole thing in one expression.
+18:34 &lt; ThreeDayMonk&gt; ah... let me think on it
+18:35 &lt; multi_io&gt; [1,2]+args+[8,9] maybe
+18:35 &lt; multi_io&gt; :)
+18:36 &lt; ThreeDayMonk&gt; would be easier if you want a one-liner :-)
+18:36 &lt; multi_io&gt; so in the function call case, that would be 
+                  foo(*([1,2]+args+[8,9]))
+18:36 &lt; multi_io&gt; foo(1,2,*args,8,9) would be prettier
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/allpairs.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/allpairs.rb </h1>
+
+  <a href="allpairs.rb">download original</a>
+
+  <pre>
+class Array
+  def each_pair &amp;block
+    case self.length
+    when 0,1
+      raise "array too short for that"
+    when 2
+      block.call(self)
+    else
+      tail = self[1..-1]
+      tail.each {|x| block.call [self[0],x] }
+      tail.each_pair &amp;block
+    end
+  end
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

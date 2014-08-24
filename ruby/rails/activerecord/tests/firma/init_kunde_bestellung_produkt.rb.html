@@ -1,0 +1,85 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/rails/activerecord/tests/firma/init_kunde_bestellung_produkt.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../.">.</a>/<a href="../../../../.">ruby</a>/<a href="../../../.">rails</a>/<a href="../../.">activerecord</a>/<a href="../.">tests</a>/<a href=".">firma</a>/init_kunde_bestellung_produkt.rb </h1>
+
+  <a href="init_kunde_bestellung_produkt.rb">download original</a>
+
+  <pre>
+require 'shared_setup'
+
+module Enumerable
+  def sum
+    self.inject(0){|part,new| part+new}
+  end
+end
+
+class Kunde &lt; ActiveRecord::Base
+  db_table "kunde"
+  belongs_to :wohnsitz, :class_name=&gt;"Adresse", :foreign_key=&gt;"wohnsitz_id"
+  has_many :bestellungen, :class_name=&gt;"Bestellung", :foreign_key=&gt;"kunde_id"
+
+  def zu_zahlen
+    self.bestellungen.map{|b|b.anzahl*b.produkt.preis}.sum
+  end
+end
+
+
+class Adresse &lt; ActiveRecord::Base
+  db_table "adresse"
+  #belongs_to :stadt, :class_name=&gt;"Stadt", :foreign_key=&gt;"stadt_id"
+end
+
+
+class Bestellung &lt; ActiveRecord::Base
+  db_table "bestellung"
+  belongs_to :kunde, :class_name=&gt;"Kunde", :foreign_key=&gt;"kunde_id"
+  belongs_to :produkt, :class_name=&gt;"Produkt", :foreign_key=&gt;"produkt_id"
+
+  def gesamtpreis
+    self.anzahl * self.produkt.preis
+  end
+end
+
+
+class Produkt &lt; ActiveRecord::Base
+  db_table "produkt"
+
+  has_and_belongs_to_many :hersteller, :class_name=&gt;"Firma",
+                                       :table_name=&gt;"firma",   # QU: shouldn't this be determined using &lt;class_name&gt;.table_name ?
+                                       :join_table=&gt;"produkt_hersteller",
+                                       :foreign_key=&gt;"produkt_id"
+end
+
+
+class Firma &lt; ActiveRecord::Base
+  db_table "firma"
+  has_and_belongs_to_many :produkt, :class_name=&gt;"Produkt",
+                                    :table_name=&gt;"produkt",
+                                    :join_table=&gt;"produkt_hersteller",
+                                    :foreign_key=&gt;"firma_id"
+end
+
+
+
+  </pre>
+
+  <a href="."> back to firma </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/classvars3.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/classvars3.rb </h1>
+
+  <a href="classvars3.rb">download original</a>
+
+  <pre>
+module M
+  def self.aax=(x)
+    @@x=x
+  end
+end
+
+
+module M2
+  def m2inst_aax
+    @@x
+  end
+end
+
+
+class C
+  include M
+  extend M2
+end
+
+
+
+M.aax=42
+p C.m2inst_aax
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

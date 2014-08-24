@@ -1,0 +1,57 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/re/reerror.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">perl</a>/<a href="../.">test</a>/<a href=".">re</a>/reerror.pl </h1>
+
+  <a href="reerror.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+@arr = split (/n( *n)+?/,'nnan         nnnbnbnnnnnnc');
+
+foreach (@arr) { print "&gt;&gt;$_&lt;&lt;\n"; }
+
+__END__
+
+Ausgabe:
+
+&gt;&gt;&lt;&lt;
+&gt;&gt;n&lt;&lt;
+&gt;&gt;a&lt;&lt;
+&gt;&gt;n&lt;&lt;
+&gt;&gt;bnb&lt;&lt;
+&gt;&gt;n&lt;&lt;
+&gt;&gt;c&lt;&lt;
+
+
+sollte IMHO:
+
+&gt;&gt;&lt;&lt;
+&gt;&gt;a&lt;&lt;
+&gt;&gt;bnb&lt;&lt;
+&gt;&gt;c&lt;&lt;
+
+(bei "/nn+/" als RE klappt das auch so)
+
+  </pre>
+
+  <a href="."> back to re </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

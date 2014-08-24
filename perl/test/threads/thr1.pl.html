@@ -1,0 +1,44 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/threads/thr1.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">perl</a>/<a href="../.">test</a>/<a href=".">threads</a>/thr1.pl </h1>
+
+  <a href="thr1.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+use Thread;
+
+my $t1 = new Thread \&amp;threadf ( 3 ),
+   $t2 = new Thread \&amp;threadf ( 1 )
+
+$t1-&gt;join;
+
+sub threadf {
+    print "thread anfang\n";
+    sleep $_[0];
+    print "thread ende\n";
+}
+
+  </pre>
+
+  <a href="."> back to threads </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

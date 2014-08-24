@@ -1,0 +1,43 @@
+olaf@tack:~/doc/mydocs/mongodb/test/sharding$ mongo
+MongoDB shell version: 2.0.5
+connecting to: test
+mongos> use admin;
+switched to db admin
+mongos> db.runCommand( { addshard : "localhost:10000" } )
+{ "shardAdded" : "shard0000", "ok" : 1 }
+mongos> db.runCommand( { addshard : "localhost:10001" } )
+{ "shardAdded" : "shard0001", "ok" : 1 }
+mongos> db.runCommand( { enablesharding : "normize" } )
+{ "ok" : 1 }
+mongos> db.runCommand( { shardcollection : "normize.companyProfileXmlElement", key : {uuid : 1} } )
+{
+	"proposedKey" : {
+		"uuid" : 1
+	},
+	"curIndexes" : [
+		{
+			"v" : 1,
+			"key" : {
+				"_id" : 1
+			},
+			"ns" : "normize.companyProfileXmlElement",
+			"name" : "_id_"
+		}
+	],
+	"ok" : 0,
+	"errmsg" : "please create an index over the sharding key before sharding."
+}
+
+(ein paar tausend Dokumente einfüllen, damit er ausreichend Werte für den Shardkey hat(?))
+
+mongos> use normize;
+switched to db normize
+mongos> db.companyProfileXmlElement.ensureIndex({uuid:1});
+mongos> use admin;
+switched to db admin
+mongos> db.runCommand( { shardcollection : "normize.companyProfileXmlElement", key : {uuid : 1} } )
+{ "collectionsharded" : "normize.companyProfileXmlElement", "ok" : 1 }
+mongos> db.runCommand( { shardcollection : "normize.companyProfileXmlElement", key : {uuid : 1} } )
+{ "ok" : 0, "errmsg" : "already sharded" }
+mongos> 
+

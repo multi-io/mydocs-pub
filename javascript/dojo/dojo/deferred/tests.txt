@@ -1,0 +1,46 @@
+d1=new dojo.Deferred();
+
+setTimeout(function(){d1.callback("call!"); }, 10000);
+
+d1.then(function(){ console.log("defer1"); }).then(function(){console.log("defer2");}, function(err){console.log("err2:" + err);})
+
+======
+
+function runerrxhr() {
+        return dojo.xhrGet({url:"foobarbaz", handleAs:"json"}).then(function(jsonResult) {
+            console.log("XML result " + jsonResult);
+        });
+}
+
+runerrxhr().then(function(){ console.log("defer1"); }).then(function(){console.log("defer2");}, function(err){console.log("err2:" + err);})
+
+=> klappt (err2 ausgegeben)
+
+======
+
+function deferimm() {
+  var d = new dojo.Deferred();
+  d.callback(42);
+  return d;
+}
+
+
+
+deferimm().then(function(){ console.log("defer1"); }).then(function(){console.log("defer2");}, function(err){console.log("err2:" + err);})
+
+
+
+=> works. (defer1\ndefer2)
+
+
+
+deferimm().then(function(){ console.log("defer1"); throw "foo"; }).then(function(){console.log("defer2");}, function(err){console.log("err2:" + err);})
+
+
+=> works.
+
+>>> deferimm().then(function(){ console.log("defer1"); throw "foo"; }).then(function(){console.log("defer2");}, function(err){console.log("err2:" + err);})
+defer1
+err2:foo
+
+=> works.

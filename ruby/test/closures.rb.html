@@ -1,0 +1,41 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/closures.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/closures.rb </h1>
+
+  <a href="closures.rb">download original</a>
+
+  <pre>
+def cltest
+  a=7
+  geta = proc { a }
+  print "cltest-1 - #{geta.call}\n"
+  a=12
+  print "cltest-2 - #{geta.call}\n"
+  geta
+end
+
+
+print "main - #{cltest.call}\n"
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

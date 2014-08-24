@@ -1,0 +1,45 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/rails/activerecord/tests/shared_setup.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">ruby</a>/<a href="../../.">rails</a>/<a href="../.">activerecord</a>/<a href=".">tests</a>/shared_setup.rb </h1>
+
+  <a href="shared_setup.rb">download original</a>
+
+  <pre>
+## Be sure to change the mysql_connection details and create a database for the example
+
+$: &lt;&lt; File.dirname(__FILE__) + '/../lib'
+
+require 'active_record'
+require 'logger'; class Logger; def format_message(severity, timestamp, msg, progname) "#{msg}\n" end; end
+
+ActiveRecord::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Base.establish_connection(
+  :adapter  =&gt; "mysql", 
+  :host     =&gt; "localhost", 
+  :username =&gt; "olaf", 
+  :password =&gt; "mysqlpw", 
+  :database =&gt; "tests"
+)
+
+  </pre>
+
+  <a href="."> back to tests </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

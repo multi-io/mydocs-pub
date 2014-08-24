@@ -1,0 +1,51 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/rails/activerecord/tests/firma/shared_setup.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../.">.</a>/<a href="../../../../.">ruby</a>/<a href="../../../.">rails</a>/<a href="../../.">activerecord</a>/<a href="../.">tests</a>/<a href=".">firma</a>/shared_setup.rb </h1>
+
+  <a href="shared_setup.rb">download original</a>
+
+  <pre>
+require 'active_record'
+require 'logger'; class Logger; def format_message(severity, timestamp, msg, progname) "#{msg}\n" end; end
+
+ActiveRecord::Base.logger = Logger.new(STDOUT)
+#ActiveRecord::Base.logger = nil
+ActiveRecord::Base.establish_connection(
+  :adapter  =&gt; "mysql", 
+  :host     =&gt; "localhost", 
+  :username =&gt; "olaf", 
+  :password =&gt; "mysqlpw", 
+  :database =&gt; "tests"
+)
+
+
+class ActiveRecord::Base
+  def self.db_table(name)
+    class_eval &lt;&lt;-"EOS"
+      def self.table_name() "#{name}" end
+    EOS
+  end
+end
+
+  </pre>
+
+  <a href="."> back to firma </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,751 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/test/java/de.oklischat.ogl.lwjgl.coil/nbproject/build-impl.xml </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../.">.</a>/<a href="../../../../.">opengl</a>/<a href="../../../.">test</a>/<a href="../../.">java</a>/<a href="../.">de.oklischat.ogl.lwjgl.coil</a>/<a href=".">nbproject</a>/build-impl.xml </h1>
+
+  <a href="build-impl.xml">download original</a>
+
+  <pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!--
+*** GENERATED FROM project.xml - DO NOT EDIT  ***
+***         EDIT ../build.xml INSTEAD         ***
+
+For the purpose of easier reading the script
+is divided into following sections:
+
+  - initialization
+  - compilation
+  - jar
+  - execution
+  - debugging
+  - javadoc
+  - junit compilation
+  - junit execution
+  - junit debugging
+  - applet
+  - cleanup
+
+        --&gt;
+&lt;project xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxrpc="http://www.netbeans.org/ns/j2se-project/jax-rpc" basedir=".." default="default" name="de.oklischat.ogl.lwjgl.coil-impl"&gt;
+    &lt;fail message="Please build using Ant 1.7.1 or higher."&gt;
+        &lt;condition&gt;
+            &lt;not&gt;
+                &lt;antversion atleast="1.7.1"/&gt;
+            &lt;/not&gt;
+        &lt;/condition&gt;
+    &lt;/fail&gt;
+    &lt;target depends="test,jar,javadoc" description="Build and test whole project." name="default"/&gt;
+    &lt;!-- 
+                ======================
+                INITIALIZATION SECTION 
+                ======================
+            --&gt;
+    &lt;target name="-pre-init"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="-pre-init" name="-init-private"&gt;
+        &lt;property file="nbproject/private/config.properties"/&gt;
+        &lt;property file="nbproject/private/configs/${config}.properties"/&gt;
+        &lt;property file="nbproject/private/private.properties"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="-pre-init,-init-private" name="-init-libraries"&gt;
+        &lt;property location="./lib/nblibraries.properties" name="libraries.1.path"/&gt;
+        &lt;dirname file="${libraries.1.path}" property="libraries.1.dir.nativedirsep"/&gt;
+        &lt;pathconvert dirsep="/" property="libraries.1.dir"&gt;
+            &lt;path path="${libraries.1.dir.nativedirsep}"/&gt;
+        &lt;/pathconvert&gt;
+        &lt;basename file="${libraries.1.path}" property="libraries.1.basename" suffix=".properties"/&gt;
+        &lt;touch file="${libraries.1.dir}/${libraries.1.basename}-private.properties"/&gt;
+        &lt;loadproperties encoding="ISO-8859-1" srcfile="${libraries.1.dir}/${libraries.1.basename}-private.properties"&gt;
+            &lt;filterchain&gt;
+                &lt;replacestring from="$${base}" to="${libraries.1.dir}"/&gt;
+                &lt;escapeunicode/&gt;
+            &lt;/filterchain&gt;
+        &lt;/loadproperties&gt;
+        &lt;loadproperties encoding="ISO-8859-1" srcfile="${libraries.1.path}"&gt;
+            &lt;filterchain&gt;
+                &lt;replacestring from="$${base}" to="${libraries.1.dir}"/&gt;
+                &lt;escapeunicode/&gt;
+            &lt;/filterchain&gt;
+        &lt;/loadproperties&gt;
+    &lt;/target&gt;
+    &lt;target depends="-pre-init,-init-private,-init-libraries" name="-init-user"&gt;
+        &lt;property file="${user.properties.file}"/&gt;
+        &lt;!-- The two properties below are usually overridden --&gt;
+        &lt;!-- by the active platform. Just a fallback. --&gt;
+        &lt;property name="default.javac.source" value="1.4"/&gt;
+        &lt;property name="default.javac.target" value="1.4"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="-pre-init,-init-private,-init-libraries,-init-user" name="-init-project"&gt;
+        &lt;property file="nbproject/configs/${config}.properties"/&gt;
+        &lt;property file="nbproject/project.properties"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="-pre-init,-init-private,-init-libraries,-init-user,-init-project,-init-macrodef-property" name="-do-init"&gt;
+        &lt;available file="${manifest.file}" property="manifest.available"/&gt;
+        &lt;condition property="manifest.available+main.class"&gt;
+            &lt;and&gt;
+                &lt;isset property="manifest.available"/&gt;
+                &lt;isset property="main.class"/&gt;
+                &lt;not&gt;
+                    &lt;equals arg1="${main.class}" arg2="" trim="true"/&gt;
+                &lt;/not&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+        &lt;condition property="manifest.available+main.class+mkdist.available"&gt;
+            &lt;and&gt;
+                &lt;istrue value="${manifest.available+main.class}"/&gt;
+                &lt;isset property="libs.CopyLibs.classpath"/&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+        &lt;condition property="have.tests"&gt;
+            &lt;or&gt;
+                &lt;available file="${test.src.dir}"/&gt;
+            &lt;/or&gt;
+        &lt;/condition&gt;
+        &lt;condition property="have.sources"&gt;
+            &lt;or&gt;
+                &lt;available file="${src.dir}"/&gt;
+            &lt;/or&gt;
+        &lt;/condition&gt;
+        &lt;condition property="netbeans.home+have.tests"&gt;
+            &lt;and&gt;
+                &lt;isset property="netbeans.home"/&gt;
+                &lt;isset property="have.tests"/&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+        &lt;condition property="no.javadoc.preview"&gt;
+            &lt;and&gt;
+                &lt;isset property="javadoc.preview"/&gt;
+                &lt;isfalse value="${javadoc.preview}"/&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+        &lt;property name="run.jvmargs" value=""/&gt;
+        &lt;property name="javac.compilerargs" value=""/&gt;
+        &lt;property name="work.dir" value="${basedir}"/&gt;
+        &lt;condition property="no.deps"&gt;
+            &lt;and&gt;
+                &lt;istrue value="${no.dependencies}"/&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+        &lt;property name="javac.debug" value="true"/&gt;
+        &lt;property name="javadoc.preview" value="true"/&gt;
+        &lt;property name="application.args" value=""/&gt;
+        &lt;property name="source.encoding" value="${file.encoding}"/&gt;
+        &lt;condition property="javadoc.encoding.used" value="${javadoc.encoding}"&gt;
+            &lt;and&gt;
+                &lt;isset property="javadoc.encoding"/&gt;
+                &lt;not&gt;
+                    &lt;equals arg1="${javadoc.encoding}" arg2=""/&gt;
+                &lt;/not&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+        &lt;property name="javadoc.encoding.used" value="${source.encoding}"/&gt;
+        &lt;property name="includes" value="**"/&gt;
+        &lt;property name="excludes" value=""/&gt;
+        &lt;property name="do.depend" value="false"/&gt;
+        &lt;condition property="do.depend.true"&gt;
+            &lt;istrue value="${do.depend}"/&gt;
+        &lt;/condition&gt;
+        &lt;condition else="" property="javac.compilerargs.jaxws" value="-Djava.endorsed.dirs='${jaxws.endorsed.dir}'"&gt;
+            &lt;and&gt;
+                &lt;isset property="jaxws.endorsed.dir"/&gt;
+                &lt;available file="nbproject/jaxws-build.xml"/&gt;
+            &lt;/and&gt;
+        &lt;/condition&gt;
+    &lt;/target&gt;
+    &lt;target name="-post-init"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="-pre-init,-init-private,-init-libraries,-init-user,-init-project,-do-init" name="-init-check"&gt;
+        &lt;fail unless="src.dir"&gt;Must set src.dir&lt;/fail&gt;
+        &lt;fail unless="test.src.dir"&gt;Must set test.src.dir&lt;/fail&gt;
+        &lt;fail unless="build.dir"&gt;Must set build.dir&lt;/fail&gt;
+        &lt;fail unless="dist.dir"&gt;Must set dist.dir&lt;/fail&gt;
+        &lt;fail unless="build.classes.dir"&gt;Must set build.classes.dir&lt;/fail&gt;
+        &lt;fail unless="dist.javadoc.dir"&gt;Must set dist.javadoc.dir&lt;/fail&gt;
+        &lt;fail unless="build.test.classes.dir"&gt;Must set build.test.classes.dir&lt;/fail&gt;
+        &lt;fail unless="build.test.results.dir"&gt;Must set build.test.results.dir&lt;/fail&gt;
+        &lt;fail unless="build.classes.excludes"&gt;Must set build.classes.excludes&lt;/fail&gt;
+        &lt;fail unless="dist.jar"&gt;Must set dist.jar&lt;/fail&gt;
+    &lt;/target&gt;
+    &lt;target name="-init-macrodef-property"&gt;
+        &lt;macrodef name="property" uri="http://www.netbeans.org/ns/j2se-project/1"&gt;
+            &lt;attribute name="name"/&gt;
+            &lt;attribute name="value"/&gt;
+            &lt;sequential&gt;
+                &lt;property name="@{name}" value="${@{value}}"/&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+    &lt;/target&gt;
+    &lt;target name="-init-macrodef-javac"&gt;
+        &lt;macrodef name="javac" uri="http://www.netbeans.org/ns/j2se-project/3"&gt;
+            &lt;attribute default="${src.dir}" name="srcdir"/&gt;
+            &lt;attribute default="${build.classes.dir}" name="destdir"/&gt;
+            &lt;attribute default="${javac.classpath}" name="classpath"/&gt;
+            &lt;attribute default="${includes}" name="includes"/&gt;
+            &lt;attribute default="${excludes}" name="excludes"/&gt;
+            &lt;attribute default="${javac.debug}" name="debug"/&gt;
+            &lt;attribute default="${empty.dir}" name="sourcepath"/&gt;
+            &lt;attribute default="${empty.dir}" name="gensrcdir"/&gt;
+            &lt;element name="customize" optional="true"/&gt;
+            &lt;sequential&gt;
+                &lt;property location="${build.dir}/empty" name="empty.dir"/&gt;
+                &lt;mkdir dir="${empty.dir}"/&gt;
+                &lt;javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" includeantruntime="false" includes="@{includes}" source="${javac.source}" sourcepath="@{sourcepath}" srcdir="@{srcdir}" target="${javac.target}"&gt;
+                    &lt;src&gt;
+                        &lt;dirset dir="@{gensrcdir}" erroronmissingdir="false"&gt;
+                            &lt;include name="*"/&gt;
+                        &lt;/dirset&gt;
+                    &lt;/src&gt;
+                    &lt;classpath&gt;
+                        &lt;path path="@{classpath}"/&gt;
+                    &lt;/classpath&gt;
+                    &lt;compilerarg line="${javac.compilerargs} ${javac.compilerargs.jaxws}"/&gt;
+                    &lt;customize/&gt;
+                &lt;/javac&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+        &lt;macrodef name="depend" uri="http://www.netbeans.org/ns/j2se-project/3"&gt;
+            &lt;attribute default="${src.dir}" name="srcdir"/&gt;
+            &lt;attribute default="${build.classes.dir}" name="destdir"/&gt;
+            &lt;attribute default="${javac.classpath}" name="classpath"/&gt;
+            &lt;sequential&gt;
+                &lt;depend cache="${build.dir}/depcache" destdir="@{destdir}" excludes="${excludes}" includes="${includes}" srcdir="@{srcdir}"&gt;
+                    &lt;classpath&gt;
+                        &lt;path path="@{classpath}"/&gt;
+                    &lt;/classpath&gt;
+                &lt;/depend&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+        &lt;macrodef name="force-recompile" uri="http://www.netbeans.org/ns/j2se-project/3"&gt;
+            &lt;attribute default="${build.classes.dir}" name="destdir"/&gt;
+            &lt;sequential&gt;
+                &lt;fail unless="javac.includes"&gt;Must set javac.includes&lt;/fail&gt;
+                &lt;pathconvert pathsep="," property="javac.includes.binary"&gt;
+                    &lt;path&gt;
+                        &lt;filelist dir="@{destdir}" files="${javac.includes}"/&gt;
+                    &lt;/path&gt;
+                    &lt;globmapper from="*.java" to="*.class"/&gt;
+                &lt;/pathconvert&gt;
+                &lt;delete&gt;
+                    &lt;files includes="${javac.includes.binary}"/&gt;
+                &lt;/delete&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+    &lt;/target&gt;
+    &lt;target name="-init-macrodef-junit"&gt;
+        &lt;macrodef name="junit" uri="http://www.netbeans.org/ns/j2se-project/3"&gt;
+            &lt;attribute default="${includes}" name="includes"/&gt;
+            &lt;attribute default="${excludes}" name="excludes"/&gt;
+            &lt;attribute default="**" name="testincludes"/&gt;
+            &lt;sequential&gt;
+                &lt;junit dir="${work.dir}" errorproperty="tests.failed" failureproperty="tests.failed" fork="true" showoutput="true"&gt;
+                    &lt;batchtest todir="${build.test.results.dir}"&gt;
+                        &lt;fileset dir="${test.src.dir}" excludes="@{excludes},${excludes}" includes="@{includes}"&gt;
+                            &lt;filename name="@{testincludes}"/&gt;
+                        &lt;/fileset&gt;
+                    &lt;/batchtest&gt;
+                    &lt;classpath&gt;
+                        &lt;path path="${run.test.classpath}"/&gt;
+                    &lt;/classpath&gt;
+                    &lt;syspropertyset&gt;
+                        &lt;propertyref prefix="test-sys-prop."/&gt;
+                        &lt;mapper from="test-sys-prop.*" to="*" type="glob"/&gt;
+                    &lt;/syspropertyset&gt;
+                    &lt;formatter type="brief" usefile="false"/&gt;
+                    &lt;formatter type="xml"/&gt;
+                    &lt;jvmarg line="${run.jvmargs}"/&gt;
+                &lt;/junit&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+    &lt;/target&gt;
+    &lt;target depends="-init-debug-args" name="-init-macrodef-nbjpda"&gt;
+        &lt;macrodef name="nbjpdastart" uri="http://www.netbeans.org/ns/j2se-project/1"&gt;
+            &lt;attribute default="${main.class}" name="name"/&gt;
+            &lt;attribute default="${debug.classpath}" name="classpath"/&gt;
+            &lt;attribute default="" name="stopclassname"/&gt;
+            &lt;sequential&gt;
+                &lt;nbjpdastart addressproperty="jpda.address" name="@{name}" stopclassname="@{stopclassname}" transport="${debug-transport}"&gt;
+                    &lt;classpath&gt;
+                        &lt;path path="@{classpath}"/&gt;
+                    &lt;/classpath&gt;
+                &lt;/nbjpdastart&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+        &lt;macrodef name="nbjpdareload" uri="http://www.netbeans.org/ns/j2se-project/1"&gt;
+            &lt;attribute default="${build.classes.dir}" name="dir"/&gt;
+            &lt;sequential&gt;
+                &lt;nbjpdareload&gt;
+                    &lt;fileset dir="@{dir}" includes="${fix.classes}"&gt;
+                        &lt;include name="${fix.includes}*.class"/&gt;
+                    &lt;/fileset&gt;
+                &lt;/nbjpdareload&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+    &lt;/target&gt;
+    &lt;target name="-init-debug-args"&gt;
+        &lt;property name="version-output" value="java version &amp;quot;${ant.java.version}"/&gt;
+        &lt;condition property="have-jdk-older-than-1.4"&gt;
+            &lt;or&gt;
+                &lt;contains string="${version-output}" substring="java version &amp;quot;1.0"/&gt;
+                &lt;contains string="${version-output}" substring="java version &amp;quot;1.1"/&gt;
+                &lt;contains string="${version-output}" substring="java version &amp;quot;1.2"/&gt;
+                &lt;contains string="${version-output}" substring="java version &amp;quot;1.3"/&gt;
+            &lt;/or&gt;
+        &lt;/condition&gt;
+        &lt;condition else="-Xdebug" property="debug-args-line" value="-Xdebug -Xnoagent -Djava.compiler=none"&gt;
+            &lt;istrue value="${have-jdk-older-than-1.4}"/&gt;
+        &lt;/condition&gt;
+        &lt;condition else="dt_socket" property="debug-transport-by-os" value="dt_shmem"&gt;
+            &lt;os family="windows"/&gt;
+        &lt;/condition&gt;
+        &lt;condition else="${debug-transport-by-os}" property="debug-transport" value="${debug.transport}"&gt;
+            &lt;isset property="debug.transport"/&gt;
+        &lt;/condition&gt;
+    &lt;/target&gt;
+    &lt;target depends="-init-debug-args" name="-init-macrodef-debug"&gt;
+        &lt;macrodef name="debug" uri="http://www.netbeans.org/ns/j2se-project/3"&gt;
+            &lt;attribute default="${main.class}" name="classname"/&gt;
+            &lt;attribute default="${debug.classpath}" name="classpath"/&gt;
+            &lt;element name="customize" optional="true"/&gt;
+            &lt;sequential&gt;
+                &lt;java classname="@{classname}" dir="${work.dir}" fork="true"&gt;
+                    &lt;jvmarg line="${debug-args-line}"/&gt;
+                    &lt;jvmarg value="-Xrunjdwp:transport=${debug-transport},address=${jpda.address}"/&gt;
+                    &lt;jvmarg value="-Dfile.encoding=${source.encoding}"/&gt;
+                    &lt;redirector errorencoding="${source.encoding}" inputencoding="${source.encoding}" outputencoding="${source.encoding}"/&gt;
+                    &lt;jvmarg line="${run.jvmargs}"/&gt;
+                    &lt;classpath&gt;
+                        &lt;path path="@{classpath}"/&gt;
+                    &lt;/classpath&gt;
+                    &lt;syspropertyset&gt;
+                        &lt;propertyref prefix="run-sys-prop."/&gt;
+                        &lt;mapper from="run-sys-prop.*" to="*" type="glob"/&gt;
+                    &lt;/syspropertyset&gt;
+                    &lt;customize/&gt;
+                &lt;/java&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+    &lt;/target&gt;
+    &lt;target name="-init-macrodef-java"&gt;
+        &lt;macrodef name="java" uri="http://www.netbeans.org/ns/j2se-project/1"&gt;
+            &lt;attribute default="${main.class}" name="classname"/&gt;
+            &lt;attribute default="${run.classpath}" name="classpath"/&gt;
+            &lt;element name="customize" optional="true"/&gt;
+            &lt;sequential&gt;
+                &lt;java classname="@{classname}" dir="${work.dir}" fork="true"&gt;
+                    &lt;jvmarg value="-Dfile.encoding=${source.encoding}"/&gt;
+                    &lt;redirector errorencoding="${source.encoding}" inputencoding="${source.encoding}" outputencoding="${source.encoding}"/&gt;
+                    &lt;jvmarg line="${run.jvmargs}"/&gt;
+                    &lt;classpath&gt;
+                        &lt;path path="@{classpath}"/&gt;
+                    &lt;/classpath&gt;
+                    &lt;syspropertyset&gt;
+                        &lt;propertyref prefix="run-sys-prop."/&gt;
+                        &lt;mapper from="run-sys-prop.*" to="*" type="glob"/&gt;
+                    &lt;/syspropertyset&gt;
+                    &lt;customize/&gt;
+                &lt;/java&gt;
+            &lt;/sequential&gt;
+        &lt;/macrodef&gt;
+    &lt;/target&gt;
+    &lt;target name="-init-presetdef-jar"&gt;
+        &lt;presetdef name="jar" uri="http://www.netbeans.org/ns/j2se-project/1"&gt;
+            &lt;jar compress="${jar.compress}" jarfile="${dist.jar}"&gt;
+                &lt;j2seproject1:fileset dir="${build.classes.dir}"/&gt;
+            &lt;/jar&gt;
+        &lt;/presetdef&gt;
+    &lt;/target&gt;
+    &lt;target depends="-pre-init,-init-private,-init-libraries,-init-user,-init-project,-do-init,-post-init,-init-check,-init-macrodef-property,-init-macrodef-javac,-init-macrodef-junit,-init-macrodef-nbjpda,-init-macrodef-debug,-init-macrodef-java,-init-presetdef-jar" name="init"/&gt;
+    &lt;!--
+                ===================
+                COMPILATION SECTION
+                ===================
+            --&gt;
+    &lt;target depends="init" name="deps-jar" unless="no.deps"/&gt;
+    &lt;target depends="init,-check-automatic-build,-clean-after-automatic-build" name="-verify-automatic-build"/&gt;
+    &lt;target depends="init" name="-check-automatic-build"&gt;
+        &lt;available file="${build.classes.dir}/.netbeans_automatic_build" property="netbeans.automatic.build"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init" if="netbeans.automatic.build" name="-clean-after-automatic-build"&gt;
+        &lt;antcall target="clean"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,deps-jar" name="-pre-pre-compile"&gt;
+        &lt;mkdir dir="${build.classes.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target name="-pre-compile"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target if="do.depend.true" name="-compile-depend"&gt;
+        &lt;pathconvert property="build.generated.subdirs"&gt;
+            &lt;dirset dir="${build.generated.sources.dir}" erroronmissingdir="false"&gt;
+                &lt;include name="*"/&gt;
+            &lt;/dirset&gt;
+        &lt;/pathconvert&gt;
+        &lt;j2seproject3:depend srcdir="${src.dir}:${build.generated.subdirs}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,deps-jar,-pre-pre-compile,-pre-compile,-compile-depend" if="have.sources" name="-do-compile"&gt;
+        &lt;j2seproject3:javac gensrcdir="${build.generated.sources.dir}"/&gt;
+        &lt;copy todir="${build.classes.dir}"&gt;
+            &lt;fileset dir="${src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/&gt;
+        &lt;/copy&gt;
+    &lt;/target&gt;
+    &lt;target name="-post-compile"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,deps-jar,-verify-automatic-build,-pre-pre-compile,-pre-compile,-do-compile,-post-compile" description="Compile project." name="compile"/&gt;
+    &lt;target name="-pre-compile-single"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,deps-jar,-pre-pre-compile" name="-do-compile-single"&gt;
+        &lt;fail unless="javac.includes"&gt;Must select some files in the IDE or set javac.includes&lt;/fail&gt;
+        &lt;j2seproject3:force-recompile/&gt;
+        &lt;j2seproject3:javac excludes="" gensrcdir="${build.generated.sources.dir}" includes="${javac.includes}" sourcepath="${src.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target name="-post-compile-single"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,deps-jar,-verify-automatic-build,-pre-pre-compile,-pre-compile-single,-do-compile-single,-post-compile-single" name="compile-single"/&gt;
+    &lt;!--
+                ====================
+                JAR BUILDING SECTION
+                ====================
+            --&gt;
+    &lt;target depends="init" name="-pre-pre-jar"&gt;
+        &lt;dirname file="${dist.jar}" property="dist.jar.dir"/&gt;
+        &lt;mkdir dir="${dist.jar.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target name="-pre-jar"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-jar,-pre-jar" name="-do-jar-without-manifest" unless="manifest.available"&gt;
+        &lt;j2seproject1:jar/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-jar,-pre-jar" if="manifest.available" name="-do-jar-with-manifest" unless="manifest.available+main.class"&gt;
+        &lt;j2seproject1:jar manifest="${manifest.file}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-jar,-pre-jar" if="manifest.available+main.class" name="-do-jar-with-mainclass" unless="manifest.available+main.class+mkdist.available"&gt;
+        &lt;j2seproject1:jar manifest="${manifest.file}"&gt;
+            &lt;j2seproject1:manifest&gt;
+                &lt;j2seproject1:attribute name="Main-Class" value="${main.class}"/&gt;
+            &lt;/j2seproject1:manifest&gt;
+        &lt;/j2seproject1:jar&gt;
+        &lt;echo&gt;To run this application from the command line without Ant, try:&lt;/echo&gt;
+        &lt;property location="${build.classes.dir}" name="build.classes.dir.resolved"/&gt;
+        &lt;property location="${dist.jar}" name="dist.jar.resolved"/&gt;
+        &lt;pathconvert property="run.classpath.with.dist.jar"&gt;
+            &lt;path path="${run.classpath}"/&gt;
+            &lt;map from="${build.classes.dir.resolved}" to="${dist.jar.resolved}"/&gt;
+        &lt;/pathconvert&gt;
+        &lt;echo&gt;java -cp "${run.classpath.with.dist.jar}" ${main.class}&lt;/echo&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-jar,-pre-jar" if="manifest.available+main.class+mkdist.available" name="-do-jar-with-libraries"&gt;
+        &lt;property location="${build.classes.dir}" name="build.classes.dir.resolved"/&gt;
+        &lt;pathconvert property="run.classpath.without.build.classes.dir"&gt;
+            &lt;path path="${run.classpath}"/&gt;
+            &lt;map from="${build.classes.dir.resolved}" to=""/&gt;
+        &lt;/pathconvert&gt;
+        &lt;pathconvert pathsep=" " property="jar.classpath"&gt;
+            &lt;path path="${run.classpath.without.build.classes.dir}"/&gt;
+            &lt;chainedmapper&gt;
+                &lt;flattenmapper/&gt;
+                &lt;globmapper from="*" to="lib/*"/&gt;
+            &lt;/chainedmapper&gt;
+        &lt;/pathconvert&gt;
+        &lt;taskdef classname="org.netbeans.modules.java.j2seproject.copylibstask.CopyLibs" classpath="${libs.CopyLibs.classpath}" name="copylibs"/&gt;
+        &lt;copylibs compress="${jar.compress}" jarfile="${dist.jar}" manifest="${manifest.file}" runtimeclasspath="${run.classpath.without.build.classes.dir}"&gt;
+            &lt;fileset dir="${build.classes.dir}"/&gt;
+            &lt;manifest&gt;
+                &lt;attribute name="Main-Class" value="${main.class}"/&gt;
+                &lt;attribute name="Class-Path" value="${jar.classpath}"/&gt;
+            &lt;/manifest&gt;
+        &lt;/copylibs&gt;
+        &lt;echo&gt;To run this application from the command line without Ant, try:&lt;/echo&gt;
+        &lt;property location="${dist.jar}" name="dist.jar.resolved"/&gt;
+        &lt;echo&gt;java -jar "${dist.jar.resolved}"&lt;/echo&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-jar,-pre-jar" if="libs.CopyLibs.classpath" name="-do-jar-with-libraries-without-manifest" unless="manifest.available+main.class"&gt;
+        &lt;property location="${build.classes.dir}" name="build.classes.dir.resolved"/&gt;
+        &lt;pathconvert property="run.classpath.without.build.classes.dir"&gt;
+            &lt;path path="${run.classpath}"/&gt;
+            &lt;map from="${build.classes.dir.resolved}" to=""/&gt;
+        &lt;/pathconvert&gt;
+        &lt;pathconvert pathsep=" " property="jar.classpath"&gt;
+            &lt;path path="${run.classpath.without.build.classes.dir}"/&gt;
+            &lt;chainedmapper&gt;
+                &lt;flattenmapper/&gt;
+                &lt;globmapper from="*" to="lib/*"/&gt;
+            &lt;/chainedmapper&gt;
+        &lt;/pathconvert&gt;
+        &lt;taskdef classname="org.netbeans.modules.java.j2seproject.copylibstask.CopyLibs" classpath="${libs.CopyLibs.classpath}" name="copylibs"/&gt;
+        &lt;copylibs compress="${jar.compress}" jarfile="${dist.jar}" runtimeclasspath="${run.classpath.without.build.classes.dir}"&gt;
+            &lt;fileset dir="${build.classes.dir}"/&gt;
+        &lt;/copylibs&gt;
+    &lt;/target&gt;
+    &lt;target name="-post-jar"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-do-jar-with-libraries-without-manifest,-post-jar" description="Build JAR." name="jar"/&gt;
+    &lt;!--
+                =================
+                EXECUTION SECTION
+                =================
+            --&gt;
+    &lt;target depends="init,compile" description="Run a main class." name="run"&gt;
+        &lt;j2seproject1:java&gt;
+            &lt;customize&gt;
+                &lt;arg line="${application.args}"/&gt;
+            &lt;/customize&gt;
+        &lt;/j2seproject1:java&gt;
+    &lt;/target&gt;
+    &lt;target name="-do-not-recompile"&gt;
+        &lt;property name="javac.includes.binary" value=""/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-do-not-recompile,compile-single" name="run-single"&gt;
+        &lt;fail unless="run.class"&gt;Must select one file in the IDE or set run.class&lt;/fail&gt;
+        &lt;j2seproject1:java classname="${run.class}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-do-not-recompile,compile-test-single" name="run-test-with-main"&gt;
+        &lt;fail unless="run.class"&gt;Must select one file in the IDE or set run.class&lt;/fail&gt;
+        &lt;j2seproject1:java classname="${run.class}" classpath="${run.test.classpath}"/&gt;
+    &lt;/target&gt;
+    &lt;!--
+                =================
+                DEBUGGING SECTION
+                =================
+            --&gt;
+    &lt;target depends="init" if="netbeans.home" name="-debug-start-debugger"&gt;
+        &lt;j2seproject1:nbjpdastart name="${debug.class}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init" if="netbeans.home" name="-debug-start-debugger-main-test"&gt;
+        &lt;j2seproject1:nbjpdastart classpath="${debug.test.classpath}" name="${debug.class}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile" name="-debug-start-debuggee"&gt;
+        &lt;j2seproject3:debug&gt;
+            &lt;customize&gt;
+                &lt;arg line="${application.args}"/&gt;
+            &lt;/customize&gt;
+        &lt;/j2seproject3:debug&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-debug-start-debugger,-debug-start-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/&gt;
+    &lt;target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto"&gt;
+        &lt;j2seproject1:nbjpdastart stopclassname="${main.class}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee" if="netbeans.home" name="debug-stepinto"/&gt;
+    &lt;target depends="init,compile-single" if="netbeans.home" name="-debug-start-debuggee-single"&gt;
+        &lt;fail unless="debug.class"&gt;Must select one file in the IDE or set debug.class&lt;/fail&gt;
+        &lt;j2seproject3:debug classname="${debug.class}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-do-not-recompile,compile-single,-debug-start-debugger,-debug-start-debuggee-single" if="netbeans.home" name="debug-single"/&gt;
+    &lt;target depends="init,compile-test-single" if="netbeans.home" name="-debug-start-debuggee-main-test"&gt;
+        &lt;fail unless="debug.class"&gt;Must select one file in the IDE or set debug.class&lt;/fail&gt;
+        &lt;j2seproject3:debug classname="${debug.class}" classpath="${debug.test.classpath}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-do-not-recompile,compile-test-single,-debug-start-debugger-main-test,-debug-start-debuggee-main-test" if="netbeans.home" name="debug-test-with-main"/&gt;
+    &lt;target depends="init" name="-pre-debug-fix"&gt;
+        &lt;fail unless="fix.includes"&gt;Must set fix.includes&lt;/fail&gt;
+        &lt;property name="javac.includes" value="${fix.includes}.java"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-pre-debug-fix,compile-single" if="netbeans.home" name="-do-debug-fix"&gt;
+        &lt;j2seproject1:nbjpdareload/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-pre-debug-fix,-do-debug-fix" if="netbeans.home" name="debug-fix"/&gt;
+    &lt;!--
+                ===============
+                JAVADOC SECTION
+                ===============
+            --&gt;
+    &lt;target depends="init" name="-javadoc-build"&gt;
+        &lt;mkdir dir="${dist.javadoc.dir}"/&gt;
+        &lt;javadoc additionalparam="${javadoc.additionalparam}" author="${javadoc.author}" charset="UTF-8" destdir="${dist.javadoc.dir}" docencoding="UTF-8" encoding="${javadoc.encoding.used}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}"&gt;
+            &lt;classpath&gt;
+                &lt;path path="${javac.classpath}"/&gt;
+            &lt;/classpath&gt;
+            &lt;fileset dir="${src.dir}" excludes="${excludes}" includes="${includes}"&gt;
+                &lt;filename name="**/*.java"/&gt;
+            &lt;/fileset&gt;
+            &lt;fileset dir="${build.generated.sources.dir}" erroronmissingdir="false"&gt;
+                &lt;include name="**/*.java"/&gt;
+            &lt;/fileset&gt;
+        &lt;/javadoc&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-javadoc-build" if="netbeans.home" name="-javadoc-browse" unless="no.javadoc.preview"&gt;
+        &lt;nbbrowse file="${dist.javadoc.dir}/index.html"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-javadoc-build,-javadoc-browse" description="Build Javadoc." name="javadoc"/&gt;
+    &lt;!--
+                =========================
+                JUNIT COMPILATION SECTION
+                =========================
+            --&gt;
+    &lt;target depends="init,compile" if="have.tests" name="-pre-pre-compile-test"&gt;
+        &lt;mkdir dir="${build.test.classes.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target name="-pre-compile-test"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target if="do.depend.true" name="-compile-test-depend"&gt;
+        &lt;j2seproject3:depend classpath="${javac.test.classpath}" destdir="${build.test.classes.dir}" srcdir="${test.src.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-compile-test,-pre-compile-test,-compile-test-depend" if="have.tests" name="-do-compile-test"&gt;
+        &lt;j2seproject3:javac classpath="${javac.test.classpath}" debug="true" destdir="${build.test.classes.dir}" srcdir="${test.src.dir}"/&gt;
+        &lt;copy todir="${build.test.classes.dir}"&gt;
+            &lt;fileset dir="${test.src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/&gt;
+        &lt;/copy&gt;
+    &lt;/target&gt;
+    &lt;target name="-post-compile-test"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-compile-test,-pre-compile-test,-do-compile-test,-post-compile-test" name="compile-test"/&gt;
+    &lt;target name="-pre-compile-test-single"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-compile-test,-pre-compile-test-single" if="have.tests" name="-do-compile-test-single"&gt;
+        &lt;fail unless="javac.includes"&gt;Must select some files in the IDE or set javac.includes&lt;/fail&gt;
+        &lt;j2seproject3:force-recompile destdir="${build.test.classes.dir}"/&gt;
+        &lt;j2seproject3:javac classpath="${javac.test.classpath}" debug="true" destdir="${build.test.classes.dir}" excludes="" includes="${javac.includes}" sourcepath="${test.src.dir}" srcdir="${test.src.dir}"/&gt;
+        &lt;copy todir="${build.test.classes.dir}"&gt;
+            &lt;fileset dir="${test.src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/&gt;
+        &lt;/copy&gt;
+    &lt;/target&gt;
+    &lt;target name="-post-compile-test-single"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile,-pre-pre-compile-test,-pre-compile-test-single,-do-compile-test-single,-post-compile-test-single" name="compile-test-single"/&gt;
+    &lt;!--
+                =======================
+                JUNIT EXECUTION SECTION
+                =======================
+            --&gt;
+    &lt;target depends="init" if="have.tests" name="-pre-test-run"&gt;
+        &lt;mkdir dir="${build.test.results.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile-test,-pre-test-run" if="have.tests" name="-do-test-run"&gt;
+        &lt;j2seproject3:junit testincludes="**/*Test.java"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile-test,-pre-test-run,-do-test-run" if="have.tests" name="-post-test-run"&gt;
+        &lt;fail if="tests.failed" unless="ignore.failing.tests"&gt;Some tests failed; see details above.&lt;/fail&gt;
+    &lt;/target&gt;
+    &lt;target depends="init" if="have.tests" name="test-report"/&gt;
+    &lt;target depends="init" if="netbeans.home+have.tests" name="-test-browse"/&gt;
+    &lt;target depends="init,compile-test,-pre-test-run,-do-test-run,test-report,-post-test-run,-test-browse" description="Run unit tests." name="test"/&gt;
+    &lt;target depends="init" if="have.tests" name="-pre-test-run-single"&gt;
+        &lt;mkdir dir="${build.test.results.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile-test-single,-pre-test-run-single" if="have.tests" name="-do-test-run-single"&gt;
+        &lt;fail unless="test.includes"&gt;Must select some files in the IDE or set test.includes&lt;/fail&gt;
+        &lt;j2seproject3:junit excludes="" includes="${test.includes}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile-test-single,-pre-test-run-single,-do-test-run-single" if="have.tests" name="-post-test-run-single"&gt;
+        &lt;fail if="tests.failed" unless="ignore.failing.tests"&gt;Some tests failed; see details above.&lt;/fail&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-do-not-recompile,compile-test-single,-pre-test-run-single,-do-test-run-single,-post-test-run-single" description="Run single unit test." name="test-single"/&gt;
+    &lt;!--
+                =======================
+                JUNIT DEBUGGING SECTION
+                =======================
+            --&gt;
+    &lt;target depends="init,compile-test" if="have.tests" name="-debug-start-debuggee-test"&gt;
+        &lt;fail unless="test.class"&gt;Must select one file in the IDE or set test.class&lt;/fail&gt;
+        &lt;property location="${build.test.results.dir}/TEST-${test.class}.xml" name="test.report.file"/&gt;
+        &lt;delete file="${test.report.file}"/&gt;
+        &lt;mkdir dir="${build.test.results.dir}"/&gt;
+        &lt;j2seproject3:debug classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner" classpath="${ant.home}/lib/ant.jar:${ant.home}/lib/ant-junit.jar:${debug.test.classpath}"&gt;
+            &lt;customize&gt;
+                &lt;syspropertyset&gt;
+                    &lt;propertyref prefix="test-sys-prop."/&gt;
+                    &lt;mapper from="test-sys-prop.*" to="*" type="glob"/&gt;
+                &lt;/syspropertyset&gt;
+                &lt;arg value="${test.class}"/&gt;
+                &lt;arg value="showoutput=true"/&gt;
+                &lt;arg value="formatter=org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter"/&gt;
+                &lt;arg value="formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,${test.report.file}"/&gt;
+            &lt;/customize&gt;
+        &lt;/j2seproject3:debug&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile-test" if="netbeans.home+have.tests" name="-debug-start-debugger-test"&gt;
+        &lt;j2seproject1:nbjpdastart classpath="${debug.test.classpath}" name="${test.class}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-do-not-recompile,compile-test-single,-debug-start-debugger-test,-debug-start-debuggee-test" name="debug-test"/&gt;
+    &lt;target depends="init,-pre-debug-fix,compile-test-single" if="netbeans.home" name="-do-debug-fix-test"&gt;
+        &lt;j2seproject1:nbjpdareload dir="${build.test.classes.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,-pre-debug-fix,-do-debug-fix-test" if="netbeans.home" name="debug-fix-test"/&gt;
+    &lt;!--
+                =========================
+                APPLET EXECUTION SECTION
+                =========================
+            --&gt;
+    &lt;target depends="init,compile-single" name="run-applet"&gt;
+        &lt;fail unless="applet.url"&gt;Must select one file in the IDE or set applet.url&lt;/fail&gt;
+        &lt;j2seproject1:java classname="sun.applet.AppletViewer"&gt;
+            &lt;customize&gt;
+                &lt;arg value="${applet.url}"/&gt;
+            &lt;/customize&gt;
+        &lt;/j2seproject1:java&gt;
+    &lt;/target&gt;
+    &lt;!--
+                =========================
+                APPLET DEBUGGING  SECTION
+                =========================
+            --&gt;
+    &lt;target depends="init,compile-single" if="netbeans.home" name="-debug-start-debuggee-applet"&gt;
+        &lt;fail unless="applet.url"&gt;Must select one file in the IDE or set applet.url&lt;/fail&gt;
+        &lt;j2seproject3:debug classname="sun.applet.AppletViewer"&gt;
+            &lt;customize&gt;
+                &lt;arg value="${applet.url}"/&gt;
+            &lt;/customize&gt;
+        &lt;/j2seproject3:debug&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,compile-single,-debug-start-debugger,-debug-start-debuggee-applet" if="netbeans.home" name="debug-applet"/&gt;
+    &lt;!--
+                ===============
+                CLEANUP SECTION
+                ===============
+            --&gt;
+    &lt;target depends="init" name="deps-clean" unless="no.deps"/&gt;
+    &lt;target depends="init" name="-do-clean"&gt;
+        &lt;delete dir="${build.dir}"/&gt;
+        &lt;delete dir="${dist.dir}"/&gt;
+    &lt;/target&gt;
+    &lt;target name="-post-clean"&gt;
+        &lt;!-- Empty placeholder for easier customization. --&gt;
+        &lt;!-- You can override this target in the ../build.xml file. --&gt;
+    &lt;/target&gt;
+    &lt;target depends="init,deps-clean,-do-clean,-post-clean" description="Clean build products." name="clean"/&gt;
+&lt;/project&gt;
+
+  </pre>
+
+  <a href="."> back to nbproject </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

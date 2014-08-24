@@ -1,0 +1,117 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/test/java/de.oklischat.ogl.lwjgl.coil/src/de/oklischat/ogl/lwjgl/coil/Main.java </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../../../../../../.">.</a>/<a href="../../../../../../../../../.">opengl</a>/<a href="../../../../../../../../.">test</a>/<a href="../../../../../../../.">java</a>/<a href="../../../../../../.">de.oklischat.ogl.lwjgl.coil</a>/<a href="../../../../../.">src</a>/<a href="../../../../.">de</a>/<a href="../../../.">oklischat</a>/<a href="../../.">ogl</a>/<a href="../.">lwjgl</a>/<a href=".">coil</a>/Main.java </h1>
+
+  <a href="Main.java">download original</a>
+
+  <pre>
+package de.oklischat.ogl.lwjgl.coil;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import org.lwjgl.opengl.Display;
+
+/**
+ *
+ * @author olaf
+ */
+public class Main {
+
+    public Main() throws Exception {
+        final Collection&lt;Component&gt; canvasses = new ArrayList&lt;Component&gt;();
+        int nFrames = 3;
+        for (int i = 0; i &lt; nFrames; i++) {
+            JFrame frame = new JFrame("Coil");
+            JToolBar toolbar = new JToolBar();
+            toolbar.setFloatable(false);
+            JComboBox cb = new JComboBox(new Object[]{"foo","bar","baz","quux"});
+            toolbar.add(cb);
+            frame.add(cb, BorderLayout.NORTH);
+            //ContextAttribs cattrs = new ContextAttribs().withDebug(true).with...;
+            //GLEventHandler canvas = new GLEventHandler(cattrs);  // need to do this for OpenGL &gt;= 3.0
+            final CoilCanvas canvas = CoilCanvas.create();
+            canvasses.add(canvas);
+            frame.add(canvas, BorderLayout.CENTER);
+            frame.setSize(800, 600);
+            frame.setBackground(Color.black);
+            frame.setVisible(true);
+            frame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    //anim.stop();
+                    System.exit(0);
+                }
+            });
+        }
+        //final Animator anim = new Animator(canvas);  // TODO
+        //anim.start();
+        final Thread animThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    for (Component c : canvasses) {
+                        c.repaint();
+                    }
+                    Display.sync(60);
+                }
+            }
+        });
+        animThread.setDaemon(true);
+        animThread.start();
+    }
+
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    new Main();
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    System.exit(1);
+                }
+            }
+        });
+    }
+
+}
+
+  </pre>
+
+  <a href="."> back to coil </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

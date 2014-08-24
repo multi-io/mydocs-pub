@@ -1,0 +1,21 @@
+- JSPX/JSTL overdesigned
+
+- Session-/Request-Attribut-Handling unübersichtlich und "zerrissen"
+  zwischen @SessionAttributes - Annotation auf Klassenebene,
+  @ModelAttribute - Annotation auf Methodenebene etc. Klassische
+  Programmierung über request.getSession().get/setAttribute wäre
+  letztlich übersichtlicher, einfacher zu verstehen und mit weniger
+  Lernkurve behaftet. Das bisschen, was Spring automatisiert, könnte
+  man in der Zeit, die man braucht, um die Doku zu lesen und zu
+  verstehen, selber schreiben.
+
+  - schwierig, String-Konstanten für Model-/Session-Attributnamen zu
+    benutzen (wg. Referenzierung dieser Namen in Annotion-Parametern)
+
+  - evtl. Vorteile bei Unit-Testing wg. IoC/besserer Mockbarkeit
+
+- macht letztlich fast nur triviale Sachen (evtl. bis auf
+  Formobjekte/Databinding)
+
+- forward von einem Controller/Handler zu einem anderen nur über
+  Client-Redirect?

@@ -1,0 +1,41 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/threads.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/threads.rb </h1>
+
+  <a href="threads.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+require 'thread'
+
+#M=Mutex.new
+
+threads = (0...7).map do
+  Thread.new { sleep rand; load "threads_mod.rb" }
+end
+
+threads.each{|t| t.join}
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

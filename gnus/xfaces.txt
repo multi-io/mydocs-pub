@@ -1,0 +1,17 @@
+Benötogte XEmacs-Features:
+
+xpm oder xface  (ersteres vorhanden (24.12.00))
+
+Benötigte externe Programme:
+
+uncompface
+icontopbm
+ppmtoxpm
+
+
+
+Siehe auch:
+
+C-h f article-display-x-face
+==> C-h f gnus-xmas-article-display-xface
+    ==> gnus-xmas.el, Funktion "gnus-xmas-article-display-xface"

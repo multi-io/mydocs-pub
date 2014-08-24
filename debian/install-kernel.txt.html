@@ -1,0 +1,87 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./debian/install-kernel.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">debian</a>/install-kernel.txt </h1>
+
+  <a href="install-kernel.txt">download original</a>
+
+  <pre>
+1 download linux-x.x.x.tar.bz2 from kernel.org, unpack under
+  /usr/src/, (optionally) symlink to /usr/src/linux
+
+2 for each separatetely distributed kernel module (e.g. alsa, nvidia
+  driver, lirc):
+
+  2.1 apt-get install &lt;module&gt;-source
+
+  2.2 (installs to /usr/src/&lt;module&gt;.tar.gz)
+
+  2.3 cd /usr/src/
+
+  2.4 tar xzf &lt;module&gt;.tar.gz
+
+  2.5 (ends up in /usr/src/modules/&lt;module&gt;/*)
+
+3 cd /usr/src/linux
+
+4 make menuconfig
+
+5 configure...
+
+6 if necessary: "make-kpkg modules_clean" to clean the src/modules
+  directory (see above) of stale object files from previous builds.
+
+7 make-kpkg --us --uc buildpackage modules_image
+
+  additional option "--added-patches foo" adds patch in
+  kernel-patches/all/&lt;kernelversion&gt;/apply/foo. For the debian kernel
+  patches, foo=debian. More than one foo can be provided by seperating
+  them with commas.
+
+  TODO: decipher make-kpkg manpage documentation for --added-patches
+  :\
+
+
+8 (creates ../kernel-{image,source,headers,doc}-x.x.x....deb as well
+  as a deb for each module unpacked above, name like
+  &lt;module&gt;-&lt;kernelversion&gt;.deb
+
+9 cd ..
+
+10 dpkg -i &lt;just created packages&gt;
+
+
+
+To use a different gcc when compiling, use
+
+MAKEFLAGS="CC=gcc-2.95" make-kpgg ...
+
+(see manpage for make-kpkg)
+
+
+
+
+if make-kppg doesn't do anything, maybe rm stamp* in the source
+directory or, as a last resort, rm -rf stamp* debian  will help.
+
+  </pre>
+
+  <a href="."> back to debian </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

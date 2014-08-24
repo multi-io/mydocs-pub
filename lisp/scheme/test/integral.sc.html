@@ -1,0 +1,39 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./lisp/scheme/test/integral.sc </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">lisp</a>/<a href="../.">scheme</a>/<a href=".">test</a>/integral.sc </h1>
+
+  <a href="integral.sc">download original</a>
+
+  <pre>
+(load "streams.sc")
+
+(define (stream-integral s dt C)
+  (make-stream
+   C
+   (stream-integral
+    (stream-tail s)
+    dt
+    (+ (stream-head s) C))))
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

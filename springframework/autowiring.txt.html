@@ -1,0 +1,175 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./springframework/autowiring.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">springframework</a>/autowiring.txt </h1>
+
+  <a href="autowiring.txt">download original</a>
+
+  <pre>
+spring @Autowired wiring-up of objects created using operator "new":
+
+package org.springframework.beans.factory.aspectj;
+
+public abstract aspect AbstractDependencyInjectionAspect {
+    ...
+
+	/**
+	 * Post-construction configuration.
+	 */
+	@SuppressAjWarnings("adviceDidNotMatch")
+	after(Object bean) returning : 
+		beanConstruction(bean) &amp;&amp; postConstructionCondition() &amp;&amp; inConfigurableBean() {
+		configureBean(bean);
+	}
+
+    ...
+}
+
+
+definitions of the pointcuts:
+
+(from AbstractInterfaceDrivenDependencyInjectionAspect)
+
+	/**
+	 * Select initialization join point as object construction
+	 */
+	public pointcut beanConstruction(Object bean) : 
+		initialization(ConfigurableObject+.new(..)) &amp;&amp; this(bean);  //see declare parents below
+
+
+
+(from AnnotationBeanConfigurerAspect)
+
+	public pointcut inConfigurableBean() : @this(Configurable);
+
+	declare parents: @Configurable * implements ConfigurableObject;
+
+
+(from AbstractDependencyInjectionAspect)
+
+	private pointcut postConstructionCondition() :
+		mostSpecificSubTypeConstruction() &amp;&amp; !preConstructionConfiguration();
+
+	/**
+	 * Select join points in beans to be configured prior to construction?
+	 * By default, use post-construction injection matching the default in the Configurable annotation.
+	 */
+	public pointcut preConstructionConfiguration() : if(false);
+
+
+	/**
+	 * Select the most-specific initialization join point 
+	 * (most concrete class) for the initialization of an instance.
+	 */
+	public pointcut mostSpecificSubTypeConstruction() :
+		if(thisJoinPoint.getSignature().getDeclaringType() == thisJoinPoint.getThis().getClass());
+
+
+
+complete backtrace (autowired setter is FormTemplate#setFormRepository):
+
+Thread [main] (Suspended (breakpoint at line 44 in FormTemplate))	
+	FormTemplate.setFormRepository(FormTemplateRepository) line: 44	
+	NativeMethodAccessorImpl.invoke0(Method, Object, Object[]) line: not available [native method]	
+	NativeMethodAccessorImpl.invoke(Object, Object[]) line: 39	
+	DelegatingMethodAccessorImpl.invoke(Object, Object[]) line: 25	
+	Method.invoke(Object, Object...) line: 597	
+	AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(Object, String, PropertyValues) line: 601	
+	InjectionMetadata.inject(Object, String, PropertyValues) line: 84	
+	AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(PropertyValues, PropertyDescriptor[], Object, String) line: 283	
+	DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).populateBean(String, AbstractBeanDefinition, BeanWrapper) line: 1074	
+	DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).autowireBeanProperties(Object, int, boolean) line: 374	
+	BeanConfigurerSupport.configureBean(Object) line: 140	
+	AnnotationBeanConfigurerAspect.configureBean(Object) line: 59	
+	AnnotationBeanConfigurerAspect(AbstractDependencyInjectionAspect).ajc$afterReturning$org_springframework_beans_factory_aspectj_AbstractDependencyInjectionAspect$2$1ea6722c(Object) line: 89	
+	&lt;unknown receiving type&gt;(FormTemplate).&lt;init&gt;() line: 28	
+	NativeConstructorAccessorImpl.newInstance0(Constructor, Object[]) line: not available [native method]	
+	NativeConstructorAccessorImpl.newInstance(Object[]) line: 39	
+	DelegatingConstructorAccessorImpl.newInstance(Object[]) line: 27	
+	Constructor&lt;T&gt;.newInstance(Object...) line: 513	
+	PojoInstantiator.instantiate() line: 111	
+	PojoInstantiator.instantiate(Serializable) line: 123	
+	PojoEntityTuplizer(AbstractEntityTuplizer).instantiate(Serializable, SessionImplementor) line: 606	
+	SingleTableEntityPersister(AbstractEntityPersister).instantiate(Serializable, SessionImplementor) line: 3888	
+	SessionImpl.instantiate(EntityPersister, Serializable) line: 1412	
+	SessionImpl.instantiate(String, Serializable) line: 1401	
+	OneToManyLoader(Loader).instanceNotYetLoaded(ResultSet, int, Loadable, String, EntityKey, LockMode, EntityKey, Object, List, SessionImplementor) line: 1362	
+	OneToManyLoader(Loader).getRow(ResultSet, Loadable[], EntityKey[], Object, EntityKey, LockMode[], List, SessionImplementor) line: 1271	
+	OneToManyLoader(Loader).getRowFromResultSet(ResultSet, SessionImplementor, QueryParameters, LockMode[], EntityKey, List, EntityKey[], boolean) line: 619	
+	OneToManyLoader(Loader).doQuery(SessionImplementor, QueryParameters, boolean) line: 745	
+	OneToManyLoader(Loader).doQueryAndInitializeNonLazyCollections(SessionImplementor, QueryParameters, boolean) line: 270	
+	OneToManyLoader(Loader).loadCollection(SessionImplementor, Serializable, Type) line: 2082	
+	OneToManyLoader(CollectionLoader).initialize(Serializable, SessionImplementor) line: 62	
+	OneToManyPersister(AbstractCollectionPersister).initialize(Serializable, SessionImplementor) line: 628	
+	DefaultInitializeCollectionEventListener.onInitializeCollection(InitializeCollectionEvent) line: 83	
+	SessionImpl.initializeCollection(PersistentCollection, boolean) line: 1853	
+	PersistentSet(AbstractPersistentCollection).forceInitialization() line: 479	
+	StatefulPersistenceContext.initializeNonLazyCollections() line: 899	
+	QueryLoader(Loader).doQueryAndInitializeNonLazyCollections(SessionImplementor, QueryParameters, boolean) line: 275	
+	QueryLoader(Loader).doList(SessionImplementor, QueryParameters) line: 2449	
+	QueryLoader(Loader).listIgnoreQueryCache(SessionImplementor, QueryParameters) line: 2192	
+	QueryLoader(Loader).list(SessionImplementor, QueryParameters, Set, Type[]) line: 2187	
+	QueryLoader.list(SessionImplementor, QueryParameters) line: 452	
+	QueryTranslatorImpl.list(SessionImplementor, QueryParameters) line: 363	
+	HQLQueryPlan.performList(QueryParameters, SessionImplementor) line: 196	
+	SessionImpl.list(String, QueryParameters) line: 1258	
+	QueryImpl.list() line: 102	
+	QueryImpl&lt;X&gt;.getSingleResult() line: 269	
+	Event.findEventByUniqueIdForStudy_aroundBody10(String, Study, JoinPoint) line: 177	
+	Event.findEventByUniqueIdForStudy(String, Study) line: 1	
+	EventEntryConverter.convert(Object, ConversionContext) line: 26	
+	Importer.importBaseXmlFragment(Object, String) line: 67	
+	Importer.importBaseXml(Object, String) line: 40	
+	Importer.importBaseXml(InputStream, String) line: 32	
+	Importer.importBaseXml(String, String) line: 24	
+	ImportTest.testImportData() line: 33	
+	NativeMethodAccessorImpl.invoke0(Method, Object, Object[]) line: not available [native method]	
+	NativeMethodAccessorImpl.invoke(Object, Object[]) line: 39	
+	DelegatingMethodAccessorImpl.invoke(Object, Object[]) line: 25	
+	Method.invoke(Object, Object...) line: 597	
+	FrameworkMethod$1.runReflectiveCall() line: 44	
+	FrameworkMethod$1(ReflectiveCallable).run() line: 15	
+	FrameworkMethod.invokeExplosively(Object, Object...) line: 41	
+	InvokeMethod.evaluate() line: 20	
+	RunBeforeTestMethodCallbacks.evaluate() line: 74	
+	RunAfterTestMethodCallbacks.evaluate() line: 82	
+	SpringRepeat.evaluate() line: 72	
+	SpringJUnit4ClassRunner.runChild(FrameworkMethod, RunNotifier) line: 240	
+	SpringJUnit4ClassRunner(BlockJUnit4ClassRunner).runChild(Object, RunNotifier) line: 50	
+	ParentRunner$3.run() line: 193	
+	ParentRunner$1.schedule(Runnable) line: 52	
+	SpringJUnit4ClassRunner(ParentRunner&lt;T&gt;).runChildren(RunNotifier) line: 191	
+	ParentRunner&lt;T&gt;.access$000(ParentRunner, RunNotifier) line: 42	
+	ParentRunner$2.evaluate() line: 184	
+	RunBeforeTestClassCallbacks.evaluate() line: 61	
+	RunAfterTestClassCallbacks.evaluate() line: 70	
+	SpringJUnit4ClassRunner(ParentRunner&lt;T&gt;).run(RunNotifier) line: 236	
+	SpringJUnit4ClassRunner.run(RunNotifier) line: 180	
+	JUnit4TestMethodReference(JUnit4TestReference).run(TestExecution) line: 49	
+	TestExecution.run(ITestReference[]) line: 38	
+	RemoteTestRunner.runTests(String[], String, TestExecution) line: 467	
+	RemoteTestRunner.runTests(TestExecution) line: 683	
+	RemoteTestRunner.run() line: 390	
+	RemoteTestRunner.main(String[]) line: 197	
+
+  </pre>
+
+  <a href="."> back to springframework </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

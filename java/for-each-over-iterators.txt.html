@@ -1,0 +1,133 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/for-each-over-iterators.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">java</a>/for-each-over-iterators.txt </h1>
+
+  <a href="for-each-over-iterators.txt">download original</a>
+
+  <pre>
+03:55 &lt; multi_io&gt; is there a specific reason why you can't loop through a 
+                  java.util.Iterator using the enhanced for loop?
+03:55 &lt; r0bby&gt; multi_io: why would you need to?
+03:55 &lt; Sou|cutter&gt; multi_io: because it doesn't implement Iterable, I suppose
+03:55 &lt; Fanook&gt; multi_io: because the iterator isn't Iterable. foreach the 
+                collection instead
+03:56 &lt; multi_io&gt; Sou|cutter: yeah, that's the technical reason. I ask why it 
+                  was designed that way.
+03:56 &lt; r0bby&gt; multi_io: ask Sun.
+03:56 &lt; Fanook&gt; because the foreach is to avoid the iterator boilerplate
+03:56 &lt; multi_io&gt; sometimes you don't have a collection, only an iterator
+03:56 &lt; Sou|cutter&gt; yes, throw your question into the sun
+03:56 &lt; Sou|cutter&gt; :)
+03:56 &lt; r0bby&gt; you ask here as if we wrote the api
+03:57 &lt; Fanook&gt; i've written AN api...
+03:57 &lt; multi_io&gt; I ask because I might have overlooked something
+03:57 &lt; r0bby&gt; multi_io: while(iter.hasNext()) { ... }
+04:00 &lt; multi_io&gt; I ask because I might have overlooked some reason why 
+                  designing the for loop to be able to loop through iterators 
+                  is a bad idea
+04:01 &lt; nmx&gt; why would you have an iterator instead of a collection?
+04:01 &lt; Fanook&gt; it's not. the foreach is to reduce the boilerplate for simple 
+                iteration
+04:01 &lt; nmx&gt; the iterator came from somewhere
+04:02 &lt; multi_io&gt; nmx: think
+04:02 &lt; multi_io&gt; non-resetable streams...
+04:02 &lt; multi_io&gt; an iterator over all lines of the standard input
+04:03 &lt; Fanook&gt; think Scanner
+04:03 &lt; multi_io&gt; for (String line: System.in.linesIterator()) { ... }
+04:04 &lt; nmx&gt; i would say that in that case, the stream should be iterable
+04:04 &lt; multi_io&gt; well, you could fake a collection around that, but its 
+                  iterator() method would work only once :-P
+04:04 &lt; Fanook&gt; think while(in.read()){...}
+04:05 &lt; r0bby&gt; while(scanner.hasNext() { System.out.println(scan.next()); }
+04:05 &lt; r0bby&gt; s/scan/scanner/
+04:06 &lt; nmx&gt; right, so if InputStream or whatever the class is has an 
+             iterator() method, it should be Iterable as well... doesn't that 
+             follow or am i missing something?
+04:06 &lt; Fanook&gt; the CLASS is iterable, not the ITERATOR
+04:06 &lt; nmx&gt; yes
+04:06 &lt; nmx&gt; so you would pass that to the foreach
+04:07 &lt; nmx&gt; eliminating the discussion
+04:08 &lt; Fanook&gt; iterating over an input stream just sounds weird, especially 
+                since we have classes/patterns like Scanner/while(hasNext){...} 
+                which are designed for that sort of thing
+04:08 &lt; nmx&gt; mogunus: it is impossible for us to provide a complete answer 
+             without source code. i would guess you haven't imported whatever 
+             class you're trying to use
+04:08 &lt; multi_io&gt; nmx: you mean like for (String line: System.in) { ... } ?
+04:09 &lt; Fanook&gt; i'm wondering where you found a stream that gives you an 
+                iterator
+04:09 &lt; nmx&gt; no
+04:09 &lt; nmx&gt; i'm not saying it DOES, i'm saying it SHOULD, by your logic
+04:09 &lt; r0bby&gt; nmx: ...
+04:09 &lt; multi_io&gt; System.in wouldn't have an iterator() method normally, 
+                  because it could have more than one iterator (over all lines, 
+                  all words, all characters, whatever)
+04:09 &lt; Fanook&gt; not by MY logic
+04:10 &lt; nmx&gt; Fanook: the general "you", sorry :)
+04:10 &lt; nmx&gt; does the linesIterator method exist or was that hypothetical?
+04:10 &lt; Fanook&gt; mogunus: it looks like you have 2 classes named Address in your 
+                namespace and you're not telling the compiler which one you 
+                want to use
+04:10 &lt; multi_io&gt; nmx: hypothetical
+04:10 &lt; nmx&gt; multi_io: ah, i see.
+04:10 &lt; multi_io&gt; it was a means to show why one could have an iterator without 
+                  a collection
+04:11 &lt; mogunus&gt; Fanook: you're right, I just explicitely imported 
+                 javax.mail.Address and it worked
+04:11 &lt; nmx&gt; multi_io: if you're trying to prove that a hypothetical situation 
+             is possible, it would help to provide an actual example
+04:11 &lt; mogunus&gt; Fanook: nmx : thanks all
+04:12 &lt; nmx&gt; multi_io: i suppose the Scanner case is an odd one.
+04:13 &lt; multi_io&gt; Fanook: the C++ STL can give you iterators over  streams
+04:18 &lt; ojacobson&gt; Are you packaging commons yourself or is it in your 
+                   container's lib (or in your ear file, if you have one, 
+                   outside the WAR)?
+04:18 &lt; ojacobson&gt; It looks a lot like classloader goofiness
+04:19 &lt; WaREX&gt; I am packaging with netbeans, I checked that inside the WAR file 
+               there is the WEB-INF/classes/log4j.properties file
+04:20 &lt; Fanook&gt; multi_io: the c++ STL is overly verbose and isn't the only 
+                standard utility library. GNU has one, Boost, there's probably 
+                one more i don't know of
+05:10 &lt; multi_io&gt; it appears I'm gathering a bunch of feature requests for Sun 
+                  here
+05:10 &lt; multi_io&gt; make for() able to use Iterators, make j.util.Collections's 
+                  constructor protected
+05:11 &lt; ojacobson&gt; I guarantee you both will be closed nearly immediately
+05:11 &lt; ojacobson&gt; the former "duplicate" the latter "won't fix"
+05:14 &lt; ojacobson&gt; (Using an iterator in a for loop is pretty close to trivial 
+                   anyways... create a one-line Iterable implementation that 
+                   returns the iterator you have and iterate over that.  
+                   Commons-Collections might even have one.)
+05:15 &lt; r0bby&gt; multi_io: ojacobson pretty much knows his shit, listen.
+05:15 &lt; ojacobson&gt; It's a good feature, and I'd love to have it
+05:15 &lt; ojacobson&gt; but its absence is not a showstopper
+05:35 &lt; multi_io&gt; ojacobson: about the "one-line Iterable" -- even that might 
+                  be too much hassle, even more so if it's not in the standard 
+                  library. The whole point of the extended for loop is saving 
+                  one line :-P
+05:35 &lt; ojacobson&gt; multi_io: aye
+05:35 &lt; ojacobson&gt; like I said: good feature to have, already widely requested, 
+                   not a showstopper, and there's a workaround for now.
+
+  </pre>
+
+  <a href="."> back to java </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

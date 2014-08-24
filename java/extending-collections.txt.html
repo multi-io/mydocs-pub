@@ -1,0 +1,69 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/extending-collections.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">java</a>/extending-collections.txt </h1>
+
+  <a href="extending-collections.txt">download original</a>
+
+  <pre>
+05:03 &lt; multi_io&gt; hmm, a class with only private constructors is not only not 
+                  instantiatable, it's also not extendable, right?
+05:03 &lt; ojacobson&gt; multi_io: true
+05:04 &lt; ojacobson&gt; Not quite non-instantiable, methods (even static ones) in 
+                   the same class can create them.
+05:04 &lt; ojacobson&gt; But close enough for gov't work.
+05:04 &lt; multi_io&gt; I wanted to "add" my own utility methods to 
+                  java.util.Collections by deriving myproject.Collections from 
+                  it and adding the methods to that
+05:05 &lt; multi_io&gt; it feels stupid to write a completely disjoint class 
+                  MyCollections
+05:05 &lt; ojacobson&gt; multi_io: what would you gain by inheriting from Collections?
+05:06 &lt; multi_io&gt; ...and then always having to remember whether a given method 
+                  is defined in java.util.Collections or myproject.MyCollections
+05:06 &lt; ojacobson&gt; Anyways, Collections is not (afaik) final
+05:06 &lt; multi_io&gt; ojacobson: as I say, I just want to "add" some methods to it 
+                  that were "forgotten"
+05:06 &lt; ojacobson&gt; You can derive from it, you just can't instantiate your 
+                   derived class.
+05:07 &lt; ojacobson&gt; ...wait, I might be lying furiously.
+05:07 &lt; multi_io&gt; I can'T.
+05:07 &lt; multi_io&gt; compiler complains b/c the construictor can't call super()
+05:07 &lt; ojacobson&gt; right, because the default constructor would have to invoke 
+                   the parent class's () constructor, even if you provide one.
+05:08 &lt; multi_io&gt; well, this sucks
+05:09 &lt; ojacobson&gt; In that you might have to remember what methods you 
+                   implemented, yes
+05:09 &lt; ojacobson&gt; I have to admit, I'm not seeing the huge burden
+05:09 &lt; r0bby&gt; nice.
+05:10 &lt; multi_io&gt; it appears I'm gathering a bunch of feature requests for Sun 
+                  here
+05:10 &lt; multi_io&gt; make for() able to use Iterators, make j.util.Collections's 
+                  constructor protected
+05:11 &lt; ojacobson&gt; I guarantee you both will be closed nearly immediately
+05:11 &lt; ojacobson&gt; the former "duplicate" the latter "won't fix"
+
+
+http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6588768
+
+
+  </pre>
+
+  <a href="."> back to java </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

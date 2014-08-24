@@ -1,0 +1,322 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./springframework/security/filterchain.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">springframework</a>/<a href=".">security</a>/filterchain.txt </h1>
+
+  <a href="filterchain.txt">download original</a>
+
+  <pre>
+CONFIG
+======
+
+(web.xml)
+
+	&lt;listener&gt;
+		&lt;listener-class&gt;org.springframework.web.util.Log4jConfigListener&lt;/listener-class&gt;
+	&lt;/listener&gt;
+
+    &lt;listener&gt;
+        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
+    &lt;/listener&gt;
+
+    &lt;!-- Handles Spring requests --&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;restApi&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+    &lt;/servlet&gt;
+    
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;restApi&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/rest/*&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+	&lt;!-- Default page to serve --&gt;
+	&lt;welcome-file-list&gt;
+		&lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+	&lt;/welcome-file-list&gt;
+
+	&lt;filter&gt;
+		&lt;filter-name&gt;springSecurityFilterChain&lt;/filter-name&gt;
+		&lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;
+	&lt;/filter&gt;
+	
+	&lt;filter-mapping&gt;
+		&lt;filter-name&gt;springSecurityFilterChain&lt;/filter-name&gt;
+		&lt;url-pattern&gt;/rest/*&lt;/url-pattern&gt;
+	&lt;/filter-mapping&gt;
+
+
+(spring context)
+
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+                           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+                           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+                           http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd"&gt;
+
+
+	&lt;!-- The controllers are autodetected POJOs labeled with the @Controller annotation. --&gt;
+	&lt;context:component-scan base-package="de.cloudio" use-default-filters="false"&gt;
+		&lt;context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/&gt;
+		&lt;context:include-filter expression="org.springframework.stereotype.Component" type="annotation"/&gt;
+	&lt;/context:component-scan&gt;
+	
+	&lt;context:property-placeholder location="classpath*:META-INF/spring/environment.properties"/&gt;
+	
+	&lt;!-- Turns on support for mapping requests to Spring MVC @Controller methods  --&gt;
+	&lt;mvc:annotation-driven/&gt;
+
+	&lt;!-- Spring security configuration --&gt;
+
+	&lt;sec:http use-expressions="true"&gt;
+		&lt;sec:intercept-url pattern="/**" access="isAuthenticated()" /&gt;
+        &lt;sec:http-basic /&gt;
+	&lt;/sec:http&gt;
+
+	&lt;sec:authentication-manager&gt;
+		&lt;sec:authentication-provider user-service-ref="connectUserService"&gt;
+		&lt;/sec:authentication-provider&gt;
+	&lt;/sec:authentication-manager&gt;	
+
+	&lt;bean id="connectUserService" class="de.cloudio.connect.server.auth.ConnectUserDetailsService"&gt;&lt;/bean&gt;
+
+&lt;/beans&gt;
+
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans        
+  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd         
+  http://www.springframework.org/schema/context         
+  http://www.springframework.org/schema/context/spring-context-3.0.xsd
+  http://www.springframework.org/schema/data/mongo 
+  http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
+  http://www.springframework.org/schema/data/jpa
+  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"&gt;    
+     
+ &lt;context:annotation-config /&gt;
+   
+ &lt;context:component-scan base-package="de.cloudio.repository" /&gt;
+  
+  &lt;bean id="credentials" class="org.springframework.data.authentication.UserCredentials"&gt;
+  	&lt;constructor-arg name="username" value="cloudio" /&gt;
+  	&lt;constructor-arg name="password" value="cloudio!Pass" /&gt;
+  &lt;/bean&gt;
+  
+ &lt;!-- MongoFactoryBean instance --&gt;
+ &lt;bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean"&gt;
+  &lt;property name="host" value="localhost" /&gt;
+ &lt;/bean&gt;   
+  
+ &lt;!-- MongoTemplate instance --&gt;
+ &lt;bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate"&gt;
+  &lt;constructor-arg name="mongo" ref="mongo" /&gt;
+  &lt;constructor-arg name="databaseName" value="cloudio" /&gt;
+&lt;!--   &lt;constructor-arg name="userCredentials" ref="credentials" /&gt; --&gt;
+ &lt;/bean&gt; 
+     
+ &lt;mongo:repositories base-package="de.cloudio.repository.repositories" mongo-template-ref="mongoTemplate" /&gt;
+
+    &lt;bean id="repository" class="de.cloudio.repository.services.Repository" /&gt;
+&lt;!--     &lt;bean id="repository" class="de.cloudio.connect.server.InMemoryRepository" /&gt; --&gt;
+
+    &lt;bean id="serviceLayer" class="de.cloudio.connect.repository.RepositoryServiceLayer"&gt;
+		&lt;constructor-arg name="repository" ref="repository" /&gt;
+    &lt;/bean&gt;
+
+	&lt;bean class="de.cloudio.connect.server.config.RepositoryPopulator"&gt;
+		&lt;property name="repository" ref="repository" /&gt;
+	&lt;/bean&gt;
+
+&lt;/beans&gt;
+
+
+
+(=&gt; objects during server initialization)
+
+Thread [main] (Suspended)	
+	owns: Object  (id=51)	
+	owns: HashMap&lt;K,V&gt;  (id=52)	
+	owns: StandardContext  (id=53)	
+	owns: StandardHost  (id=54)	
+	owns: StandardEngine  (id=55)	
+	owns: Service[]  (id=56)	
+	DefaultListableBeanFactory(DefaultSingletonBeanRegistry).getSingleton(String, boolean) line: 179	
+	DefaultListableBeanFactory(DefaultSingletonBeanRegistry).getSingleton(String) line: 167	
+	DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class&lt;T&gt;, Object[], boolean) line: 238	
+	DefaultListableBeanFactory(AbstractBeanFactory).getBean(String, Class&lt;T&gt;) line: 198	
+	XmlWebApplicationContext(AbstractApplicationContext).getBean(String, Class&lt;T&gt;) line: 1121	
+	DelegatingFilterProxy.initDelegate(WebApplicationContext) line: 326	
+	DelegatingFilterProxy.initFilterBean() line: 236	
+	DelegatingFilterProxy(GenericFilterBean).init(FilterConfig) line: 194	
+	ApplicationFilterConfig.getFilter() line: 275	
+	ApplicationFilterConfig.setFilterDef(FilterDef) line: 397	
+	ApplicationFilterConfig.&lt;init&gt;(Context, FilterDef) line: 108	
+	StandardContext.filterStart() line: 3709	
+	StandardContext.start() line: 4363	
+	StandardHost(ContainerBase).start() line: 1045	
+	StandardHost.start() line: 719	
+	StandardEngine(ContainerBase).start() line: 1045	
+	StandardEngine.start() line: 443	
+	StandardService.start() line: 516	
+	StandardServer.start() line: 710	
+	Catalina.start() line: 578	
+	NativeMethodAccessorImpl.invoke0(Method, Object, Object[]) line: not available [native method]	
+	NativeMethodAccessorImpl.invoke(Object, Object[]) line: 39	
+	DelegatingMethodAccessorImpl.invoke(Object, Object[]) line: 25	
+	Method.invoke(Object, Object...) line: 597	
+	Bootstrap.start() line: 288	
+	Bootstrap.main(String[]) line: 413	
+
+
+Map&lt;String, Object&gt; DefaultSingletonBeanRegistry.singletonObjects =
+
+   //(does this include everything?)
+
+{
+org.springframework.security.web.PortMapperImpl#0=org.springframework.security.web.PortMapperImpl@5f2679f2,
+de.cloudio.connect.server.config.RepositoryPopulator#0=de.cloudio.connect.server.config.RepositoryPopulator@57102fab,
+org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy#0=org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy@67a9b034,
+org.springframework.context.annotation.internalCommonAnnotationProcessor=org.springframework.context.annotation.CommonAnnotationBeanPostProcessor@356f5b17,
+org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping#0=org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping@21c55e69,
+uploadDataRepository=org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean@24b950d1,
+org.springframework.security.authenticationManager=org.springframework.security.authentication.ProviderManager@268dc2d,
+dataService=de.cloudio.repository.services.DataService@324f0f97,
+org.springframework.security.config.authentication.AuthenticationManagerFactoryBean#0=org.springframework.security.config.authentication.AuthenticationManagerFactoryBean@64889c4e,
+org.springframework.security.web.DefaultSecurityFilterChain#0=[
+    org.springframework.security.web.util.AnyRequestMatcher@1,   #requestMatcher
+    [                                                            #filters
+        org.springframework.security.web.context.SecurityContextPersistenceFilter@46192974,
+        org.springframework.security.web.authentication.www.BasicAuthenticationFilter@1df0a2a0,
+        org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2144c5bb,
+        org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2a11890d,
+        org.springframework.security.web.authentication.AnonymousAuthenticationFilter@653cca0e,
+        org.springframework.security.web.session.SessionManagementFilter@79f5910e,
+        org.springframework.security.web.access.ExceptionTranslationFilter@69066caf,
+        org.springframework.security.web.access.intercept.FilterSecurityInterceptor@24c98b07
+    ]
+],
+org.springframework.security.access.vote.AffirmativeBased#0=org.springframework.security.access.vote.AffirmativeBased@44cdf872,  #TODO list its AccessDecisionVoters
+mongoTemplate=org.springframework.data.mongodb.core.MongoTemplate@2e7227a8,
+contextAttributes={
+    org.springframework.web.context.support.ServletContextScope=org.springframework.web.context.support.ServletContextScope@48899e6a,
+    org.apache.catalina.jsp_classpath=/home/olaf/workspace.cloudio/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/connect/WEB-INF/classes/:...:/usr/local/jdk1.6.0_30/jre/lib/ext/jai_core.jar,
+    org.apache.AnnotationProcessor=org.apache.catalina.util.DefaultAnnotationProcessor@42ff665a,
+    javax.servlet.context.tempdir=/home/olaf/workspace.cloudio/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/work/Catalina/localhost/connect,
+    org.apache.catalina.WELCOME_FILES = (java.lang.String[]) [index.html]
+    org.apache.catalina.resources=org.apache.naming.resources.ProxyDirContext@27abcd5e},
+org.springframework.context.support.PropertySourcesPlaceholderConfigurer#0=org.springframework.context.support.PropertySourcesPlaceholderConfigurer@37eaab,
+repository=de.cloudio.repository.services.Repository@44274608,
+org.springframework.context.annotation.internalRequiredAnnotationProcessor=org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor@570f80a9,
+messageSource=org.springframework.context.support.DelegatingMessageSource@3ac803e6,
+environment=StandardServletEnvironment {
+    activeProfiles=[],
+    defaultProfiles=[default],
+    propertySources=[servletConfigInitParams,servletContextInitParams,jndiProperties,systemProperties,systemEnvironment]},
+credentials=username = [cloudio],
+password = [c**********s],
+org.springframework.security.filterChains=org.springframework.beans.factory.config.ListFactoryBean@21780f30,
+org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping=org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping@512d297a,
+org.springframework.validation.beanvalidation.LocalValidatorFactoryBean#0=org.springframework.validation.beanvalidation.LocalValidatorFactoryBean@6bfe3238,
+mongo=org.springframework.data.mongodb.core.MongoFactoryBean@7d9331eb,
+org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor=org.springframework.context.annotation.ConfigurationClassPostProcessor$ImportAwareBeanPostProcessor@4ab27bb5,
+org.springframework.security.web.savedrequest.HttpSessionRequestCache#0=org.springframework.security.web.savedrequest.HttpSessionRequestCache@bd7ce63,
+applicationEventMulticaster=org.springframework.context.event.SimpleApplicationEventMulticaster@52ecba8,
+serviceLayer=de.cloudio.connect.repository.RepositoryServiceLayer@433c8540,
+org.springframework.context.annotation.internalAutowiredAnnotationProcessor=org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor@3a504f3c,
+org.springframework.context.annotation.internalConfigurationAnnotationProcessor=org.springframework.context.annotation.ConfigurationClassPostProcessor@6e820a0c,
+org.springframework.web.servlet.handler.MappedInterceptor#0=org.springframework.web.servlet.handler.MappedInterceptor@1b61d282,
+userRepository=org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean@334362d9,
+org.springframework.security.authentication.DefaultAuthenticationEventPublisher#0=org.springframework.security.authentication.DefaultAuthenticationEventPublisher@d0eaeda,
+org.springframework.context.annotation.ConfigurationClassPostProcessor.importRegistry=ImportStack: [],
+org.springframework.security.web.PortResolverImpl#0=org.springframework.security.web.PortResolverImpl@3ef970e8,
+contextParameters={
+    contextConfigLocation=/WEB-INF/applicationContext*.xml,
+    log4jConfigLocation=/WEB-INF/log4j.properties,
+    webAppRootKey=cloudioConnectApplication.root,
+    log4jExposeWebAppRoot=false
+},
+formDataRepository=org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean@6a63afa4,
+org.springframework.data.repository.core.support.RepositoryInterfaceAwareBeanPostProcessor#0=org.springframework.data.repository.core.support.RepositoryInterfaceAwareBeanPostProcessor@36a06e8d,
+lifecycleProcessor=org.springframework.context.support.DefaultLifecycleProcessor@5eba06ff,
+org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter=org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter@7217fef,
+mvcContentNegotiationManager=org.springframework.web.accept.ContentNegotiationManagerFactoryBean@28562791,
+org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver#0=org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver@303fb547,
+entityRepository=org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean@26966110,
+systemProperties={java.runtime.name=Java(TM) SE Runtime Environment,...,sun.cpu.isalist=},
+org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver#0=org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver@5abe753a,
+nodeService=de.cloudio.repository.services.NodeService@e026161,
+org.springframework.security.authentication.AnonymousAuthenticationProvider#0=org.springframework.security.authentication.AnonymousAuthenticationProvider@3e472e76,
+org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint#0=org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint@333b64eb,
+org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver#0=org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver@5e9a94,
+servletContext=org.apache.catalina.core.ApplicationContextFacade@42f66abc,
+org.springframework.security.filterChainProxy=FilterChainProxy[
+    Filter Chains: [
+        [
+            org.springframework.security.web.util.AnyRequestMatcher@1,
+            [
+                org.springframework.security.web.context.SecurityContextPersistenceFilter@46192974,
+                org.springframework.security.web.authentication.www.BasicAuthenticationFilter@1df0a2a0,
+                org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2144c5bb,
+                org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2a11890d,
+                org.springframework.security.web.authentication.AnonymousAuthenticationFilter@653cca0e,
+                org.springframework.security.web.session.SessionManagementFilter@79f5910e,
+                org.springframework.security.web.access.ExceptionTranslationFilter@69066caf,
+                org.springframework.security.web.access.intercept.FilterSecurityInterceptor@24c98b07
+            ]
+        ]
+    ]
+],
+org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler#0=org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler@3fd97efc,
+userService=de.cloudio.repository.services.UserService@601ff323,
+systemEnvironment={TERM=xterm,...,LANG=en_US.UTF-8},
+nodeRepository=org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean@6a073b72,
+org.springframework.security.web.context.HttpSessionSecurityContextRepository#0=org.springframework.security.web.context.HttpSessionSecurityContextRepository@cfefc0,
+org.springframework.security.userDetailsServiceFactory=org.springframework.security.config.http.UserDetailsServiceFactoryBean@538526aa,
+connectController=de.cloudio.connect.server.ConnectController@4aad8dbc,
+subjectRepository=org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean@483457f1,
+subjectService=de.cloudio.repository.services.SubjectService@6479b43f,
+org.springframework.security.authentication.dao.DaoAuthenticationProvider#0=org.springframework.security.authentication.dao.DaoAuthenticationProvider@7228c7a1,
+org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter=org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter@534a5594,
+org.springframework.security.web.access.DefaultWebInvocationPrivilegeEvaluator#0=org.springframework.security.web.access.DefaultWebInvocationPrivilegeEvaluator@35389244,
+org.springframework.security.authentication.ProviderManager#0=org.springframework.security.authentication.ProviderManager@150ac9a8,  # TODO: this is the AuthenticationManager -- it performs the Authentication authenticate(Authentication) functionality by delegating to a list of AuthenticationProviders (ProviderManager#getProviders()). List them.
+connectUserService=de.cloudio.connect.server.auth.ConnectUserDetailsService@773d3f62,
+org.springframework.security.web.access.intercept.FilterSecurityInterceptor#0=org.springframework.security.web.access.intercept.FilterSecurityInterceptor@24c98b07,
+org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter#0=org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter@560c7816,
+org.springframework.format.support.FormattingConversionServiceFactoryBean#0=org.springframework.format.support.FormattingConversionServiceFactoryBean@4ca0187c, 
+dataRepository=org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean@22a79c31
+}
+
+  </pre>
+
+  <a href="."> back to security </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/CallersRestrictorTest.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/CallersRestrictorTest.pl </h1>
+
+  <a href="CallersRestrictorTest.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl
+
+use CallersRestrictor;
+
+sub fn1 {
+    print "fn1 called\n";
+}
+
+sub fn2 {
+    print "fn2 called\n";
+}
+
+
+restrictCallers fn1 =&gt; ['pkg1','pkg3'],
+                fn2 =&gt; ['pkg2'];
+
+
+
+
+package pkg1;
+
+main::fn1; main::fn2;
+
+package pkg2;
+
+main::fn1; main::fn2;
+
+package pkg3;
+
+main::fn1; main::fn2;
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

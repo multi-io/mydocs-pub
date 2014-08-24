@@ -1,0 +1,383 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./javascript/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">javascript</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+(section numbering from "ECMAScript language specification"
+(Ecma-262.pdf))
+
+Strongly and dynamically typed.
+
+Based on prototypes (no classes). I.e. there are only objects, which
+may have prototypes, which are also objects. Objects have named
+properties; property access is delegated to the prototype
+(recursively), which is how "inheritance" is
+implemented. Specifically, methods are also properties (of type
+"function"), and are inherited just like any other properties.
+
+Lexic and syntax are Java/C++ - like. Input to the lexer is a sequence
+of Unicode codepoints; Java-like \uxxxx codes are supported.
+
+Built-in Types: Undefined, Null, Boolean, Number, String, Object
+
+For each non-object type except Undefined and Null, there is a
+corresponding (native) object type, instances of which will be
+automatically created when a value of the corresponding primitive type
+is used like an object (autoboxing).
+
+
+[8.6]
+
+Objects are unordered sets of properties.
+
+Properties have a name (which is a string), a value (which is an
+object), and a set of attributes out of {ReadOnly, DontEnum,
+ontDelete, Internal}.
+
+Properties with attribute "Internal" ("Internal Properties"):
+
+- have no name (umm...) and aren't directly accessible from
+  JavaScript.
+
+- purely a specification concept (used in the specification (and here)
+  for describing the semantics of the language); whether/how they're
+  implemented is up to the implementation
+
+- defined internal properties: Prototype, Class (that's the "kind" of
+  the object (...), not the class/prototype), Get(name),
+  Put(name,value), CanPut(name), Delete(name), DefaultValue,
+  Construct(...), Call(...)  (only in function objects),
+  HasInstance(value) (only in function objects; determines whether
+  value has or inherits the function, AFAICS), Scope (only in function
+  objects; contains the scope chain (see below) of the function),
+  Match(string, index) (for regexes)
+
+Property access in the source code generally works using either dot
+notation (obj.property) or "indexed" access (obj["property"]). In the
+latter case, the property name is given as a string, which may be
+runtime-determined. obj may be either an identifier (which is resolved
+using the current /scope chain/ (see below)), or an expression that
+returns an object. More below.
+
+The Delete(name) function, which deletes property name from the
+object, is invoked in the source via "delete obj.name". It deletes the
+property and returns true iff the property was present.
+
+[8.7]
+
+"Reference" type
+
+- purely a specification concept (used in the specification (and here)
+  for explaining operators like delete, typeof and such); whether/how
+  they're implemented is up to the implementation
+
+- represents a readable/writable reference to a property of an object
+
+- encompasses: the object ("base object"), and the name of the
+  property
+
+- operations: GetBase(Ref), GetPropertyName(Ref), GetValue(V) (returns
+  V if V is not a Reference, else, returns the value of the property),
+  PutValue(Ref, Value)
+
+For example, a property access expression (obj.property or
+obj["property"]) returns a Reference with obj as the base object and
+"property" as the property. Since a Reference is returned, this
+expression may be used on the right side as well as on the left side
+of an assignment operator (=), i.e. it may be used for reading and
+writing the property.
+
+
+[10]
+
+Code runs in an /execution context/.
+
+Every function and constructor call enters a new execution context,
+even if a function is calling itself recursively.
+
+At any time there is a stack of execution contexts that runs up to the
+current execution context (in callstack order).
+
+An execution context is associated with a /variable object/, which
+contains:
+
+- local variable declarations (they're added to variable object as the
+  variables are declared)
+
+For function code, the variable object additionally contains:
+
+- the parameters given in the call to the function (with formal
+  parameter names as the names of the properties)
+
+- an "arguments" property which holds
+
+  - a "length" property that contains the number of actual parameters
+    given
+
+  - for the nth (0-based) parameter, an "n" property that contains the
+    value of the parameter
+
+  - a "callee" property that contains the function being executed
+    (this is so anonymous functions can call themselves recursively)
+
+  for example, the print statements in the following function all
+  print the value of the formal parameter b:
+
+  function myf(a,b,c) {
+    print(b);
+    //print(arguments.1);   //should work in priciple, but confuses the lexer 
+    print(arguments[1]);
+  }
+
+
+An execution context is also associated with a /scope chain/, which is
+a stack of objects that is used to resolve identifiers. The scope
+chain generally contains the variable objects of the current stack of
+execution contexts in callstack order, but see below for
+details. "with" and "catch" blocks also push an object onto the scope
+chain. (there are also blocks ({....}), but they don't create a new
+scope.
+
+Additionally, an execution context has a /this/ value, which depends
+on the caller (see below).
+
+
+3 types of executing code/execution contexts:
+
+- global (toplevel)
+
+  - variable object = "this" value = the "global object" (a special
+    object that is created when the JavaScript VM starts and is never
+    deleted)
+
+  - scope chain contains the global object only
+  
+- function code (part of a function definition body, or given as a
+  string to the "Function" constructor)
+
+  - scope chain = the variable object, followed by chain contained in
+    the "Scope" property of the function object
+
+  - "this" value provided by caller (see below)
+
+- eval code (created by built-in "eval" function)
+
+  - scope chain and "this" value are the ones from the calling
+    execution context
+
+
+[11]
+
+Expressions with no real equivalent or different meaning [than] in
+Java/C++:
+
+("ref" refers to an expression that returns a Reference (see [8.7]
+above))
+
+- array literal: [exp,exp,exp...]
+
+  - creates new array as if by "new Array()" (for "new" expressions
+    see ...)
+
+  - no exp (i.e. just ,,) places the numeric value 1 at that position
+    (TODO: verify; Execute JS extension in Mozilla suggests otherwise)
+
+- object literal:
+
+  TODO
+
+
+- delete ref
+
+  - deletes the property of ref, i.e. calls Delete(propname) on the
+    base object of ref, and returns true iff the property was present
+    before
+
+  - most common usage: delete obj.property
+
+- void expr
+  
+  - evaluates expr, ignores result, returns undefined
+
+- typeof expr
+
+  - returns a string describing the type of expr: for an object type
+    that's callable (implements Call), return "function" , for an
+    object type that's not callable, return "object", for primitive
+    types return "undefined", "object" (for type Null), "boolean",
+    "number", or "string", respectively. For host objects, the result
+    is implementation-defined (TODO: elaborate, verify)
+
+    E.g. typeof(42) =&gt; "number", typeof(new Number(42)) =&gt; "object"
+
+- + expr
+
+  - calls ToNumber [9.3] on result of expr, i.e. converts result of
+    expr to a number
+
+- lhs &gt;&gt;&gt; count
+
+  - unsigned right shift, e.g. -2&gt;&gt;&gt;1 =&gt; 2147483647, -2&gt;&gt;1 =&gt; -1
+
+  (there's no "unsigned left shift")
+
+- addition (+)  [11.6.1]
+
+  - if both operands are numbers, adds them; else, converts to String
+    and concatenates
+
+- relational operators (&lt;, &gt;, &lt;=, &gt;=)  [11.8.5]
+
+  - if any operand is a number, compares them numerically (returns
+    undefined if one couldn't be converted to number [TODO: Firefox
+    appears to return false in such a case; verify!]); else, converts
+    to String and compares using string compare
+
+- comparison operator (==, !=)  [11.9.3]
+
+  - for objects, test for identity (like Java); for other types,
+    *including String*, test for equality, including some type
+    coercions, e.g. 42=="42", true==1, false==0, true!=42
+
+- strict equals operator (===, !==)  [11.9.6]
+
+  - like ==, but without the type coercions. e.g. 42!=="42"
+
+
+- obj instanceof func  [11.8.6]
+
+  - true if obj delegates behaviour to func (func must be an object,
+    not a primitive)
+
+- prop in obj  [11.8.7]
+
+  - test for presence of prop in obj
+
+
+[12]
+
+(for the semantics of statements:
+ 
+The Completion type is used to explain the behaviour of statements
+(break, continue, return and throw) that perform nonlocal transfers of
+control. Values of the Completion type are triples of the form (type,
+value, target), where type is one of normal, break, continue, return,
+or throw, value is any ECMAScript value or empty, and target is any
+ECMAScript identifier or empty.
+
+)
+
+
+Statements with no real equivalent or different meaning [than] in
+Java/C++:
+
+- var v1[=v1v][,v2[=v2v]...]
+
+  - variable declaration. defines and optionally initializes
+    variables. They're added as properties to the variable object of
+    the current execution scope.
+
+- for (lhs in obj) statement
+
+  run statement for each property (not having attribute DontEnum) in
+  obj and its prototype chain (obj may be any expression), assigning
+  the name of the property to lhs each time.
+
+- for (var v in obj) statement
+
+  run statement for each property (not having attribute DontEnum) in
+  obj and its prototype chain (obj may be any expression), assigning
+  the name of the property to the variable v each time. v ist declared
+  just like in a variable definition outside a loop; no new variable
+  object is created, i.e. the variable is added to the variable object
+  of the enclosing execution context (this implies that the variable
+  continues to exist after the loop ends).
+
+- switch (expr) { case caseexp : statement; [...] [default: statement;] }
+
+  any expressions are allowed for expr and the caseexps; they are
+  compared via === to decide which clause to start executing.
+
+- throw expr
+
+  any value may be thrown, not just instances of (some subclass of)
+  some "exception type".
+
+
+[13]
+
+functions, objects, prototypes, constructors
+
+
+- function identifier (args) { body }
+
+  set property "identifier" of the current variable object to a
+  function object F such that:
+
+  - F.length == number of args
+
+  - F.scope == scope chain of execution context that created the
+    function context
+
+  - PT=new Object(); F.prototype == PT; PT.constructor == F
+
+  - when calling F, execute its code in a new execution context, with
+    scope = (a variable object containing args and the "this" provided
+    by the caller) + F.scope
+
+    In a function call obj.func(args), obj will become the "this".
+
+    In a function call func(args), the top of the scope chain will
+    become the "this". For functions defined in the scope of an
+    object definition, this will be that object
+
+- new fcn(args)
+
+  (fcn must be any function object)
+
+  - does the following:
+
+    newobj = new Object()
+    newobj.[[prototype]] = fcn.prototype [or Object.prototype if
+                                          fcn.prototype is undefined)
+    call fcn(args) with this == newobj
+    return newobj [or the return value of the call, if it was an object]
+
+  - so the prototype of obj = new fcn(args) is *not* fcn, but the
+    *prototype of fcn*. This means that properties of fcn cannot be
+    accessed via obj. In practice, this is used for "private"
+    variables/functions
+
+
+---
+
+TODO: don't forget:
+
+  - Date, Regexp, ...
+
+  - ...
+
+  </pre>
+
+  <a href="."> back to javascript </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

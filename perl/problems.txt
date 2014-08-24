@@ -1,0 +1,270 @@
+----
+Array-Referenzen werden zu Hashreferenzen
+
+  DB<50> @arr=(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+
+  DB<69> x \{@arr}
+0  SCALAR(0x91a4a94)
+   -> HASH(0x91a198c)
+      0 => 1
+      10 => 11
+      12 => 13
+      14 => 15
+      2 => 3
+      4 => 5
+      6 => 7
+      8 => 9
+  DB<70> x \@arr    # this way it works as expected
+0  ARRAY(0x919d7e4)
+   0  0
+   1  1
+   2  2
+   3  3
+   4  4
+   5  5
+   6  6
+   7  7
+   8  8
+   9  9
+   10  10
+   11  11
+   12  12
+   13  13
+   14  14
+   15  15
+  DB<71> x {@arr}
+
+
+  DB<66> $cpy= \{@arr[10..12]}
+
+  DB<67> x $cpy
+0  SCALAR(0x91a29cc)
+   -> HASH(0x91a2b70)
+      10 => 11
+      12 => undef
+  DB<68> x $cpy->[0]
+Not an ARRAY reference at (eval 89)[/usr/local/lib/perl5/5.6.0/perl5db.pl:1510] line 2, <IN> line 72.
+
+
+How are slices implemented? Full-blown arrays created as (shallow)
+copies of the specified section of the original array, or just a
+pointer to the original array, plus two indizes?
+
+
+  DB<75> $deepobj=[30,40,50,60]
+
+  DB<76> 
+main::(./tv_gui_regrtest.pl:61):	print "ALL TESTS SUCCESFUL.\n";
+  DB<76> 
+ALL TESTS SUCCESFUL.
+Debugged program terminated.  Use q to quit or R to restart,
+  use O inhibit_exit to avoid stopping after program termination,
+  h q, h R or h O to get additional info.  
+  DB<76> x $deepobj
+0  ARRAY(0x91a6bac)
+   0  30
+   1  40
+   2  50
+   3  60
+  DB<77> push @arr, $deepobj
+
+  DB<78> push @arr, 42
+
+  DB<79> push @arr, 43
+  DB<80> x @arr
+0  0
+1  1
+2  2
+3  3
+4  4
+5  5
+6  6
+7  7
+8  8
+9  9
+10  10
+11  11
+12  12
+13  13
+14  14
+15  15
+16  ARRAY(0x91a6bac)
+   0  30
+   1  40
+   2  50
+   3  60
+17  42
+18  43
+
+  DB<82> x @cpy2=@arr[13..17]
+0  13
+1  14
+2  15
+3  ARRAY(0x91a6bac)
+   0  30
+   1  40
+   2  50
+   3  60
+4  42
+  DB<83> x push @$cpy2[2],70
+Type of arg 1 to push must be array (not array slice) at (eval 104)[/usr/local/lib/perl5/5.6.0/perl5db.pl:1510] line 2, at EOF
+  DB<84> x push @{$cpy2[2]},70
+0  1
+  DB<85> x @cpy2
+0  13
+1  14
+2  15
+3  ARRAY(0x91a6bac)
+   0  30
+   1  40
+   2  50
+   3  60
+4  42
+  DB<86> x push @{$cpy2[3]},70
+0  5
+  DB<87> x @cpy2
+0  13
+1  14
+2  15
+3  ARRAY(0x91a6bac)
+   0  30
+   1  40
+   2  50
+   3  60
+   4  70
+4  42
+  DB<88> x @arr
+0  0
+1  1
+2  2
+3  3
+4  4
+5  5
+6  6
+7  7
+8  8
+9  9
+10  10
+11  11
+12  12
+13  13
+14  14
+15  15
+16  ARRAY(0x91a6bac)
+   0  30
+   1  40
+   2  50
+   3  60
+   4  70
+17  42
+18  43
+  DB<89> 
+
+----
+Apparently "iterators" over arrays as established by e.g. "foreach"
+are not part of the array itself:
+
+  DB<89> @arr2=(0,1,2)
+
+  DB<91> for $it1 (@arr2) { for $it2 (@arr2) { print "$it1 $it2   "; }}
+0 0   0 1   0 2   1 0   1 1   1 2   2 0   2 1   2 2   
+
+Is there a way to create and increment such iterators manually, or are
+they an integrated part of the "foreach" magic?
+
+----
+
+how do you obtain a reference to a hash returned by a function call?
+
+e.g.:
+
+this gives me the hash returned by "map":
+
+  DB<126> x map { ($_=>1) } 6,8,3,4,2
+0  6
+1  1
+2  8
+3  1
+4  3
+5  1
+6  4
+7  1
+8  2
+9  1
+
+same here (why doesn't this create a reference to the hash?)
+
+  DB<127> x { map { ($_=>1) } 6,8,3,4,2 }
+0  6
+1  1
+2  8
+3  1
+4  3
+5  1
+6  4
+7  1
+8  2
+9  1
+
+but this gives me a reference to a reference to the hash!
+
+  DB<128> x \{ map { ($_=>1) } 6,8,3,4,2 }
+0  REF(0x84dfb90)
+   -> HASH(0x84dc22c)
+      2 => 1
+      3 => 1
+      4 => 1
+      6 => 1
+      8 => 1
+
+And this doesn't work either:
+
+  DB<129> x \ map { ($_=>1) } 6,8,3,4,2
+0  SCALAR(0x84e0a98)
+   -> 6
+1  SCALAR(0x84dc250)
+   -> 1
+2  SCALAR(0x84e4254)
+   -> 8
+3  SCALAR(0x84de0cc)
+   -> 1
+4  SCALAR(0x84e0b64)
+   -> 3
+5  SCALAR(0x84e0d7c)
+   -> 1
+6  SCALAR(0x84e0a74)
+   -> 4
+7  SCALAR(0x84e4278)
+   -> 1
+8  SCALAR(0x84dc004)
+   -> 2
+9  SCALAR(0x84de1a4)
+   -> 1
+  DB<130> 
+
+it only works as expected when I create a temporary variable:
+
+  DB<130> x %res=map { ($_=>1) } 6,8,3,4,2; \%res
+0  HASH(0x84e0c54)
+   2 => 1
+   3 => 1
+   4 => 1
+   6 => 1
+   8 => 1
+  DB<131> 
+
+aaaah...
+
+  DB<141> x +{ map {$_+3} 6,8,3,4,2,5 }
+0  HASH(0x84e0cb4)
+   5 => 8
+   6 => 7
+   9 => 11
+  DB<142> 
+
+(see "man perlref"/"making references"/3.)
+----
+----
+----
+----
+----

@@ -1,0 +1,49 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./unix/logrotate/test/script_handling_rotation/logfile_write_longrunning_subprocess.sh </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">unix</a>/<a href="../../.">logrotate</a>/<a href="../.">test</a>/<a href=".">script_handling_rotation</a>/logfile_write_longrunning_subprocess.sh </h1>
+
+  <a href="logfile_write_longrunning_subprocess.sh">download original</a>
+
+  <pre>
+#!/bin/sh
+
+cd "`dirname $0`"
+
+set -e
+
+trap 'kill 0' EXIT
+trap 'true' HUP
+
+while true; do
+    # (while true; do echo hello; sleep 1; done) | prepend-time &gt;&gt;logfile2.txt 2&gt;&amp;1 &amp;
+    log-transferrate eth0 | prepend-time &gt;&gt;logfile2.txt 2&gt;&amp;1 &amp;
+    wait "$!" || true
+    echo kill "$!"
+    kill "$!"
+done
+
+# not perfect -- the kill $! actually kills only the prepend-time and
+# may cause "broken pipe" messages on stderr. But functionality-wise
+# everything works.
+  </pre>
+
+  <a href="."> back to script_handling_rotation </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

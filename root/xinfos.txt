@@ -1,0 +1,54 @@
+X (/etc/X11/X) - Executable des X-Servers. Ist ein Symlink zum an die Grafikkarte
+angepassten Server (z.B. /usr/X11R6/bin/XF86_S3V)
+Ein laufender X-Server kann mit Ctrl-Alt-Backspace beendet werden.
+
+fvwm, fvwm2 usw. (/usr/X11R6/bin/fvwm(2) ) - Executables der verschiedenen Window-Manager, die das
+Aussehen der Fenster bestimmen (Rahmen, Icons, ...). Der Window-Manager
+muss nach dem X-Server gestartet werden. Bsp.:
+X | fvwm
+startet den X-Server und anschliessend den fvwm
+Die Window-Manager lesen beim Start automatisch ihre Konfigurationsdatei
+aus. Diese enthaelt Informationen ueber zu verwendende Farben, Schriftarten,
+Quickstart-Menues usw...  Existiert eine Konfigurationsdatei im
+Homeverzeichnis des Benutzers, wird sie benutzt (z.B. ~/.fvwm2rc fuer
+fvwm2), ansonsten wird eine Defaultdatei verwendet
+(/etc/X11/fvwm2/system.fvwm2rc fuer fvwm2).
+
+xinit (/usr/X11R6/bin/xinit) - Programmstarter, der zuerst den X-Server und
+anschliessend ein beliebiges Client-Programm (welches wiederum den Window-Manager
+starten sollte) startet. Aufruf:
+xinit [ClientPrg] [-- [ServerPrg]]
+Wird kein ClientPrg angegeben, fuehrt xinit die Datei .xinitrc im Home des
+Benutzers aus, und falls diese nicht existiert, ein einfaches xterm.
+Wird kein ServerPrg angegeben (oft der Fall), fuehrt xinit den normalen
+X-Server 'X' aus.
+
+startx (/usr/X11R6/bin/startx) - Frontend fuer xinit:
+Schaut nach, ob eine Datei .xinitrc im Home des Benutzers existiert. Falls ja, wird
+sie an xinit uebergeben, sonst die Default-Datei
+/etc/X11/xinit/xinitrc.
+Analog wird fuer den Server eine Datei .xserverrc im Home gesucht und ggf.
+uebergeben, falls die Datei nicht existiert, wird /etc/X11/xinit/xserverrc
+gesucht, und falls auch diese Datei nicht existiert, wird kein ServerPrg an
+xinit uebergeben, wodurch der Standard-Server 'X' gestartet wird (siehe
+voriger Abschnitt).
+
+.xinitrc (~/.xinitrc bzw. /etc/X11/xinit/xinitrc) - Das erste Skript, das
+nach dem Start des X-Servers ausgefuehrt wird. Hier werden Programme
+gestartet, die beim Start von X gleich ausgefuehrt werden sollen (entspr.
+Autostart-Gruppe in Windows), und anschliessend wird der Window-Manager
+gestartet. .xinitrc uebertraegt den grossteil der Arbeit der Datei
+~/.Xclients, falls diese existiert. 
+
+Die meisten Window-Manager bieten auch
+die Moeglichkeit, Autostart-Programme in die Konfig.-Datei des
+Window-Managers einzutragen. Beim FVWM2 geschieht das z.B. in etwa so:
+
+...
+AddToFunc "InitFunction"
++         "I" Exec xearth &  #drehende Erde als Hintergrund
+...
+
+
+siehe auch:
+man X

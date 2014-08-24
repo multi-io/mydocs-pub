@@ -1,0 +1,72 @@
+// Compiled from ImageViewerCanvas.java (version 1.4 : 48.0, super bit)
+public class com.sun.activation.viewers.ImageViewerCanvas extends java.awt.Canvas {
+
+  ...
+
+  // Method descriptor #25 ()Ljava/awt/Dimension;
+  // Stack: 5, Locals: 2
+  public java.awt.Dimension getPreferredSize();
+     0  aconst_null
+     1  astore_1 [d]
+     2  aload_0 [this]
+     3  getfield com.sun.activation.viewers.ImageViewerCanvas.canvas_image : java.awt.Image [2]
+     6  ifnonnull 26
+     9  new java.awt.Dimension [5]
+    12  dup
+    13  sipush 200
+    16  sipush 200
+    19  invokespecial java.awt.Dimension(int, int) [6]
+    22  astore_1 [d]
+    23  goto 50
+    26  new java.awt.Dimension [5]
+    29  dup
+    30  aload_0 [this]
+    31  getfield com.sun.activation.viewers.ImageViewerCanvas.canvas_image : java.awt.Image [2]
+    34  aload_0 [this]
+    35  invokevirtual java.awt.Image.getWidth(java.awt.image.ImageObserver) : int [7]
+    38  aload_0 [this]
+    39  getfield com.sun.activation.viewers.ImageViewerCanvas.canvas_image : java.awt.Image [2]
+    42  aload_0 [this]
+    43  invokevirtual java.awt.Image.getHeight(java.awt.image.ImageObserver) : int [8]
+    46  invokespecial java.awt.Dimension(int, int) [6]
+    49  astore_1 [d]
+    50  aload_1 [d]
+    51  areturn
+      Line numbers:
+        [pc: 0, line: 59]
+        [pc: 2, line: 61]
+        [pc: 9, line: 63]
+        [pc: 23, line: 64]
+        [pc: 26, line: 66]
+        [pc: 50, line: 69]
+      Local variable table:
+        [pc: 0, pc: 52] local: this index: 0 type: com.sun.activation.viewers.ImageViewerCanvas
+        [pc: 2, pc: 52] local: d index: 1 type: java.awt.Dimension
+  
+
+  ...
+}
+
+
+
+=>
+
+public class com.sun.activation.viewers.ImageViewerCanvas extends java.awt.Canvas {
+
+  ...
+
+  public java.awt.Dimension getPreferredSize() {
+    Dimension d = null;
+    if (this.canvas_image==null) {
+      d = new Dimension(200,200);
+    } else {
+      d = new Dimension(this.canvas_image.getWidth(this),
+                        this.canvas_image.getHeight(this));
+    }
+    return d;
+  }
+
+  ...
+
+
+}

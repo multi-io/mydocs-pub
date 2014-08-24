@@ -1,0 +1,62 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./mongodb/test/java/spring-mongo-versioned-entities/src/main/java/de/oklischat/mydocs/mongodb/spring/persistence/PersonService.java </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../../../../../../../../../.">.</a>/<a href="../../../../../../../../../../../../.">mongodb</a>/<a href="../../../../../../../../../../../.">test</a>/<a href="../../../../../../../../../../.">java</a>/<a href="../../../../../../../../../.">spring-mongo-versioned-entities</a>/<a href="../../../../../../../../.">src</a>/<a href="../../../../../../../.">main</a>/<a href="../../../../../../.">java</a>/<a href="../../../../../.">de</a>/<a href="../../../../.">oklischat</a>/<a href="../../../.">mydocs</a>/<a href="../../.">mongodb</a>/<a href="../.">spring</a>/<a href=".">persistence</a>/PersonService.java </h1>
+
+  <a href="PersonService.java">download original</a>
+
+  <pre>
+package de.oklischat.mydocs.mongodb.spring.persistence;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
+
+import de.oklischat.mydocs.mongodb.spring.domain.Person;
+
+@Service
+public class PersonService extends EntityPersister&lt;Person&gt; {
+	
+	protected static final Logger logger = Logger.getLogger(PersonService.class);
+
+	@Autowired
+	public PersonService(MongoTemplate mongoTemplate) {
+		super(mongoTemplate);
+	}
+
+	public List&lt;Person&gt; findByName(String name, int firstRowNr, int rowsCount) {
+		Query q = query(where("name").is(name)).skip(firstRowNr).limit(rowsCount);
+		//q.sort().on("name", Order.ASCENDING);
+		return getMongoTemplate().find(q, Person.class);
+	}
+	
+}
+
+  </pre>
+
+  <a href="."> back to persistence </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

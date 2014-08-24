@@ -1,0 +1,50 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/streams2test.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/streams2test.rb </h1>
+
+  <a href="streams2test.rb">download original</a>
+
+  <pre>
+require 'streams2'
+
+class TestStream
+  include Stream
+
+  def initialize
+    @val=1
+  end
+
+  def hasNext
+    @val &lt; 100
+  end
+
+  def next
+    tmp = @val
+    @val *= 2
+    tmp
+  end
+
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

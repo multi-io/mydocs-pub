@@ -1,0 +1,86 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/rails/activerecord/tests/firma/create.sql </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../.">.</a>/<a href="../../../../.">ruby</a>/<a href="../../../.">rails</a>/<a href="../../.">activerecord</a>/<a href="../.">tests</a>/<a href=".">firma</a>/create.sql </h1>
+
+  <a href="create.sql">download original</a>
+
+  <pre>
+CREATE TABLE kunde
+(
+    id            INT PRIMARY KEY, 
+    name          VARCHAR(40) NOT NULL,
+    geburtsjahr   INT,
+    wohnsitz_id   INT REFERENCES adresse(id),
+    geburtsort_id INT REFERENCES stadt(id)
+);
+
+
+CREATE TABLE produkt
+(
+    id         INT PRIMARY KEY,
+    name       VARCHAR(40) NOT NULL,
+    preis      INT NOT NULL
+);
+
+
+CREATE TABLE bestellung
+(
+    id          INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    produkt_id  INT REFERENCES produkt(id),
+    kunde_id    INT REFERENCES kunde(id),
+    anzahl      INT NOT NULL
+);
+
+
+CREATE TABLE firma
+(
+    id         INT PRIMARY KEY,
+    name       VARCHAR(40),
+);
+
+
+CREATE TABLE produkt_hersteller
+(
+    produkt_id  INT REFERENCES produkt(id),
+    firma_id    INT REFERENCES firma(id),
+);
+
+
+CREATE TABLE stadt
+(
+    id         INT PRIMARY KEY, 
+    name       VARCHAR(40) NOT NULL,
+    ewzahl     INT,
+);
+
+
+CREATE TABLE adresse
+(
+    id         INT PRIMARY KEY,
+    stadt_id   INT REFERENCES stadt(id),
+    strasse    VARCHAR(40),
+    nr         INT
+);
+
+  </pre>
+
+  <a href="."> back to firma </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

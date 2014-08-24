@@ -1,0 +1,29 @@
+irb(main):001:0> require 'rexml/document'
+=> true
+irb(main):002:0> include REXML
+=> Object
+irb(main):003:0> d=Document.new "<foo/>"
+=> <UNDEFINED> ... </>
+irb(main):004:0> d.write
+<foo/>=> [#<REXML::XMLDecl:0x4065e5a0 @version="1.0", @writeencoding=false, @parent=nil, @writethis=false, @standalone=nil, @encoding="UTF-8">, <foo/>]
+irb(main):005:0> d.elements.add "bar"
+RuntimeError: attempted adding second root element to document
+        from /usr/lib/ruby/1.8/rexml/document.rb:81:in `<<'
+        from /usr/lib/ruby/1.8/rexml/element.rb:893:in `add'
+        from /usr/lib/ruby/1.8/rexml/child.rb:21:in `initialize'
+        from /usr/lib/ruby/1.8/rexml/parent.rb:13:in `initialize'
+        from /usr/lib/ruby/1.8/rexml/element.rb:53:in `initialize'
+        from /usr/lib/ruby/1.8/rexml/element.rb:891:in `new'
+        from /usr/lib/ruby/1.8/rexml/element.rb:891:in `add'
+        from (irb):5
+irb(main):006:0> d.write
+<foo/><NoMethodError: undefined method `empty?' for nil:NilClass
+        from /usr/lib/ruby/1.8/rexml/element.rb:663:in `write'
+        from /usr/lib/ruby/1.8/rexml/document.rb:163:in `write'
+        from /usr/lib/ruby/1.8/rexml/document.rb:161:in `each'
+        from /usr/lib/ruby/1.8/rexml/document.rb:161:in `write'
+        from (irb):6
+irb(main):007:0> 
+
+
+the latter exception is the problem

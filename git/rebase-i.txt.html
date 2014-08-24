@@ -1,0 +1,470 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./git/rebase-i.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">git</a>/rebase-i.txt </h1>
+
+  <a href="rebase-i.txt">download original</a>
+
+  <pre>
+original branch was:
+
+
+commit eccea1bb76274e4988bfa4b7899283b447ae0b4c
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 05:04:11 2012 +0100
+
+    .gitignore, Eclipse settings
+
+commit 2f675d74fc8691b420c21f697680eeadf77520ef
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 04:04:57 2012 +0100
+
+    cell painting infrastructure backend: javadoc updated
+
+commit ef0e8b06980e2c1e6b7198add8a3d74f550dbce6
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 03:25:00 2012 +0100
+
+    cell painting infrastructure backend refactoring bugfix
+
+commit 7460ac28280a1732408173cebd26146345415bd7
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 02:45:47 2012 +0100
+
+    ILVImgPaintController GL bugfix
+
+commit 6d56c90bcd82bbafa549ffccac49d0b0eaf00add
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 02:40:44 2012 +0100
+
+    ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+
+commit 690aa675f975855e99199754b68a81d444375c32
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 05:20:59 2012 +0100
+
+    ImageListViewPrintLUTController moved to backends. All still untested.
+
+commit b2078219b1cea8ee1ef2b9517fa569f370f97f1a
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 02:10:03 2012 +0100
+
+    cell painting infrastructure / cell image painting moved to backends
+
+commit 8475f65d6bdb70ab56b6f8c74ebae11581256131
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Tue Nov 27 02:18:55 2012 +0100
+
+    ILVBackendBase, ILVBackend#createRoiDrawingViewe
+
+
+
+
+# usage: git rebase -i &lt;last commit you want to retain as-is&gt;
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git rebase -i 8475f65d6bdb70ab56b
+
+(editor pops up)
+
+pick b207821 cell painting infrastructure / cell image painting moved to backends
+pick 690aa67 ImageListViewPrintLUTController moved to backends. All still untested.
+pick 6d56c90 ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+pick 7460ac2 ILVImgPaintController GL bugfix
+pick ef0e8b0 cell painting infrastructure backend refactoring bugfix
+pick 2f675d7 cell painting infrastructure backend: javadoc updated
+pick eccea1b .gitignore, Eclipse settings
+
+# Rebase 8475f65..eccea1b onto 8475f65
+#
+# Commands:
+#  p, pick = use commit
+#  r, reword = use commit, but edit the commit message
+#  e, edit = use commit, but stop for amending
+#  s, squash = use commit, but meld into previous commit
+#  f, fixup = like "squash", but discard this commit's log message
+#  x, exec = run command (the rest of the line) using shell
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+# However, if you remove everything, the rebase will be aborted.
+#
+
+
+(READ those those descriptions; they're clearer and more concise than
+those in most online Git books: the commits are listed in
+chronological order (reverse to "git log"), because that's the order
+in which they'll be applied, and you can reorder lines and "fuse"
+commits using "squash" or "fixup")
+
+lines changed to:
+
+pick b207821 cell painting infrastructure / cell image painting moved to backends
+fixup ef0e8b0 cell painting infrastructure backend refactoring bugfix
+fixup 2f675d7 cell painting infrastructure backend: javadoc updated
+fixup 7460ac2 ILVImgPaintController GL bugfix
+pick 690aa67 ImageListViewPrintLUTController moved to backends. All still untested.
+pick 6d56c90 ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+pick eccea1b .gitignore, Eclipse settings
+
+(save &amp; exit)
+
+
+
+error: could not apply 7460ac2... ILVImgPaintController GL bugfix
+
+When you have resolved this problem run "git rebase --continue".
+If you would prefer to skip this patch, instead run "git rebase --skip".
+To check out the original branch and stop rebasing run "git rebase --abort".
+
+Could not apply 7460ac2... ILVImgPaintController GL bugfix
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git status src/
+# Not currently on any branch.
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#	modified:   src/main/java/de/sofd/viskit/controllers/ImageListViewInitialWindowingController.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/ImageListViewInitialZoomPanController.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/ImageListViewMouseMeasurementController.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/cellpaint/CellPaintControllerBase.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewImagePaintController.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewInitStateIndicationPaintController.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/ImageListViewBackend.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/ImageListViewBaseImpl.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/event/cellpaint/ImageListViewCellPaintListener.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/glimpl/JGLImageListView.java
+#	renamed:    src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewImagePaintController.java -&gt; src/main/java/de/sofd/viskit/ui/imagelist/j2dimpl/J2DImageListViewBackend.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/jlistimpl/test/JListImageListTestApp.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListView.java
+#
+# Unmerged paths:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#   (use "git add/rm &lt;file&gt;..." as appropriate to mark resolution)
+#
+#	both modified:      src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java
+#	both modified:      src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBackend.java
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#	src/main/java/de/sofd/viskit/ui/imagelist/JImageListViewBase.java
+#	src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBase.java
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ vim src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java 
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ vim src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBackend.java
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git add src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBackend.java
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git rebase --continue
+
+(editor pops up)
+
+# This is a combination of 4 commits.
+# The first commit's message is:
+cell painting infrastructure / cell image painting moved to backends
+
+# The 2nd commit message will be skipped:
+
+#       cell painting infrastructure backend refactoring bugfix
+
+# The 3rd commit message will be skipped:
+
+#       cell painting infrastructure backend: javadoc updated
+
+# The 4th commit message will be skipped:
+
+#       ILVImgPaintController GL bugfix
+
+(save &amp; exit)
+
+
+[detached HEAD 456cbee] cell painting infrastructure / cell image painting moved to backends
+ 15 files changed, 493 insertions(+), 1282 deletions(-)
+ rewrite src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewImagePaintController.java (97%)
+ rewrite src/main/java/de/sofd/viskit/ui/imagelist/event/cellpaint/ImageListViewCellPaintListener.java (72%)
+ rename src/main/java/de/sofd/viskit/{controllers/cellpaint/ImageListViewImagePaintController.java =&gt; ui/imagelist/j2dimpl/J2DImageListViewBackend.java} (52%)
+error: could not apply 690aa67... ImageListViewPrintLUTController moved to backends. All still untested.
+
+When you have resolved this problem run "git rebase --continue".
+If you would prefer to skip this patch, instead run "git rebase --skip".
+To check out the original branch and stop rebasing run "git rebase --abort".
+Could not apply 690aa67... ImageListViewPrintLUTController moved to backends. All still untested.
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ 
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git status src/
+# Not currently on any branch.
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#	modified:   src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewInitStateIndicationPaintController.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewPrintLUTController.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/ImageListViewBackend.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/j2dimpl/J2DImageListViewBackend.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListView.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBackend.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/draw2d/LWJGLGC.java
+#
+# Unmerged paths:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#   (use "git add/rm &lt;file&gt;..." as appropriate to mark resolution)
+#
+#	both modified:      src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#	src/main/java/de/sofd/viskit/ui/imagelist/JImageListViewBase.java
+#	src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBase.java
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ vim src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git add src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java
+
+
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git rebase --continue
+[detached HEAD 4eb9b21] ImageListViewPrintLUTController moved to backends. All still untested.
+ 8 files changed, 566 insertions(+), 525 deletions(-)
+ rewrite src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewPrintLUTController.java (66%)
+error: could not apply 6d56c90... ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+
+When you have resolved this problem run "git rebase --continue".
+If you would prefer to skip this patch, instead run "git rebase --skip".
+To check out the original branch and stop rebasing run "git rebase --abort".
+Could not apply 6d56c90... ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ 
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git status src/
+# Not currently on any branch.
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#	modified:   src/main/java/de/sofd/viskit/controllers/ImageListViewMouseMeasurementController.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewPrintTextToCellsController.java
+#	modified:   src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewRoiPaintController.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/ImageListViewBackend.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/j2dimpl/J2DImageListViewBackend.java
+#	modified:   src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBackend.java
+#
+# Unmerged paths:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#   (use "git add/rm &lt;file&gt;..." as appropriate to mark resolution)
+#
+#	both modified:      src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#	src/main/java/de/sofd/viskit/ui/imagelist/JImageListViewBase.java
+#	src/main/java/de/sofd/viskit/ui/imagelist/twlimpl/TWLImageListViewBase.java
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ vim src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java
+
+
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git add src/main/java/de/sofd/viskit/ui/imagelist/glimpl/GLImageListViewBackend.java 
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ git rebase --continue
+[detached HEAD bf09e6e] ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+ 7 files changed, 195 insertions(+), 240 deletions(-)
+Successfully rebased and updated refs/heads/backends_split-backend_iface.
+olaf@tack:~/hieronymusr-opensource/gitconv/iirkit_all/viskit$ 
+
+
+resulting branch is:
+
+commit 20b89229bc318651b13951271586fab049e1c3db
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 05:04:11 2012 +0100
+
+    .gitignore, Eclipse settings
+
+commit 82baddcce0f4c8c385072ad6b457d4ac334bd8f9
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 02:40:44 2012 +0100
+
+    ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+
+commit 4eb9b218de35ecc2eba9fc5646c26c4d2c9e294b
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 05:20:59 2012 +0100
+
+    ImageListViewPrintLUTController moved to backends. All still untested.
+
+commit 456cbeec6f65d18fe11b16fc727f1fcd2b959eae
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 02:10:03 2012 +0100
+
+    cell painting infrastructure / cell image painting moved to backends
+
+commit 8475f65d6bdb70ab56b6f8c74ebae11581256131
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Tue Nov 27 02:18:55 2012 +0100
+
+    ILVBackendBase, ILVBackend#createRoiDrawingViewe
+
+
+
+
+
+============================================================
+
+
+Other frequent use case: Modify a file in an earlier commit.
+
+Example: Given the above log, modify something in the
+4eb9b218de35ecc2eba9fc5646c26c4d2c9e294b commit.
+
+
+original branch was:
+
+commit 20b89229bc318651b13951271586fab049e1c3db
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 05:04:11 2012 +0100
+
+    .gitignore, Eclipse settings
+
+commit 82baddcce0f4c8c385072ad6b457d4ac334bd8f9
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 02:40:44 2012 +0100
+
+    ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+
+commit 4eb9b218de35ecc2eba9fc5646c26c4d2c9e294b
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 05:20:59 2012 +0100
+
+    ImageListViewPrintLUTController moved to backends. All still untested.
+
+commit 456cbeec6f65d18fe11b16fc727f1fcd2b959eae
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 02:10:03 2012 +0100
+
+    cell painting infrastructure / cell image painting moved to backends
+
+
+
+$ git rebase -i 456cbeec6  # 456cbeec6 = last commit we want to retain
+
+(editor pops up)
+
+pick 4eb9b21 ImageListViewPrintLUTController moved to backends. All still untested.
+pick 82baddc ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+pick 20b8922 .gitignore, Eclipse settings
+
+# Rebase 456cbee..20b8922 onto 456cbee
+#
+# Commands:
+#  p, pick = use commit
+#  r, reword = use commit, but edit the commit message
+#  e, edit = use commit, but stop for amending
+#  s, squash = use commit, but meld into previous commit
+#  f, fixup = like "squash", but discard this commit's log message
+#  x, exec = run command (the rest of the line) using shell
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+# However, if you remove everything, the rebase will be aborted.
+#
+
+change to "edit" the line of the commit we want to modify:
+
+edit 4eb9b21 ImageListViewPrintLUTController moved to backends. All still untested.
+pick 82baddc ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+pick 20b8922 .gitignore, Eclipse settings
+
+(save &amp; exit)
+
+Stopped at 4eb9b21... ImageListViewPrintLUTController moved to backends. All still untested.
+You can amend the commit now, with
+
+	git commit --amend
+
+Once you are satisfied with your changes, run
+
+	git rebase --continue
+
+$ git log
+commit 4eb9b218de35ecc2eba9fc5646c26c4d2c9e294b
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 05:20:59 2012 +0100
+
+    ImageListViewPrintLUTController moved to backends. All still untested.
+
+commit 456cbeec6f65d18fe11b16fc727f1fcd2b959eae
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 02:10:03 2012 +0100
+
+    cell painting infrastructure / cell image painting moved to backends
+
+$
+
+So we're rolled back to a state where the commit we want to edit is
+HEAD. We have to *amend* that commit with our modification (just like
+the blurb above says):
+
+# so, edit and add the file we want to modify, the amend
+$ vim src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewInitStateIndicationPaintController.java
+$ git add src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewInitStateIndicationPaintController.java
+$ git commit --amend
+..
+[detached HEAD 2b1c4f5] ImageListViewPrintLUTController moved to backends. All still untested.
+ Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+ 8 files changed, 567 insertions(+), 524 deletions(-)
+ rewrite src/main/java/de/sofd/viskit/controllers/cellpaint/ImageListViewPrintLUTController.java (66%)
+
+$ git rebase --continue
+Successfully rebased and updated refs/heads/backends_split-backend_iface.
+$ 
+
+
+final branch:
+
+commit e4a81fd3d8edc229078d4e4f6e8a2e43cb233e76
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 05:04:11 2012 +0100
+
+    .gitignore, Eclipse settings
+
+commit 9b329a56965c5f5c1274ae566f314945082e4d6a
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Thu Nov 29 02:40:44 2012 +0100
+
+    ILVPrintText,RoiPaint,MouseMeasurement moved to backends
+
+commit 2b1c4f5c2e37f97b79add4f2c75aa79440e36322
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 05:20:59 2012 +0100
+
+    ImageListViewPrintLUTController moved to backends. All still untested.
+
+commit 456cbeec6f65d18fe11b16fc727f1fcd2b959eae
+Author: Olaf Klischat &lt;olaf.klischat@sofd.de&gt;
+Date:   Wed Nov 28 02:10:03 2012 +0100
+
+    cell painting infrastructure / cell image painting moved to backends
+
+
+(i.e. all sha1 after 456cbeec6 have changed, as expected)
+
+  </pre>
+
+  <a href="."> back to git </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

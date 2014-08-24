@@ -1,0 +1,207 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./wwwpublish </title>
+</head>
+
+<body>
+
+  <h1> <a href=".">.</a>/wwwpublish </h1>
+
+  <a href="wwwpublish">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+use strict;
+use File::Find;
+
+sub rejected {
+    local ($_) = shift;
+    my $accessible_file = shift;
+    (! -f $accessible_file and ! -d $accessible_file) or
+    (stat($accessible_file))[7] &gt; 120000 or
+    ### things we don't want to publish
+    m!/CVS! or
+    m!cvsignore$! or
+    m!~$! or
+    m!\/.gradle! or
+    m!/tmp/! or
+    m!/build/! or
+    m!/core$! or
+    m!\.metadata! or
+    m!\.orig! or
+    m!\.git! or
+    m!\.gz$! or
+    m!\.tgz$! or
+    m!\.bz2$! or
+    m!\.tbz2$! or
+    m!\.exe$! or
+    m!\.dll$! or
+    m!\.dylib$! or
+    m!\.so$! or
+    m!\.jnilib$! or
+    m!\.zip$! or
+    m!\.jar$! or
+    m!\.class$! or
+    m!^./git/git-svn/! or
+    m!^./isst! or
+    m!^./isst! or
+    m!^./java/test! or
+    m!^./math/.*?\.png$! or
+    m!^./population_development/derivation.png! or
+    m!^./passwords.txt.asc! or
+    m!^./elasticsearch/test/node*! or
+    m!^./elasticsearch/test/singlenode/data/*! or
+    m!scheme/test/dstruct.sc! or
+    m!scheme/test/queens.sc! or
+    m!^./javascript/dojo/test/dojo! or
+    m!^./javascript/dojo/test/dijit! or
+    m!^./opengl/ms_aa_blend_textfilt! or
+    m!ruby/rails/actionpack! or
+    m!ruby/rails/problems.txt! or
+    m!aerzte!i or
+    m!\#$! or
+     # m!^./wwwpublish! or
+    not (
+         ### things we do want to publish (unless they match the things we don't want to publish)
+         m!^.$! or
+         m!^./$! or
+         m!^./ajax/! or
+         m!^./aspectj/! or
+         m!^./avreceivers/! or
+         m!^./backups/! or
+         m!^./elasticsearch/! or
+         m!^./ibatis/! or
+         m!^./ruby! or
+         m!^./perl! or
+         m!^./grub! or
+         m!^./Makefile! or
+         m!^./java/nio! or
+         m!^./java/.*?txt$! or
+         m!^./java/build-tools! or
+         # m!^./svn! or
+         m!^./gnus/! or
+         # m!^./mediamaerkte/.*?txt$! or
+         m!^./wget! or
+         m!^./linux/requested-modules.txt! or
+         m!^./longhorn! or
+         m!^./math/! or
+         m!^./dotnet/! or
+         m!^./debian! or
+         m!^./git/.*?txt$! or
+         m!^./apt/apt-build.txt! or
+         m!^./emacs/! or
+         m!^./gradle/! or
+         m!^./mongodb/! or
+         m!^./matlab_octave/! or
+         m!^./bluetooth/bluetooth.txt! or
+         m!^./bluetooth/rfcomm.txt! or
+         m!^./internet! or
+         m!^./javascript/closure-based-oop.txt$! or
+         m!^./javascript/misc.txt$! or
+         m!^./javascript/dojo! or
+         m!^./javascript/drawing! or
+         m!^./javascript/profiling/! or
+         m!^./lisp/! or
+         m!^./root! or
+         m!^./internet$! or
+         m!^./sane.txt! or
+         m!^./springframework/.*?txt$! or
+         m!^./springframework/.*?pdf$! or
+         m!^./unfs/! or
+         m!^./unix/! or
+         m!^./cdwriting.txt! or
+         m!^./grepre-examples.txt! or
+         m!^./mbrsaverestore.txt! or
+         m!^./printing-hierarchical-websites.txt! or
+         m!^./physics! or
+         m!^./swt/test/browser! or
+         m!^./xgalaga/prizes/prizes.html$! or
+         m!^./xgalaga/prizes/code.txt$! or
+         m!^./xgalaga/prizes/Makefile$! or
+         m!^./xgalaga/prizes/.*?xpm$! or
+         m!^./xgalaga/prizes/.*?png$! or
+         m!^./wwwpublish! or
+         m!^./opengl/!
+        );
+}
+
+
+my $root = {};
+
+find(sub {
+         return if rejected($File::Find::name,$_);
+         my $currdir = $root;
+         my $currpath = "";
+         foreach my $d (split("/",$File::Find::dir)) {
+             $currpath .= "${d}/";
+             my $parent = $currdir;
+             $currdir = ($currdir-&gt;{DIRS}-&gt;{$d} ||= {});
+             $currdir-&gt;{PARENT} = $parent;
+             $currdir-&gt;{NAME} = $d;
+             $currdir-&gt;{PATH} = $currpath;
+         }
+         if (-f) {
+             push @{$currdir-&gt;{FILES}}, $_;
+         }
+     },
+     ".");
+
+$root = $root-&gt;{DIRS}-&gt;{'.'};
+$root-&gt;{PARENT} = undef;
+
+# turn all DIRS into lists, sort all DIRS and FILES
+sub sortdir {
+    my $dir = shift;
+    $dir-&gt;{DIRS} = [sort { $a-&gt;{NAME} cmp $b-&gt;{NAME} } (values %{$dir-&gt;{DIRS} || {}})];
+    $dir-&gt;{FILES} = [sort @{$dir-&gt;{FILES} || []}];
+    foreach my $d (@{$dir-&gt;{DIRS}}) {
+        sortdir($d);
+    }
+}
+
+sortdir($root);
+
+unless (__FILE__ eq $0) {
+    our $root = $root;
+    return;
+}
+
+
+sub check {
+    our $dir = shift;
+    print STDERR "checking: $dir-&gt;{PATH}\n";
+    foreach my $d (@{$dir-&gt;{DIRS}}) {
+        check($d);
+    }
+}
+
+
+my $PUBHTMLDIR = $ARGV[0] or die "usage: wwwpublish &lt;targetdir&gt;";
+
+#check $root;
+#__END__
+
+
+use Publish;
+
+
+publish $root, $PUBHTMLDIR;
+
+  </pre>
+
+  <a href="."> back to . </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

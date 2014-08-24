@@ -1,0 +1,97 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./git/commands.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">git</a>/commands.txt </h1>
+
+  <a href="commands.txt">download original</a>
+
+  <pre>
+revert local (uncommitted) changes:
+
+git checkout HEAD -- path/to/file
+
+
+git equivalent to hg rollback:
+
+git reset --soft HEAD^
+
+
+to unstage changes:
+
+git reset HEAD &lt;files&gt;
+
+
+to abort a merge:
+
+git reset --hard
+
+
+clone into existing non-empty directory "foo":
+
+git clone --bare /some/where/foo.git
+mv foo.git foo/.git
+cd foo
+git config core.bare false
+git reset HEAD .
+
+
+
+&lt;multi_io&gt; is it possible to directly fast-forward a non-checked out branch to the checked out branch?
+[15:23] &lt;cehteh&gt; git push . brach:branch
+[15:24] &lt;multi_io&gt; i.e. I've checked out branch B, and there's a branch A in the repo which is an ancestor of B, and I want to do the equivalent of git checkout A; git merge --ff-only B; git checkout B
+
+=&gt; git push . B:A
+
+&lt;cmn&gt; git branch -f A B would also work
+&lt;cmn&gt; and be less magical
+
+
+
+specifying commit ranges:
+
+see git help rev-list
+
+- git rev-list master: master and all commits reachable from it via "parent" relation
+
+- git rev-list master ^other: master and all commits reachable from it, but not from other, via "parent" relation
+
+from git help rev-list:
+
+       You can think of this as a set operation. Commits given on the command line form a set of commits that are reachable
+       from any of them, and then commits reachable from any of the ones given with ^ in front are subtracted from that set.
+       The remaining commits are what comes out in the command’s output. Various other options and paths parameters can be used
+       to further limit the result.
+
+several commands take commit range arguments, e.g. cherry-pick.
+
+
+directly moving HEAD pointer to any branch, without touching either
+the index or the wd (essentially a checkout without modifying the
+index or wd):
+
+git symbolic-ref HEAD refs/heads/&lt;branch&gt;
+
+(after which you'd probably issue a "git reset" to copy the new HEAD
+tree into the index)
+
+  </pre>
+
+  <a href="."> back to git </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

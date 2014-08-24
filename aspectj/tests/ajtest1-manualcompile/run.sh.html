@@ -1,0 +1,42 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./aspectj/tests/ajtest1-manualcompile/run.sh </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">aspectj</a>/<a href="../.">tests</a>/<a href=".">ajtest1-manualcompile</a>/run.sh </h1>
+
+  <a href="run.sh">download original</a>
+
+  <pre>
+#!/bin/sh
+
+set -e
+
+cd "`dirname $0`"
+
+#ajcp="`echo lib/aspectj/*jar | tr ' ' ':'`"
+ajcp=lib/aspectj/aspectjrt.jar
+
+cp="bin:$ajcp"
+
+java -cp "$cp" de/oklischat/ajtest1/Main
+
+  </pre>
+
+  <a href="."> back to ajtest1-manualcompile </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

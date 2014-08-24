@@ -1,0 +1,32 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./debian/signing-key-importing.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">debian</a>/signing-key-importing.txt </h1>
+
+  <a href="signing-key-importing.txt">download original</a>
+
+  <pre>
+gpg --keyserver gpg-keyserver.de --recv-keys 0x033431536A423791
+gpg --armor --export 033431536A423791 | apt-key add -
+
+  </pre>
+
+  <a href="."> back to debian </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,159 @@
+$Id: impl.txt,v 1.5 2004/11/20 12:22:15 oklischa Exp $
+
+ActiveRecord::Base:
+
+
+important internal class methods:
+
+- table_name()   # table name
+
+  derived from the name of the class up the hierarchy from self
+  onwards that descends from ActiveRecord directly. This table will
+  hold all instances of that class as well as of all classes derived
+  from it. In each row of the table, the SQL field "type" (if present)
+  will hold the name of the ruby class of the instance saved in that
+  row. If there is no "type" field, the class of created objects will
+  be the one on which the constructor method (find/create) was called
+  (see "instantiate" below)
+
+- primary_key()  # name of PK field in #{table_name}
+
+- connection / retrieve_connection()   # the low-level SQL connection
+
+  The connection should be established using Base.establish_connection
+  before any ActiveRecords are used. The call should basically look
+  like this:
+
+  ActiveRecord::Base.establish_connection(
+         :adapter  => "mysql",
+         :host     => "localhost",
+         :username => "myuser",
+         :password => "mypass",
+         :database => "somedatabase"
+       )
+
+  See "establish_connection" and "retrieve_connection"  in
+  lib/active_record/connection_adapters/abstract_adapter.rb for
+  further information
+
+
+
+- instantiate(record)   # create instance of self from record (hash of
+                        # (field_name=>field_value) pairs).
+                        # record should've been obtained by calling
+                        # calling connection.select_..(sqlstring)
+          object = record_with_type?(record) ? compute_type(record["type"]).allocate : allocate
+          object.instance_variable_set("@attributes", record)
+          return object
+
+- primary_key   # name of PK field
+
+
+important class methods:
+
+- find(*ids)
+  find_on_conditions(id, conditions)  # e.g. Person.find_on_conditions 5, "first_name LIKE '%dav%' AND last_name = 'heinemeier'"
+  find_all(conditions = nil, orderings = nil, limit = nil, joins = nil)
+  find_first(conditions = nil, orderings = nil)
+
+      find matching records, call self.instantiate(record) (i.e. call
+       instantiate on the class the find method was called on)
+
+
+- create(attributes = nil)
+
+      # Creates an object, instantly saves it as a record (if the validation permits it), and returns it. If the save
+      # fail under validations, the unsaved object is still returned.
+
+
+
+important instance methods:
+
+- save()   # save object to db
+
+- read_attribute(name)
+
+  read column <name> from self's row in db
+
+- write_attribute(name, value)
+
+  write <value> to column <name> in self's row in db
+
+
+- method_missing(method_id, *arguments)
+
+  delegates to write_attribute()/query_attribute()/read_attribute()
+  depending on whether method_id ends with "=", "?", or nothing
+  special, respectively. So, "p=Person.create(..); p.name = 'Hugo'"
+  would end up calling p.write_attribute("name","Hugo")
+
+
+
+
+
+addionally added functionality:
+-------------------------------
+
+ActiveRecord::Base.class_eval do
+  include ActiveRecord::Validations
+  include ActiveRecord::Callbacks
+  include ActiveRecord::Associations
+  include ActiveRecord::Aggregations
+  include ActiveRecord::Transactions
+  include ActiveRecord::Reflection
+end
+
+
+##### ActiveRecord::Associations (associations.rb)
+
+    # TODO
+
+##### ActiveRecord::Aggregations (aggregations.rb)
+
+    #   class Customer < ActiveRecord::Base
+    #     composed_of :address, :mapping => [ %w(address_street street), %w(address_city city) ]
+    #   end
+
+    # => the composed_of macro (class method) adds the following to
+    # the "Customer" class:
+
+    #        def address(force_reload = false)
+    #          if @address.nil? || force_reload
+    #            @address = Address.new(read_attribute("address_street"), read_attribute("address_city"))
+    #          end
+    #          return @address
+    #        end
+    #
+    #        def address=(part)
+    #          @address = part.freeze
+    #          @attributes["address_street"] = part.street
+    #          @attributes["address_city"] = part.city
+    #        end
+
+    => the aggregated object is stored in fields of its aggregating
+       object's row.
+
+
+
+
+instance methods of connection objects:
+
+- select..()
+  select_one(sql, "#{name} Find")
+  select_all(sql, "#{name} Load")
+  select_one(sql, "#{name} Load First")
+
+  return records (arrays of hashes, each hash containing
+                  field_name=>field_value mappings (field_names
+                  redundantly in each hash))
+
+
+
+- update(sql, "#{name} Update")
+
+- ? columns(table_name, "#{name} Columns")
+
+- apparently, the 2nd argument (name) is used for logging ouput only
+
+
+ClassInheritableAttributes?

@@ -1,0 +1,83 @@
+-:- multi_io [~olaf@dsl-082-082-095-042.arcor-ip.net] has joined #perl
+
+<multi_io> hmmm, it seems the package stmt doesn't accept non-constant
+           arguments, e.g. "package $pkg". Correct? If so, why?
+
+<bpalmer> multi_io: package affects compilation
+
+<multi_io> bpalmer: I see
+<multi_io> thx
+
+<multi_io> my problem is this: I have a subroutine, and in that subroutine, I
+           want to eval() a string, with unqualified variable refs in that
+           string forced to be in the subroutine's caller's namespace. How
+           could I do this then?
+<multi_io> the string is non-constant
+<multi_io> ie not known until runtime
+<woggle> multi_io: If you're doing this for anything but implementing a
+          debugger, I strongly suggest you find an alternate way of doing
+          this. Specifically, if you're implementing a templating system,
+          please look at any of the many existing ones. People do not tie the
+          template parameter names to the names of variables in the code for a
+          good reason.
+-:- SignOff SirThomas: #perl ("Leaving")
+<woggle> And if you absolutely insist on doing this, read the docs very
+          closely.
+-:- Dalroth [Dalroth@dsl081-148-205.chi1.dsl.speakeasy.net] has joined #perl
+<multi_io> woggle: good guess; it's a templating system :). It's more like a
+           demonstration of perl's merits as a dynamic language for soem
+           die-hard C++ fan... For a serious app, I would use Text::Template
+           or something
+-:- SignOff bbeck: #perl ("I shall return!")
+-:- Prophet_ [~Prophet@p50813EE5.dip.t-dialin.net] has joined #perl
+-:- green_ [~cjs@pcp03695477pcs.columb01.pa.comcast.net] has joined #perl
+<woggle> multi_io: I would not consider that you can do this a good thing.
+          It's not a good idea to so tightly tie these templates that
+          non-programmers are going to edit to the implementation details of
+          your code. E.g., it's very easy to accidentally break the templates
+          by clarifying a variable name, and it's quite hard, in fact, to edit
+          the code without knowing if some variable you are removing or
+          whatever will cause problems.
+<multi_io> I haven't found a templating system on CPAN which transforms the
+           template to a piece of perl code and eval()s that. Wouldn't that be
+           a natural design for such a system?
+-:- SignOff __Ace__: #perl ()
+<woggle> multi_io: Anyways, while perl does support the feature you asked for
+          initially, it only supported to let the debugger work.
+-:- SignOff perlbot: #perl (Remote closed the connection)
+
+[MISSING STUFF HERE]
+
+<multi_io> hmm. Haven't looked at the code, but have you seen teh example in
+           the manpage containing a foreach loop? They manually append to $OUT
+           inside the loop. Very ugly IMHO.
+<kbt_> helo
+<Stevie-O> 250 Stevie-O
+-:- perlbot [~perlbot@ns.bj21.com] has joined #perl
+<kbt_> smby alive?
+<Chris62vw> no
+<jagerman> just:  eval "package $pkg; ... code. .."
+<Chris62vw> perlbot math 0x97
+<Chris62vw> perlbot math 1 x 10
+<perlbot> 1111111111
+<woggle> perlbot math
+          13.10.81.85.73.84.32.58.115.101.99.117.114.105.116.121.32.104.111.108
+          .101.13.10
+-:- SignOff perlbot: #perl (Client Quit)
+<woggle> Try again.
+<GXTi> smooth
+<kbt_> i use io::sockets and sometime when i create socket it make for very
+          long time, howto make timeout?
+<Limbic_Region> perlbot math $_[0]
+<woggle> Limbic_Region: 23:22:24 -!- perlbot [~perlbot@ns.bj21.com] has quit
+          [Client Quit]
+* Limbic_Region/#perl thinks Chris62vw just found a security hole
+<woggle> It seems what I did kinda worked. (;
+-:- SignOff td-work: #perl ("Leaving")
+-:- SignOff gabber: #perl ("Leaving")
+<woggle> Or Chris62vw removed the bot for that other hole he pointed out.
+-:- PerlJam [[0V+7Ij9Tu@165.95.1.149] has left #perl []
+-:- webfiend [~random@arcanine.omnigroup.com] has joined #perl
+<multi_io> jagerman: no one ever sees or uses the Perl code? So you have your
+           own syntax for statements and expressions?
+<multi_io> thx for the eval suggestion btw

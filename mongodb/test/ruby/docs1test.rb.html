@@ -1,0 +1,36 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./mongodb/test/ruby/docs1test.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">mongodb</a>/<a href="../.">test</a>/<a href=".">ruby</a>/docs1test.rb </h1>
+
+  <a href="docs1test.rb">download original</a>
+
+  <pre>
+require 'docs1'
+
+Mongoid.configure{|config| name = "rubytests"; host = "localhost"; port=27017; config.database = Mongo::Connection.new.db(name)  }
+
+p = Person.new; p.name = "Matz"; p.age=43
+p.save
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

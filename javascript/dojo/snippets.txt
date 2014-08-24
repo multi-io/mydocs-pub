@@ -1,0 +1,64 @@
+dojo.isArray(obj)
+
+dojo.stopEvent(evt)
+
+dojo.body()  //returns body node of current document
+
+dojo.place(newNode, existingParentNode)
+
+dojo.Deferred also supports explicit .addCallback(), .addErrorback()
+
+// clone (deep copying) an object
+var obj = { a:"b", c:"d" };
+var thing = dojo.clone(obj);
+
+// clone (deep copying) an array
+var newarray = dojo.clone(["a","b","c"]);
+
+// shallow copying:
+object y = dojo.mixin({}, x);
+
+dijit._CssStateMixin:
+	// summary:
+	//		Mixin for widgets to set CSS classes on the widget DOM nodes depending on hover/mouse press/focus
+	//		state changes, and also higher-level state changes such becoming disabled or selected.
+	//
+	// description:
+	//		By mixing this class into your widget, and setting the this.baseClass attribute, it will automatically
+	//		maintain CSS classes on the widget root node (this.domNode) depending on hover,
+	//		active, focus, etc. state.   Ex: with a baseClass of dijitButton, it will apply the classes
+	//		dijitButtonHovered and dijitButtonActive, as the user moves the mouse over the widget and clicks it.
+	//
+	//		It also sets CSS like dijitButtonDisabled based on widget semantic state.
+	//
+	//		By setting the cssStateNodes attribute, a widget can also track events on subnodes (like buttons
+	//		within the widget).
+
+
+
+dojo.getObject / dojo.setObject: generalized getters/setters for
+attributes specified as dot-separated strings
+
+
+
+dojo/_base/_loader/loader.js:
+	dojo._loadUri = function(/*String*/uri, /*Function?*/cb){ //(called by dojo.require)
+       .....
+		var contents = d._getText(uri, true);
+			if(!d.isIE){ contents += "\r\n//@ sourceURL=" + uri; } // debugging assist for Firebug
+
+
+07:15 < multi_io> kgf, neekfenwick: http://user.cs.tu-berlin.de/~klischat/dijitattrtest.html
+07:17 < multi_io> summary: I have mything="f4ab32c7-60a9" in the markup and mything:null in the widget => it 
+                  apparently tries to eval(f4ab32c7-60a9), which gives the error ("unexpected token ILLEGAL" in Chrome)
+07:19 < multi_io> if I change the declaration in the widget to mything:"x", it all works; the string "f4ab32c7-60a9" 
+                  is assigned to mything.
+07:20 < multi_io> apparently it determines the type of the value assigned in the definition in the widget and then 
+                  tries to evaluate the markup value as that type
+07:21 < neekfenwick> multi_io: i got half way through looking and suddenly have to go help wash the baby :(
+07:21 < neekfenwick> brb
+07:22 < multi_io> neekfenwick: np :-P
+07:22 -!- boaz [~boaz@c-24-128-79-120.hsd1.ma.comcast.net] has quit [Quit: boaz]
+07:22 < multi_io> I think I grok that logic, it kinda makes sense
+07:25 < multi_io> looking through the dojo source code again, Isee that they do define string-valued attributes as 
+                  name:"" in the widget source.

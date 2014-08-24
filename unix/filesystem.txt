@@ -1,0 +1,116 @@
+unix filesystems:
+
+- a file is a finite sequences of bytes with a specific length.
+
+- an inode is a structure with meta data about a specific file. It
+  contains:
+
+  - user, group, r/w/x permissions for user, group, others
+
+  - file size
+
+  - pointer to file's content somewhere in the filesystem 
+
+  - file type (regular file|directory|symlink|device file|socket|..)
+
+  - link count (number of hard links (see below) currently pointing to
+    the inode)
+
+- (1) permission r: read file
+
+- (2) permission w: write file
+
+- (3) permission x on regular files (not directories): execute the
+  file
+
+- a directory is a file with fixed contents: a list of "directory
+  entries"
+
+- a directory entry is a (filename, inode number) tuple.
+
+- an inode number is a pointer to an inode somewhere in the filesystem
+
+- several directory entries (in the same or in different directories)
+  having the same inode number (i.e. pointing to the same inode) are
+  called hard links (actually every directory entry is a hard link)
+
+- there is no support for having multiple inodes pointing to the same
+  file contents
+
+- as per (1), the r permission on a directory means you're able to
+  read the directory's contents, i.e. the list of (filename, inode
+  number) tuples
+
+- as per (2), the w permission on a directory means you're able to
+  write the directory's contents, i.e. the list of (filename, inode
+  number) tuples (directory entries). This SHOULD mean that you should
+  be able to rename files without being able to read their inodes or
+  content -- but that's not the case TODO why? (removing (unlinking) a
+  file requires write access to its inode to decrement the link count)
+
+This means you can add/remove
+  (link/unlink, actually) files from the directory -- even if you
+  can't read and/or write those files themselves
+
+- the x permission on a directory means you're able to read the inodes
+  pointed to by the directory entries
+
+  - this implies that if you have the r permission but not the x
+    permission on a directory, you can read the directory entries
+    (which contain the the file names), but you can't read the files'
+    inodes (which contain the size, user, group, and permission bits):
+
+    $ mkdir foo
+    $ touch foo/bar foo/baz
+    $ ls -ld foo
+    drwxrwxr-x 2 olaf olaf 4096 Oct 17 18:35 foo
+    $ ls -l foo
+    total 0
+    -rw-rw-r-- 1 olaf olaf 0 Oct 17 18:35 bar
+    -rw-rw-r-- 1 olaf olaf 0 Oct 17 18:35 baz
+    $ chmod -x foo
+    $ ls -ld foo
+    drw-rw-r-- 2 olaf olaf 4096 Oct 17 18:35 foo
+    $ ls -l foo
+    ls: cannot access foo/bar: Permission denied
+    ls: cannot access foo/baz: Permission denied
+    total 0
+    -????????? ? ? ? ?            ? bar
+    -????????? ? ? ? ?            ? baz
+    $ 
+
+  - creating a file requires wx on the directory (w to write the
+    directory entry/file name, x to create the inode).
+
+    Linking an existing file also requires wx on the directory (w to
+    write the directory entry/file name, x to increment the link count
+    in the inode).
+
+    Reading a file with known name only requires x on the directory
+    (presumably to read the point to the contents from the inode --
+    but why doesn't it require r on the directory to get the inode
+    number in the first place?) and r on the file. Since listing the
+    file names in the directory requires r, having only wx on a
+    directory means you can create a file in the directory, but you
+    cannot see the files names in the directory (including the one you
+    created) -- you can however (strangely) see a specific file name
+    and its inode contents (size, permissions etc.) if you know its
+    name, even though you shouldn't be able to get at the inode number
+    in the directory because of the missing r??
+
+- the sgid bit on a directory means that if a file is created[*] in
+  the directory, that file's group is set to the directory's group
+
+- the suid bit on a directory is ignored (except on FreeBSD, where it
+  it trated analogously to the sgid bit, but it pertains to the user
+  rather than the group)
+
+
+
+TODO:
+
+- path search permissions, path_resolution(7)
+
+- symlinks
+
+- 

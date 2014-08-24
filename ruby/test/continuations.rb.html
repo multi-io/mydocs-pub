@@ -1,0 +1,51 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/continuations.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/continuations.rb </h1>
+
+  <a href="continuations.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+def walk tree
+  tree.each do |elt|
+    if Enumerable===elt
+      walk elt
+    else
+      callcc{|c| throw :elt_found,[elt,c]}
+    end
+  end
+end
+
+
+elt,c = catch(:elt_found) do
+  walk [5,7,[3,[8,3,4,],8,5,6],[1,0,7,[[3,4,8],6,4,5],5,2],5,[1,6,7]]
+  nil
+end
+if c
+  puts elt
+  c.call
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

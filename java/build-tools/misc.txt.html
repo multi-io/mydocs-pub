@@ -1,0 +1,82 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/build-tools/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">java</a>/<a href=".">build-tools</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+14:47 -!- multi_io [n=olaf@port-87-193-172-154.static.qsc.de] has joined ##java
+
+15:56 &lt; multi_io&gt; the ant people rightly saw that Unix make has portability issues, then wrongly decided that XML was 
+                  the best way to solve them
+15:56 -!- hrehf [n=fsljif@dslb-092-073-082-069.pools.arcor-ip.net] has quit [Read error: 110 (Connection timed out)]
+15:56 -!- hrehf_ is now known as hrehf
+15:57 &lt; multi_io&gt; essentially, they wrongly identified make's scriptability as being the root of the portability issues
+15:57 &lt; multi_io&gt; which is of course wrong. The underlying shell's portability issues are the root of the problem
+15:58 &lt; waz&gt; nothing in makefiles format make them non crossplatform
+15:58 &lt; multi_io&gt; so, the right way would have been to standardize the scripting layer, maybe by using something 
+                  Java-based for it (BeanShell or jpython or something similar comes to mind)
+15:58  * tazle doesn't understand "make's scriptability"
+15:59 &lt; tazle&gt; it just runs shell commands, how is that "scriptable"?
+15:59 &lt; multi_io&gt; Ant is essentially a wrong solution for a correctly identified problem :P
+15:59 -!- robyonrails [n=robyonra@host51-121-dynamic.51-82-r.retail.telecomitalia.it] has quit ["Leaving"]
+15:59 &lt; bearded_oneder&gt; multi_io -&gt;  as well as the limitations of some unnamed platforms' shell environment (cough, 
+                        cough)
+15:59 &lt; multi_io&gt; yeah, and the shell commands aren't too portable
+15:59 &lt; multi_io&gt; as well as the shell itself
+15:59 &lt; basicer&gt; If Ant is the solution to your problem, and you like it: use it.  If you dont like it, or it is not 
+                 the solution to your problem: use or create something else you like.
+15:59 &lt; multi_io&gt; "it's easier to port a shell than a shell script" :-P
+16:00 &lt; waz&gt; maven does the job for us
+16:01 &lt; RenatoSilva&gt; bearded_oneder: isn't Java human readable?
+16:01 &lt; multi_io&gt; tazle: "make's scriptability" = make's ability to easily write (shell) code in it (the code that 
+                  executes the build tasks)
+16:02 &lt; multi_io&gt; maven isn't scriptable enough imho
+16:02 &lt; multi_io&gt; it's too declarative, as far as I can see
+16:03 &lt; waz&gt; Java is a LOT more readable than xml
+16:03 &lt; multi_io&gt; so.. maven is another wrong solution to a correctly identified problem :P
+16:03 &lt; bearded_oneder&gt; RenatoSilva -&gt;  still think it is ill advised to mingle the build executor (whether that be an 
+                        executable, script, or java class) with the build descriptoe.
+16:03 &lt; waz&gt; multi_io: I can build a massive code base across 28 project by typing mvn install
+16:04 &lt; waz&gt; pontificate all you like, it works
+16:04 &lt; bearded_oneder&gt; descriptor*
+16:04 &lt; waz&gt; every time
+16:04 &lt; basicer&gt; multi_io -&gt; Id like to see an example build file (in ant) that has problems because its not scritable 
+                 enough, and the proposed "java" syntax to compile that same ant script.
+16:04 &lt; defendguin&gt; basicer: how can i easily tell then
+16:06 -!- Absolute0 [n=ramin@ool-182e4b01.dyn.optonline.net] has joined ##java
+16:06 &lt; basicer&gt; System.err.prntln(System.getProperty("java.runtime.version")); at the beggining of main should tell 
+                 you
+16:06 &lt; multi_io&gt; the right way would have been to standardize the scripting layer as said before, and then implement 
+                  an equivalent to maven's automatic dependency resolver as a portable library on top of that 
+                  scripting layer
+16:06 &lt; bearded_oneder&gt; RenatoSilva -&gt;  waz had a valid point that the problem with ant was choosing XML as the 
+                        descriptor format, rather than the problem being  the separation of the descriptor from the 
+                        executor.
+16:09 &lt; multi_io&gt; basicer: it's just not hackable enough. As soon as you want to do something trivial that's not 
+                  directly supported, like automatically generating some text file that'll be needed at runtime, you 
+                  have to switch to Java and write a specific "Ant task" for that
+16:10 &lt; multi_io&gt; that's the opposite of hackability
+
+  </pre>
+
+  <a href="."> back to build-tools </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

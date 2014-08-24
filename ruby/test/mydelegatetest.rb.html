@@ -1,0 +1,50 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/mydelegatetest.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/mydelegatetest.rb </h1>
+
+  <a href="mydelegatetest.rb">download original</a>
+
+  <pre>
+class ArrayView
+
+  includeDelegationTo Array
+
+  def initialize(array)
+    @model = array
+  end
+
+
+  def printView
+    print "&gt;&gt;&gt; VIEW:\n  "
+    @model.each {|elem| print "#{elem} "}
+    print "\n"
+  end
+
+  def get_delegate
+    @model
+  end
+
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

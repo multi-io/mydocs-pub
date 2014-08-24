@@ -1,0 +1,331 @@
+Comparing rsnapshot/rsync and rdiff-backup, using a ~14G Virtualbox
+VMs directory (so we have some big binaries that change a little every
+time -- a scenario rdiff-backup should be better at) as well as a
+larger number of smallish files.
+
+Source (/home/olaf/VirtualBox VMs/) is an internal SATA-2 hard drive,
+destination (/mnt/backup1/test) is a USB-2 connected external hard
+drive with a dm-crypt/LUKS1 encrypted ext4 filesystem. iotop and some
+simple tests indicate about 65 MB/s read bandwidth for the source and
+30 MB/s write bandwidth for the destination.
+
+
+## start with the source containing only the Virtualbox data, not the
+   many small files
+
+# prime the buffer cache
+
+olaf@tack:~$ find VirtualBox\ VMs/ -type f -print0 | xargs -0 cat >/dev/null
+
+
+# initial backup -- rsync
+
+tack:/mnt/backup1/test# time rsync -a /home/olaf/VirtualBox\ VMs/ rsync/bup.1
+
+real	7m50.050s
+user	1m21.448s
+sys	0m59.796s
+tack:/mnt/backup1/test# 
+
+
+# initial backup -- rdiff-backup
+
+tack:/mnt/backup1/test# time rdiff-backup /home/olaf/VirtualBox\ VMs/ rdiffbackup/bup
+
+real	7m46.949s
+user	0m35.204s
+sys	0m29.980s
+tack:/mnt/backup1/test# 
+
+
+
+
+olaf@tack:~$ virtualbox 
+(launch WinXP VM, create file foo.txt on Desktop, open in notepad,
+write "Hello World" into it, save, leave notepad running, save&exit VM)
+
+olaf@tack:~$ 
+olaf@tack:~$ 
+olaf@tack:~$ find VirtualBox\ VMs/ -cmin -2 -o -mmin -2
+VirtualBox VMs/NewXP
+VirtualBox VMs/NewXP/Logs
+VirtualBox VMs/NewXP/Logs/VBox.log.3
+VirtualBox VMs/NewXP/Logs/VBox.log.1
+VirtualBox VMs/NewXP/Logs/VBox.log
+VirtualBox VMs/NewXP/Logs/VBox.log.2
+VirtualBox VMs/NewXP/NewXP.vbox-prev
+VirtualBox VMs/NewXP/NewXP.vbox
+VirtualBox VMs/NewXP/Snapshots
+VirtualBox VMs/NewXP/Snapshots/2014-08-10T02-30-17-707740000Z.sav
+VirtualBox VMs/NewXP/Snapshots/{b8630efa-1eef-48f4-872d-28fa6f86167f}.vdi
+olaf@tack:~$ 
+
+
+
+# 1st incremental backup -- rsync
+
+tack:/mnt/backup1/test# time rsync -a --delete --link-dest=../bup.1 /home/olaf/VirtualBox\ VMs/ rsync/bup.2
+
+real	1m51.257s
+user	0m20.528s
+sys	0m15.020s
+tack:/mnt/backup1/test# 
+
+
+# 1st incremental backup -- rdiff-backup
+
+tack:/mnt/backup1/test# time rdiff-backup /home/olaf/VirtualBox\ VMs/ rdiffbackup/bup
+
+real	9m0.157s
+user	1m2.692s
+sys	0m15.500s
+tack:/mnt/backup1/test# 
+
+
+
+# size comparison:
+
+tack:/mnt/backup1/test# du -hs rdiffbackup
+13G	rdiffbackup
+
+tack:/mnt/backup1/test# du -hs rsync/
+16G	rsync/
+
+
+## ok, apparently rdiff-backup did indeed create binary diffs and save
+   space, but took over 4 times as long as rsync to complete
+
+
+
+# for the 2nd incremental backup, add two directories with a bunch of
+  mostly smallish files -- my "utils" and "mydocs" repositories
+
+
+## copy it in, clean, checkout revision from January 1st, 2012
+
+olaf@tack:~$ cp -rf utils VirtualBox\ VMs/
+olaf@tack:~$ cd VirtualBox\ VMs/utils/
+olaf@tack:~/VirtualBox VMs/utils$ git ls-files -o -z | xargs -0 rm -f
+olaf@tack:~/VirtualBox VMs/utils$ git checkout -- .
+olaf@tack:~/VirtualBox VMs/utils$ git checkout `git rev-list -n 1 --before="2012-01-01" master`
+Note: checking out '1b3d958ebebffd44641c66b606796d02e8415339'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b new_branch_name
+
+HEAD is now at 1b3d958... myhomehost/setup-6to4: bugfix (set up correct route into local /64 network)
+olaf@tack:~/VirtualBox VMs/utils$ 
+
+
+olaf@tack:~/VirtualBox VMs$ git clone ~/doc/mydocs
+Cloning into 'mydocs'...
+done.
+Checking out files: 100% (2037/2037), done.
+olaf@tack:~/VirtualBox VMs$ cd mydocs/
+olaf@tack:~/VirtualBox VMs/mydocs$ git checkout `git rev-list -n 1 --before="2012-01-01" master`
+Note: checking out '1d37aa4906dcf915dd64d0b39591b5bc3db13c50'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b new_branch_name
+
+HEAD is now at 1d37aa4... yt-posts merged
+olaf@tack:~/VirtualBox VMs/mydocs$ 
+olaf@tack:~/VirtualBox VMs/mydocs$ cd ..
+olaf@tack:~/VirtualBox VMs$ 
+olaf@tack:~/VirtualBox VMs$ 
+olaf@tack:~/VirtualBox VMs$ 
+olaf@tack:~/VirtualBox VMs$ du -hs utils/ mydocs/
+2.6M	utils/
+114M	mydocs/
+olaf@tack:~/VirtualBox VMs$ 
+olaf@tack:~/VirtualBox VMs$ find utils/ -type f | wc -l
+405
+olaf@tack:~/VirtualBox VMs$ find mydocs/ -type f | wc -l
+2304
+olaf@tack:~/VirtualBox VMs$ 
+
+
+
+
+# 2nd incremental backup -- rsync
+
+tack:/mnt/backup1/test# time rsync -a --delete --link-dest=../bup.2 /home/olaf/VirtualBox\ VMs/ rsync/bup.3
+
+real	0m5.669s
+user	0m0.696s
+sys	0m0.704s
+tack:/mnt/backup1/test# 
+
+
+# 2nd incremental backup -- rdiff-backup
+
+tack:/mnt/backup1/test# time rdiff-backup /home/olaf/VirtualBox\ VMs/ rdiffbackup/bup
+
+real	1m42.415s
+user	0m3.076s
+sys	0m1.212s
+tack:/mnt/backup1/test# 
+
+
+
+# for the 3rd incremental backup, forward the versions of the two
+  directories checked out in the previous step by two years
+
+olaf@tack:~/VirtualBox VMs$ cd utils/
+olaf@tack:~/VirtualBox VMs/utils$ 
+olaf@tack:~/VirtualBox VMs/utils$ 
+olaf@tack:~/VirtualBox VMs/utils$ git checkout `git rev-list -n 1 --before="2014-01-01" master`
+Previous HEAD position was 1b3d958... myhomehost/setup-6to4: bugfix (set up correct route into local /64 network)
+HEAD is now at 163f5e9... myhomehost/reinit-network
+olaf@tack:~/VirtualBox VMs/utils$ cd ..
+olaf@tack:~/VirtualBox VMs$ cd mydocs/
+olaf@tack:~/VirtualBox VMs/mydocs$ git checkout `git rev-list -n 1 --before="2014-01-01" master`
+Previous HEAD position was 1d37aa4... yt-posts merged
+HEAD is now at 28da1ff... passwords update
+olaf@tack:~/VirtualBox VMs/mydocs$ 
+
+
+
+# 3rd incremental backup -- rsync
+
+tack:/mnt/backup1/test# time rsync -a --delete --link-dest=../bup.3 /home/olaf/VirtualBox\ VMs/ rsync/bup.4
+
+real	0m0.415s
+user	0m0.088s
+sys	0m0.164s
+tack:/mnt/backup1/test# 
+
+
+# 3rd incremental backup -- rdiff-backup
+
+tack:/mnt/backup1/test# time rdiff-backup /home/olaf/VirtualBox\ VMs/ rdiffbackup/bup
+
+real	0m14.533s
+user	0m1.636s
+sys	0m0.240s
+tack:/mnt/backup1/test# 
+
+
+
+# quick checks for correctness of the backups (latest snapshot)
+
+tack:/mnt/backup1/test# diff -ur rdiffbackup/bup/utils/ /home/olaf/VirtualBox\ VMs/utils/
+tack:/mnt/backup1/test# diff -ur rsync/bup.4/utils/ /home/olaf/VirtualBox\ VMs/utils/
+tack:/mnt/backup1/test# 
+
+tack:/mnt/backup1/test# diff -ur rdiffbackup/bup/mydocs/ /home/olaf/VirtualBox\ VMs/mydocs/
+tack:/mnt/backup1/test# diff -ur rsync/bup.4/mydocs/ /home/olaf/VirtualBox\ VMs/mydocs/
+tack:/mnt/backup1/test# 
+
+tack:/mnt/backup1/test# diff rsync/bup.NewXP/Snapshots/\{b8630efa-1eef-48f4-872d-28fa6f86167f\}.vdi /home/olaf/VirtualBox\ VMs/NewXP/Snapshots/\{b8630efa-1eef-48f4-872d-28fa6f86167f\}.vdi 
+bup.1/ bup.2/ bup.3/ bup.4/ 
+tack:/mnt/backup1/test# diff rsync/bup.4/NewXP/Snapshots/\{b8630efa-1eef-48f4-872d-28fa6f86167f\}.vdi /home/olaf/VirtualBox\ VMs/NewXP/Snapshots/\{b8630efa-1eef-48f4-872d-28fa6f86167f\}.vdi 
+tack:/mnt/backup1/test# 
+
+
+## 4th incremental backup preparation -- start XP in virtualbox again,
+   start Chrome in XP, surf a couple of news sites, watch 2 short YT
+   videos, download
+   http://ftp.de.debian.org/debian/pool/main/e/emacs23/emacs23_23.4+1-4_amd64.deb,
+   leave browser running, save&exit VM
+
+olaf@tack:~$ find VirtualBox\ VMs/ -type f -a \( -cmin -30 -o -mmin -30 \) -print0 | xargs -0 ls -l
+-rw------- 1 olaf olaf      87151 Aug 10 06:05 VirtualBox VMs/NewXP/Logs/VBox.log
+-rw------- 1 olaf olaf      85350 Aug 10 04:30 VirtualBox VMs/NewXP/Logs/VBox.log.1
+-rw------- 1 olaf olaf      85038 Aug 10 03:50 VirtualBox VMs/NewXP/Logs/VBox.log.2
+-rw------- 1 olaf olaf      85796 Oct 22  2013 VirtualBox VMs/NewXP/Logs/VBox.log.3
+-rw------- 1 olaf olaf      88167 Aug 10 06:05 VirtualBox VMs/NewXP/NewXP.vbox
+-rw------- 1 olaf olaf      88430 Aug 10 06:05 VirtualBox VMs/NewXP/NewXP.vbox-prev
+-rw------- 1 olaf olaf  330667948 Aug 10 06:05 VirtualBox VMs/NewXP/Snapshots/2014-08-10T04-05-25-278196000Z.sav
+-rw------- 1 olaf olaf 3303059456 Aug 10 06:05 VirtualBox VMs/NewXP/Snapshots/{b8630efa-1eef-48f4-872d-28fa6f86167f}.vdi
+olaf@tack:~$ 
+
+
+# 4th incremental backup -- rsync
+
+tack:/mnt/backup1/test# time rsync -a --delete --link-dest=../bup.4 /home/olaf/VirtualBox\ VMs/ rsync/bup.5
+
+real	1m57.103s
+user	0m21.028s
+sys	0m16.620s
+tack:/mnt/backup1/test# 
+
+
+# 4th incremental backup -- rdiff-backup
+
+tack:/mnt/backup1/test# time rdiff-backup /home/olaf/VirtualBox\ VMs/ rdiffbackup/bup
+
+real	9m26.591s
+user	1m35.844s
+sys	0m16.296s
+tack:/mnt/backup1/test# 
+
+
+size comparison:
+
+tack:/mnt/backup1/test# du -hs rdiffbackup/
+14G	rdiffbackup/
+tack:/mnt/backup1/test# 
+
+tack:/mnt/backup1/test# du -hs rsync/
+20G	rsync/
+tack:/mnt/backup1/test# 
+
+
+# try to estimate the size of the binary deltas (I didn't do du
+  without -h after earlier backups)
+
+tack:/mnt/backup1/test# ls -lh rdiffbackup/bup/rdiff-backup-data/increments/NewXP/Snapshots/
+total 227M
+-rw------- 1 olaf olaf  92M Aug 10 03:50 2014-08-10T01-50-38-582549000Z.sav.2014-08-10T04:18:12+02:00.snapshot.gz
+-rw------- 1 root root    0 Aug 10 04:46 2014-08-10T02-30-17-707740000Z.sav.2014-08-10T04:18:12+02:00.missing
+-rw------- 1 olaf olaf  93M Aug 10 04:30 2014-08-10T02-30-17-707740000Z.sav.2014-08-10T05:26:50+02:00.snapshot.gz
+-rw------- 1 root root    0 Aug 10 06:12 2014-08-10T04-05-25-278196000Z.sav.2014-08-10T05:26:50+02:00.missing
+-rw------- 1 olaf olaf 1.7M Aug 10 03:50 {b8630efa-1eef-48f4-872d-28fa6f86167f}.vdi.2014-08-10T04:18:12+02:00.diff.gz
+-rw------- 1 olaf olaf  42M Aug 10 04:30 {b8630efa-1eef-48f4-872d-28fa6f86167f}.vdi.2014-08-10T05:26:50+02:00.diff.gz
+tack:/mnt/backup1/test# 
+
+(the Aug 10 04:30 things should be the 4th backup)
+
+
+
+==> summary
+
+The rdiff-backup compressed binary delta thing works and saves a lot
+of storage space on incremental backups (at least 90..95% for
+Virtualvox VM images with few changes in them). 
+
+rsync/rsnapshot operated ~5..20 times faster than rdiff-backup for
+incremental backups (for full/initial backups, running times are
+almost the same):
+
+For full backups, the effective transfer rate for both tools was ~30
+MB/s -- close to to physical bandwith of the involved storage media.
+
+For incremental backups:
+
+When the backup contained about 115MB of new, smallish files in a
+previously backed-up ~13GB directory, the effective transfer rate was
+about 20 MB/s for rsync and 1.1 MB/s for rdiff-backup (see 2nd
+incremental backup above).
+
+When the backup contained about 3.6GB of modified large binaries in a
+previously backed-up ~14GB directory (mostly just two files -- 300MB
+and 3.3GB, with a binary delta size of about 130MB according to
+rdiff-backup), the effective transfer rate, in relation to the size of
+the modified files, was ~30 MB/s for rsync and 6.3 MB/s for
+rdiff-backup -- or 1.1 MB/s (rsync) and 230 kB/s (rdiff-backup) in
+relation to the size of the delta. (see 4th incremental backup above).
+

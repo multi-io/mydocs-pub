@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- demo from http://dojotutorial.org/008/custom-confirm-dialog -->
+<html>
+  <head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="-1" />
+    <title>dijit.Dialog</title>
+    <link rel="stylesheet" href="dijit/themes/tundra/tundra.css">
+    <script type="text/javascript" src="dojo/dojo.js" charset="utf-8" djConfig="parseOnLoad: true"></script>
+    <script type="text/javascript">
+      dojo.require('dijit.form.Button');
+      dojo.require('de.olafklischat.confirm');
+    </script>
+
+  </head>
+
+  <body class="tundra">
+
+      <button id="showBtn" dojoType="dijit.form.Button">show</button>
+
+    <script type="text/javascript">
+      dojo.addOnLoad(function() {
+	/**
+	 * Button click action.
+	 */
+	onButtonClick = function() {
+            de.olafklischat.confirm("Hello",
+                {Grr:    function(){ console.log("Grr clicked"); },
+                 Hello: function(){ console.log("Hello clicked");},
+                 Doit: '_OK',
+                 Yoyo: function(){ console.log("Yoyo");},
+                 Holle: 'Hello'}
+            );
+	};
+
+        dojo.connect(dijit.byId('showBtn'), 'onClick', onButtonClick);
+        console.log('loaded!');
+
+      });
+    </script>
+
+  </body>
+</html>

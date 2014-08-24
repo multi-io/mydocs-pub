@@ -1,0 +1,21 @@
+<%= @people %> customers have debts:
+
+<%my $sum = 0;%>
+
+<%foreach my $k (@people) {%>
+
+Foo \<%  Bar \<%=
+Baz \>
+
+customer: <%= $k->{sex} eq 'm'? "Mr." : "Mrs."%> <%= $k->{name}%> 
+is <%= $k->{debt}%> $ in debt.
+
+<%$sum += $k->{debt};%>
+
+<%}%>
+
+Total: <%= $sum %> $.
+
+<%= $self->include("rsincl.templ") %>
+
+Yours sincerely...

@@ -1,0 +1,60 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/gd/demos/fills.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">perl</a>/<a href="../../.">test</a>/<a href="../.">gd</a>/<a href=".">demos</a>/fills.pl </h1>
+
+  <a href="fills.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl
+
+use GD;
+
+$im = new GD::Image(100,50);
+
+# allocate black -- this will be our background
+$black = $im-&gt;colorAllocate(0, 0, 0);
+
+# allocate white
+$white = $im-&gt;colorAllocate(255, 255, 255);        
+
+# allocate red
+$red = $im-&gt;colorAllocate(255, 0, 0);      
+
+# allocate blue
+$blue = $im-&gt;colorAllocate(0,0,255);
+
+#Inscribe an ellipse in the image
+$im-&gt;arc(50, 25, 98, 48, 0, 360, $white);
+
+# Flood-fill the ellipse. Fill color is red, and will replace the
+# black interior of the ellipse
+$im-&gt;fill(50, 21, $red);
+
+binmode STDOUT;
+
+# print the image to stdout
+print $im-&gt;png;
+
+
+  </pre>
+
+  <a href="."> back to demos </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

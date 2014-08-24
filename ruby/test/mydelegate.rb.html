@@ -1,0 +1,54 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/mydelegate.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/mydelegate.rb </h1>
+
+  <a href="mydelegate.rb">download original</a>
+
+  <pre>
+# call includeDelegationTo(delegate_class)
+# from inside a class body to add methods
+# with signatures of delegate_class's methods
+# to that class. The generated implementations
+# delegate the method calls to a delegator object
+# obtained by calling get_delegate (which
+# subclasses must define)
+def includeDelegationTo(delegate_class)
+  methods = delegate_class.instance_methods(true)
+  methods -= ::Kernel.instance_methods
+  methods |= ["to_s","to_a","inspect","==","=~","==="]
+  for method in methods
+    self.class_eval &lt;&lt;-EOS
+        def #{method}(*args, &amp;block)
+          begin
+            get_delegate.__send__(:#{method}, *args, &amp;block)
+	  rescue
+            $@[0,2] = nil
+            raise
+	  end
+	end
+	EOS
+  end
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

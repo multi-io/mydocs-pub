@@ -1,0 +1,93 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./gh-publish </title>
+</head>
+
+<body>
+
+  <h1> <a href=".">.</a>/gh-publish </h1>
+
+  <a href="gh-publish">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+use strict;
+use File::Find;
+
+my $root = {NAME =&gt; ".", PATH =&gt; "./", PARENT =&gt; undef};
+open(GITLS, "git ls-files |");
+while(&lt;GITLS&gt;) {
+    chomp;
+    my @comps = split(m!/!);
+    my @dirs = @comps[0 .. (@comps-2)];
+    my $file = $comps[-1];
+    my $currdir = $root;
+    foreach my $d (@dirs) {
+        my $parent = $currdir;
+        $currdir = ($currdir-&gt;{DIRS}-&gt;{$d} ||= {});
+        $currdir-&gt;{PATH} = $parent-&gt;{PATH} . $d . "/";
+        $currdir-&gt;{PARENT} = $parent;
+        $currdir-&gt;{NAME} = $d;
+    }
+    push @{$currdir-&gt;{FILES}}, $file;
+}
+
+# turn all DIRS into lists, sort all DIRS and FILES
+sub sortdir {
+    my $dir = shift;
+    $dir-&gt;{DIRS} = [sort { $a-&gt;{NAME} cmp $b-&gt;{NAME} } (values %{$dir-&gt;{DIRS} || {}})];
+    $dir-&gt;{FILES} = [sort @{$dir-&gt;{FILES} || []}];
+    foreach my $d (@{$dir-&gt;{DIRS}}) {
+        sortdir($d);
+    }
+}
+
+sortdir($root);
+
+unless (__FILE__ eq $0) {
+    our $root = $root;
+    return;
+}
+
+
+sub check {
+    our $dir = shift;
+    print STDERR "checking: $dir-&gt;{PATH}\n";
+    foreach my $d (@{$dir-&gt;{DIRS}}) {
+        check($d);
+    }
+}
+
+
+use Publish;
+use File::Temp qw/tempdir/;
+use autodie qw(:all);  # needs libautodie-perl, libipc-system-simple-perl (on Debian at least)
+
+my $tmpdir = tempdir( CLEANUP =&gt; 1 );
+chomp(my $revision=`git rev-parse HEAD`);
+
+# --no-checkout also deletes all files in the target's index
+system("git clone --branch gh-pages --no-checkout . $tmpdir");
+publish $root, $tmpdir;
+system("cd $tmpdir &amp;&amp; git add . &amp;&amp; git commit -m 'upgrade to $revision'");
+system("git fetch $tmpdir");
+system("git branch -f gh-pages FETCH_HEAD");
+
+  </pre>
+
+  <a href="."> back to . </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

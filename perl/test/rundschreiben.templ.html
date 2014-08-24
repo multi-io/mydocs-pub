@@ -1,0 +1,51 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/rundschreiben.templ </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/rundschreiben.templ </h1>
+
+  <a href="rundschreiben.templ">download original</a>
+
+  <pre>
+&lt;%= @people %&gt; Kunden habe Schulden:
+
+&lt;%my $sum = 0;%&gt;
+
+&lt;%foreach my $k (@people) {%&gt;
+
+Foo \&lt;%  Bar \&lt;%=
+Baz \&gt;
+
+Kunde: &lt;%= $k-&gt;{sex} eq 'm'? "Herr" : "Frau"%&gt; &lt;%= $k-&gt;{name}%&gt; 
+Hat &lt;%= $k-&gt;{debt}%&gt; Euro Schulden.
+
+&lt;%$sum += $k-&gt;{debt};%&gt;
+
+&lt;%}%&gt;
+
+Gesamt: &lt;%= $sum %&gt; Euro.
+
+&lt;%= $self-&gt;include("rsincl.templ") %&gt;
+
+Mit freundlichen...
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

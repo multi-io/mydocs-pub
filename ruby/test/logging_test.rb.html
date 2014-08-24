@@ -1,0 +1,69 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/logging_test.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/logging_test.rb </h1>
+
+  <a href="logging_test.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby -w
+
+class C
+  def cat_file(filename,openmode)
+    File.open(filename,openmode) do |file|
+      file.read
+    end
+  end
+
+  def test
+    filename="/etc/issue"
+    begin
+      cnt=cat_file filename, "r+"
+    rescue
+      cnt=cat_file filename, "r"
+    end
+    print "contents of #{filename}:\n#{cnt}\n"
+  end
+
+end
+
+
+$LOGGING=false
+begin
+  load "~/.appconfig"
+rescue LoadError
+  #ignore
+end
+
+if $LOGGING
+  require 'logging'
+
+  class C
+    include Logging
+    add_logging
+  end
+end
+
+C.new.test
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

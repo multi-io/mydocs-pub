@@ -1,0 +1,48 @@
+- normally, Spring beans are just POJOs, but they may implement
+  special framework interfaces e.g. to learn their own name in the
+  container, to be notified when they've been inserted into their
+  container or when their properties have been set, whenever any bean
+  has been inserted into the container (so they can do some processing
+  for all the beans in there, e.g. for evaluating annotations -- this
+  is how @Autowired is processed in
+  org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor)
+  etc.
+
+- for example, the latter implements this interface:
+
+  public interface   org.springframework.beans.factory.config.BeanPostProcessor {
+      Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
+
+      Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
+
+  }
+
+  The callbacks are called for each bean in the container. The
+  implementation must return the bean that's really to be inserted. So
+  this enables you to automatically e.g. generate some kind of proxy
+  here for the real bean.
+
+
+- org.springframework.beans.factory.FactoryBean<T>
+
+  may apparently be used in the context in place of a bean to provide
+  more control over instantiation etc.
+
+
+- interface org.springframework.beans.factory.InitializingBean {
+	/**
+	 * Invoked by a BeanFactory after it has set all bean properties supplied
+	 * (and satisfied BeanFactoryAware and ApplicationContextAware).
+	 * <p>This method allows the bean instance to perform initialization only
+	 * possible when all bean properties have been set and to throw an
+	 * exception in the event of misconfiguration.
+	 * @throws Exception in the event of misconfiguration (such
+	 * as failure to set an essential property) or if initialization fails.
+	 */
+	void afterPropertiesSet() throws Exception;
+
+   }
+
+   often used for one-time initialization of another bean
+   (e.g. populating a dataSource or repository of some sort with some
+   initial data)

@@ -1,0 +1,72 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./lisp/readability_test.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">lisp</a>/readability_test.pl </h1>
+
+  <a href="readability_test.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+use strict;
+
+our %match_window_profile = ();
+
+#%match_window_profile = (
+#   [WM_CLASS, "Term"] =&gt; $VAR1={ignore-program-position=&gt;1, foo=&gt;42},
+#   [WND_TITLE, "MyApp"] =&gt; $VAR1,
+#   [WM_CLASS, "Lalala"] =&gt; {ignore-program-position=&gt;0},
+#   [WND_TITLE, "Netscape"] =&gt; {sticky=&gt;1, cyclable=&gt;0},
+#);
+
+$match_window_profile{WM_CLASS}{"Term"} = {ignore_program_position=&gt;1, foo=&gt;42};
+$match_window_profile{WND_TITLE}{"MyApp"} = {ignore_program_position=&gt;1, foo=&gt;42};
+$match_window_profile{WM_CLASS}{"Lalala"} = {ignore_program_position=&gt;0};
+$match_window_profile{WND_TITLE}{"Netscape"} = {sticky=&gt;1, cyclable=&gt;0};
+
+
+sub add_window_matcher {
+    my ($prop, $value, %actions) = @_;
+    foreach my $k (keys %actions) {
+        $match_window_profile{$prop}{$value}-&gt;{$k} = $actions{$k};
+    };
+}
+
+
+
+use Data::Dumper;
+
+print "&gt;&gt;BEFORE:\n";
+print Dumper(%match_window_profile);
+
+add_window_matcher('WND_TITLE', "Netscape", sticky=&gt;5, olaf=&gt;"klischat");
+
+
+print "\n\n&gt;&gt;AFTER:\n";
+print Dumper(%match_window_profile);
+
+
+
+## doesn't work -- arrays as hash keys don't work...
+
+  </pre>
+
+  <a href="."> back to lisp </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

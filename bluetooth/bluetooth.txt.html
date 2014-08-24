@@ -1,0 +1,483 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./bluetooth/bluetooth.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">bluetooth</a>/bluetooth.txt </h1>
+
+  <a href="bluetooth.txt">download original</a>
+
+  <pre>
+Bluetooth + Linux implementation
+
+
+physical layer:
+
+- wireless connection technology, 2.4GHz (ISM band)
+
+- several devices share a common radio channel, forming a "piconet"
+
+- each device has a unique Bluetooth address (a sequence of 6 bytes,
+  dubbed the "BD_ADDR"). The sequence is constant and unique per
+  device (assigned by some registration authority). The bit sequence
+  is subdivided into LAP (bits 0-23), UAP (24-31), and NAP
+  (32-47). Some sequences are reserved for special purposes, e.g. for
+  "inquiries".
+
+- one of the devices in a piconet serves as the "master", the others
+  are the "slaves"
+
+- frequency hopping patterns to avoid interference with other senders
+
+  - hopping over 79 channels, each ca. 1MHz wide
+
+  - hopping sequence determined by master's address and clock
+
+  - 1600 timeslots/sec
+
+  - raw bitrate 914560/s (TODO: verify). Shared among all devices, and
+    communication links, protocol headers etc.
+
+  - max. effective bitrate 723200/s ("DH5", 2 devices, 5 timeslots per
+    packet in the "fast" direction, 1 in the slow one)
+
+- "physical links" only between master and a slave, "logical links"
+  between any devices use "physical links" as their transport
+
+- types of logical links: unicast, multicast, synchronous,
+  asynchronous, isochronous (??)
+
+- "link manager protocol (LMP)": control protocol for the physical
+  layers (TODO: elaborate), transported over a dedicated asynchronous,
+  connection-oriented logical link, the ACL. Each dev in the piconet
+  automatically connects to that transport upon joining the piconet
+
+- devices may create additional transports if desired
+
+- L2CAP: higher-level protocol providing connection-oriented or -less
+  communication over distinct "channels" (somewhat like TCP on the
+  internet)
+
+- SDP (service discovery protocol): used for discovering he "services"
+  provided by a given device.
+
+- TODO: more...
+
+
+
+- Linux implementation:
+
+  - kernel: core, device drivers, HCI, L2CAP, RFCOMM
+
+    - interfacing to userspace: Socket API (new socket types), ioctls
+      for non-stream-orientied things
+
+    - userspace wrapper libraries (bluez-libs)
+
+  - userspace: SDP, OBEX, everything in higher layers
+
+
+////bluez-libs/bluetooth/bluetooth.h
+
+/* BD Address */
+typedef struct {
+      uint8_t b[6];
+} __attribute__((packed)) bdaddr_t;
+
+//so a bluetooth endpoint is a 6-byte number ("Bluetooth device address")
+
+
+So bluetooth/bluetooth.h only defines some basic utility
+functions. The hard work happens in the kernel.
+
+
+HCI
+========================
+
+////bluez-libs/bluetooth/hci.h/hci_lib.h/hci.c
+
+//the functions here are mostly frontends to correspondings
+//ioctls on socket created via socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI)
+
+//(name is misleading, should be "hci_find_dev")
+//find first (w.r.t. ioctl HCIGETDEVLIST) connected device dev_id for which
+//func(&lt;socket created via socket(AF_BLUETOOTH,SOCK_RAW,BTPROTO_HCI)&gt;,
+//     dev_id, args)
+//returns non-0. Returns that device's dev_id. Returns -1 if no such
+//device was found.
+//If func is NULL, return first connected device.
+//QU: What is a dev_id? Has a corresponding bdaddr_t when connected
+//    (ioctl HCIGETDEVINFO can find the bdaddr_t of a given dev_id)
+int hci_for_each_dev(int flag, int (*func)(int s, int dev_id, long arg), long arg);
+
+
+//return dev_id of first conn. device having an address other than *bdaddr
+int hci_get_route(bdaddr_t *bdaddr);
+
+//return dev_id of conn. device identified by str
+//str may either be "hci&lt;dev_id&gt;" (dev_id = the integer number 2b
+// returned) or a string representation of teh device's bdaddr
+// (looks like "xx:xx:xx:xx:xx:xx", i.e. the six bytes comprising the
+// bdaddr in hex representation)
+int hci_devid(const char *str);
+
+
+
+
+//gets complete hci_dev_info of device identified by dev_id
+int hci_devinfo(int dev_id, /*out*/struct hci_dev_info *di);
+
+struct hci_dev_info {
+        uint16_t dev_id;
+        char     name[8];
+
+        bdaddr_t bdaddr;
+
+        uint32_t flags;
+        uint8_t  type;
+
+        uint8_t  features[8];
+
+        uint32_t pkt_type;
+        uint32_t link_policy;
+        uint32_t link_mode;
+
+        uint16_t acl_mtu;
+        uint16_t acl_pkts;
+        uint16_t sco_mtu;
+        uint16_t sco_pkts;
+
+        struct   hci_dev_stats stat;
+};
+
+
+//gets bdaddr of device dev_id
+int hci_devba(int dev_id, /*out*/bdaddr_t *ba)
+
+
+// (Wrapper around ioctl: HCIINQUIRY)
+//
+//inputs:
+//
+//dev_id - "starting device" of the inquiry? If NULL, start with
+//         first (HCIGETDEVLIST) found device.
+//
+//nrsp - max. number of result devices
+//
+//len - ?? ( =&gt; hci_inquiry_req.length)
+//
+//flags - ?? ( =&gt; hci_inquiry_req.flags)
+//
+//return: -1 on error, else:
+//        number of result inquiry_info structures; *ii will be
+//         malloc()ed and filled with these inquiry_info structures
+
+int hci_inquiry(int dev_id, int len, int nrsp, const uint8_t *lap, inquiry_info 
+                **ii, long flags);
+
+
+
+
+L2CAP
+========================
+
+// create L2CAP connection
+int sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+
+struct sockaddr_l2 sa;
+sa.l2_family = AF_BLUETOOTH;
+sa.l2_psm = 0;
+sa.l2_bdaddr = &lt;source, i.e. our local address?&gt;;
+bind(sock, (struct sockaddr *)&amp;sa, sizeof(sa));
+sa.l2_psm = htobs(SDP_PSM);
+sa.l2_bdaddr = &lt;destination device's address&gt;;
+connect(sock, (struct sockaddr *)&amp;sa, sizeof(sa));
+
+
+SDP (Service Discovery Protocol)
+================================
+
+- used to discover "services" provided by connected devices
+
+- protocol on top of L2CAP
+
+- devices provide "services", services have "attributes"
+
+- specific services and attributes have unique identifiers (UUIDs?)
+  registered with the Bluetooth SIG (special interest group)
+
+- SDP capabilities:
+
+  - discover services and attributes offered by a given device
+
+  - discover all devices offering a given service
+
+  - discover all devices offering services with given attributes
+
+  - ...
+
+  - services may be dynamically activated/deactivated on a device
+
+  - but there's no event notification mechanism (so polling may be
+    necessary)
+
+- Linux implementation:
+
+  - in userspace
+
+  - 
+                const bdaddr_t *src = ...; const bdaddr_t *dst = ...;
+
+		struct sockaddr_l2 sa;
+
+		int sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+		sa.l2_family = AF_BLUETOOTH;
+		sa.l2_psm = 0;
+		if (bacmp(src, BDADDR_ANY) != 0) {
+			sa.l2_bdaddr = *src;
+			if (0 &gt; bind(session-&gt;sock, (struct sockaddr *)&amp;sa, sizeof(sa)))
+				goto fail;
+		}
+		sa.l2_psm = htobs(SDP_PSM);
+		sa.l2_bdaddr = *dst;
+		connect(session-&gt;sock, (struct sockaddr *)&amp;sa, sizeof(sa)) == 0)
+
+                ...then write/read SDP PDUs to/from the socket.
+
+  - sdp.h/sdp.c (from bluez-libs) provides wrapper functions in userspace
+
+
+//////sdp.h/sdp.c userspace library:
+
+struct sdp_list_t {  //utility type: linked list of void*s
+	sdp_list_t *next;
+	void *data;
+};
+
+
+struct sdp_record_t {
+	uint32_t handle;
+            //Spec: A service record handle is a 32-bit number that uniquely
+            //identifies each service record within an SDP server. It is
+            //important to note that, in general, each handle is
+            //unique only within each SDP server.
+
+	sdp_list_t *pattern;  //purpose?
+	sdp_list_t *attrlist;  //list of sdp_data_t, i.e. list of lists of SDP attributes
+};
+
+struct sdp_data_t {  //obviously a list of SDP attributes
+	uint16_t attrId;
+	SDP_BOOL|SDP_UINT8|SDP_UINT16|...|SDP_UUID_..|..|SDP_TEXT_STR8|SDP_TEXT_STR16|...|SDP_SEQ_..   dtd;  //type
+             //SDP_TEXT_STR8 -- string length &lt;256 chars; SDP_TEXT_STR16 -- string length &lt;65536 chars
+	int8_t int8 | int16_t int16 | .. | uuid_t uuid | char *str | sdp_data_t *dataseq     val;            //value
+	sdp_data_t *next;
+	int unitSize;         //?
+};
+//predefined attributes (attrId, dtd):
+// ( * See SDP Spec, section "Service Attribute Definitions" for more details.)
+// SDP_ATTR_SVCNAME_PRIMARY, STR8
+// SDP_ATTR_SVCDESC_PRIMARY, STR8
+// SDP_ATTR_PROVNAME_PRIMARY, STR8
+// SDP_ATTR_PROTO_DESC_LIST, ?
+// SDP_ATTR_LANG_BASE_ATTR_ID_LIST, ?
+// SDP_ATTR_PFILE_DESC_LIST, SDP_SEQ_? (list of (uint8_t uuid, uint16_t Vnum) =&gt; sdp_profile_desc_t. Use
+//    int sdp_get_profile_descs(const sdp_record_t *rec, sdp_list_t **profDescSeq);
+//    to extract. *profDescSeq will be returned as a list of sdp_profile_desc_t's.
+// SDP_ATTR_VERSION_NUM_LIST, SDP_SEQ_? (list of uint16_t Vnum). Use
+//    int sdp_get_server_ver(const sdp_record_t *rec, sdp_list_t **u16); to extract.
+// SDP_ATTR_SERVICE_ID, SDP_UUID_?. Use int sdp_get_service_id(const sdp_record_t *rec, uuid_t *uuid) to extract
+// SDP_ATTR_GROUP_ID, SDP_UUID_?. Use int sdp_get_group_id(const sdp_record_t *rec, uuid_t *uuid) to extract
+// SDP_ATTR_RECORD_STATE, SDP_UINT32
+// ...
+
+
+//return first attribute (sdp_data_t) in rec-&gt;attrlist whose attrId equals attrId
+sdp_data_t *sdp_data_get(const sdp_record_t *rec, uint16_t attrId);
+
+//if first attribute (sdp_data_t) in rec-&gt;attrlist whose attrId equals attrId
+//  is an int, return it in *value.
+int sdp_get_int_attr(const sdp_record_t *rec, uint16_t attrid, int *value);
+
+//same for string attributes (length must be &lt; valuelen)
+int sdp_get_string_attr(const sdp_record_t *rec, uint16_t attrid, char *value, int valuelen);
+
+//allocate new attribute of type dtd and value *value
+sdp_data_t *sdp_data_alloc(uint8_t dtd, const void *value)
+
+
+////all functions dexcribed so far work "off-line", i.e. on sdp_record_t's present
+//// in the local machine's memory
+
+////"on-line" functions
+
+sdp_session_t *sdp_connect(const bdaddr_t *src, const bdaddr_t *dst, uint32_t flags);
+int sdp_close(sdp_session_t *session);
+
+static inline int sdp_get_socket(const sdp_session_t *s);
+
+/*
+ * a service search request. 
+ * 
+ *  INPUT :
+ * 
+ *    sdp_list_t *search_list
+ *      list containing elements of the search
+ *      pattern. Each entry in the list is a UUID
+ *      of the service to be searched
+ * 
+ *    uint16_t max_rec_num
+ *       An integer specifying the maximum number of
+ *       entries that the client can handle in the response.
+ * 
+ *  OUTPUT :
+ * 
+ *    int return value
+ *      0 
+ *        The request completed successfully. This does not
+ *        mean the requested services were found
+ *      -1
+ *        The request completed unsuccessfully
+ * 
+ *    sdp_list_t *rsp_list
+ *      This variable is set on a successful return if there are
+ *      non-zero service handles. It is a singly linked list of
+ *      service records (sdp_record_t)
+ */
+int sdp_service_search_req(sdp_session_t *session, const sdp_list_t *search_list, uint16_t max_rec_num, sdp_list_t **rsp_list);
+
+
+
+
+
+/////BUGS in bluez-libs
+
+setting dtd in sdp_data_t *sdp_data_alloc(uint8_t dtd, const void *value) (in sdp.c) has no effect.
+
+
+
+========================
+========================
+========================
+
+data structures (userspace):
+
+typedef struct {
+        bdaddr_t        bdaddr;
+        uint8_t         pscan_rep_mode;
+        uint8_t         pscan_period_mode;
+        uint8_t         pscan_mode;
+        uint8_t         dev_class[3];
+        uint16_t        clock_offset;
+} __attribute__ ((packed)) inquiry_info;
+#define INQUIRY_INFO_SIZE 14
+
+
+struct hci_inquiry_req {
+        uint16_t dev_id;
+        uint16_t flags;
+        uint8_t  lap[3];
+        uint8_t  length;
+        uint8_t  num_rsp;
+};
+
+
+
+data structures (kernel):
+
+struct hci_inquiry_req {
+	__u16 dev_id;
+	__u16 flags;
+	__u8  lap[3];
+	__u8  length;
+	__u8  num_rsp;
+};
+
+typedef struct {
+	__u8 	lap[3];
+	__u8 	length;
+	__u8	num_rsp;
+} __attribute__ ((packed)) inquiry_cp;
+#define INQUIRY_CP_SIZE 5
+
+struct hci_dev {
+	struct list_head list;
+	spinlock_t	lock;
+	atomic_t 	refcnt;
+
+	char		name[8];
+	unsigned long	flags;
+	__u16		id;
+	__u8	 	type;
+	bdaddr_t	bdaddr;
+	__u8		features[8];
+
+	__u16		pkt_type;
+	__u16		link_policy;
+	__u16		link_mode;
+	
+	atomic_t 	cmd_cnt;
+	unsigned int 	acl_cnt;
+	unsigned int 	sco_cnt;
+
+	unsigned int	acl_mtu;
+	unsigned int 	sco_mtu;
+	unsigned int	acl_pkts;
+	unsigned int	sco_pkts;
+
+	unsigned long   cmd_last_tx;
+	unsigned long   acl_last_tx;
+	unsigned long   sco_last_tx;
+	
+	struct tasklet_struct 	cmd_task;
+	struct tasklet_struct	rx_task;
+	struct tasklet_struct 	tx_task;
+
+	struct sk_buff_head	rx_q;
+	struct sk_buff_head 	raw_q;
+	struct sk_buff_head 	cmd_q;
+
+	struct sk_buff     	*sent_cmd;
+
+	struct semaphore	req_lock;
+	wait_queue_head_t	req_wait_q;
+	__u32			req_status;
+	__u32			req_result;
+
+	struct inquiry_cache 	inq_cache;
+	struct conn_hash 	conn_hash;
+
+	struct hci_dev_stats 	stat;
+
+	void			*driver_data;
+	void			*core_data;
+
+	atomic_t 		promisc;
+
+	int (*open)(struct hci_dev *hdev);
+	int (*close)(struct hci_dev *hdev);
+	int (*flush)(struct hci_dev *hdev);
+	int (*send)(struct sk_buff *skb);
+	void (*destruct)(struct hci_dev *hdev);
+	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+};
+
+  </pre>
+
+  <a href="."> back to bluetooth </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

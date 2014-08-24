@@ -1,0 +1,393 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./gnus/srcdoc/send-mail.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">gnus</a>/<a href=".">srcdoc</a>/send-mail.txt </h1>
+
+  <a href="send-mail.txt">download original</a>
+
+  <pre>
+Group-Buffer =&gt; a =&gt;
+
+  message-setup(((Newsgroups . "") (Subject . "")))
+* message-news("")
+* gnus-post-news(post "")
+* byte-code("..." [arg prefix-numeric-value 1 completing-read "Newsgroup: " gnus-active-hashtb nil gnus-read-active-file-p gnus-group-group-name "" gnus-newsgroup-name gnus-post-news post] 5)
+* gnus-group-post-news(nil)
+  call-interactively(gnus-group-post-news)
+
+message-setup erledigt den Großteil des Erzeugens und Vorbereitens des
+neuen Message-Buffers für die zu schreibende Nachricht.
+
+Wichtige Tweakpoints (Punkte, an denen man drehen kann) (in
+chronologischer Reihenfolge der Anwendung):
+
+message-header-format-alist
+
+message-default-([mail-|news-])headers
+
+message-generate-headers-first
+
+message-signature-setup-hook
+
+(message-insert-signature)
+message-signature
+
+message-alternative-emails (wird gematcht auf To: und Cc:; siehe
+message-use-alternative-email-as-from)
+
+message-setup-hook
+
+
+----------
+
+Message-Mode =&gt; C-c C-c =&gt;
+
+[message.el]
+==&gt;message-send-and-exit
+
+  ==&gt;message-send
+
+    ==&gt;message-fix-before-sending
+
+    (run-hooks 'message-send-hook) ;; stdmäßig nil
+
+    Mittels Infos aus "message-send-method-alist" Nachrichtentyp
+    pruefen (normalerweise News oder Mail) und mittels
+    entspr. Funktion verschicken. "message-send-method-alist" hat als
+    stdwert:
+    ((news message-news-p message-send-via-news)
+     (mail message-mail-p message-send-via-mail))
+    (Jeweils: (Typ, Prädikatfkt. zum Check, Sendefunktion))
+    Impl. von message-news-p message-mail-p s.u.
+    Beim Verschicken einer Mail wird also bspw. aufgerufen:
+
+    ==&gt;message-send-via-mail
+      ==&gt;message-send-mail  (L2253)
+
+        (let ((message-deletable-headers '(Message-ID Date Lines))) 
+        ==&gt;(message-generate-headers message-required-mail-headers)  (L3156)
+
+          ....
+
+        ) ;;let
+
+        (run-hooks 'message-header-hook)  ;;stdmäßig nil
+
+        .... (ab L2272)
+
+    if (Senden erfolgreich)
+
+      ==&gt;message-do-fcc
+
+        Nachricht in allen in "Fcc" - Headern der Nachricht
+        angegebenen Dateien abspeichern (jwls. ein Dateiname pro
+        Fcc-Header). Die Fcc-Header selbst werden entfernt, die
+        Nachricht wird entspr. encoded usw.. Die Fcc-Header können
+        alternativ zu Dateinamen auch Kommandos angeben, in die der
+        Nachrichtentext hineingepiped werden soll. Näheres siehe
+        message-do-fcc - Impl.
+
+      (save-excursion
+	(run-hooks 'message-sent-hook))   ;;stdmäßig nil
+
+
+
+---------------
+Nebeninfo (wg. Übersichtlichkeit hier und nicht in message-send):
+
+==&gt;message-news-p
+
+  true gdw.:
+
+  - Var. "message-this-is-mail" ist nil (nicht-true)
+   und
+  - - Var. "message-this-is-news" ist true
+     oder
+    - Message enthält Header "newsgroups" und enthält nicht den Header
+      "posted-to"
+
+
+==&gt;message-mail-p
+
+  true gdw.:
+
+  - Var. "message-this-is-news" ist nil (nicht-true)
+   und
+  - - Var. "message-this-is-mail" ist true
+     oder
+    - Message enthält mind. einen der  Header "to", "cc", "bcc"
+
+
+d.h. mit "message-this-is-news" bzw. "message-this-is-mail" kann man
+den jwlg. Typ erzwingen, sind diese Variablen nil, werden die Header
+überprüft
+
+
+
+
+-----------------------
+message-send-and-exit nochmal (verschiedene Stacktraces in
+chronologischer Reihenfolge)
+
+
+  message-make-fqdn()
+* message-make-message-id()
+* message-generate-headers((From Newsgroups Subject Date Message-ID (optional . Organization) Lines (optional . User-Agent)))
+* message-send-news(nil)
+* message-send-via-news(nil)
+* message-send(nil)
+* byte-code("..." [message-exit-actions actions buf message-send arg buffer-name message-kill-buffer-on-exit kill-buffer bury-buffer message-bury message-do-actions t] 2)
+* message-send-and-exit(nil)
+  call-interactively(message-send-and-exit)
+
+
+* message-make-address()
+* message-make-from()
+* message-generate-headers((From Newsgroups Subject Date Message-ID (optional . Organization) Lines (optional . User-Agent)))
+* message-send-news(nil)
+* message-send-via-news(nil)
+* message-send(nil)
+* byte-code("..." [message-exit-actions actions buf message-send arg buffer-name message-kill-buffer-on-exit kill-buffer bury-buffer message-bury message-do-actions t] 2)
+* message-send-and-exit(nil)
+  call-interactively(message-send-and-exit)
+
+=&gt; In message-make-address() wird die Mailadresse für den From: -
+Header generiert: Bevorzugt aus "user-mail-address" oder -- wenn das
+nil ist -- als (concat (user-login-name) "@" (message-make-domain))
+
+(message-make-domain) ist:
+
+  system-name, falls da mind. ein "." drin ist; sonst:
+
+  mail-host-address, falls da mind. ein "." drin ist; sonst:
+
+  alles hinter dem "@" in user-mail-address, falls user-mail-address
+  ein "@" und dahinter mind. ein "." enthält, sonst:
+
+  (concat system-name ".i-did-not-set--mail-host-address--so-shoot-me")
+
+
+Der Realname der From-Adresse ist
+  (or (and (boundp 'user-full-name)
+            user-full-name)
+      (user-full-name))
+
+
+sonstige Tweakpoints (in chronologischer Reihenfolge der Anwendung):
+  
+  message-send-hook
+  
+  
+  Bei News ((message-send-via-news)):
+  
+    gnus-group-name-charset-method-alist
+  
+    gnus-group-name-charset-group-alist
+  
+    rfc2047-header-encoding-alist
+  
+    message-syntax-checks (s. (message-check-news-body-syntax))
+  
+    gnus-group-posting-charset-alist
+
+    message-required-news-headers
+
+      (message-make-date)
+
+      (message-make-message-id)
+
+      (message-make-organization)
+
+      (message-make-path)
+
+      (message-make-in-reply-to)
+
+      (message-make-lines)
+
+      (message-make-expires)
+
+      message-newsreader
+
+      message-from-style
+
+    message-header-hook
+
+    message-inhibit-body-encoding
+
+    message-default-charset
+
+      Mule-Unterstützung in Emacs
+
+      (mm-mime-charset 'latin-iso8859-15) sollte nicht nil
+      zurückgeben. Siehe Fkt. mm-find-mime-charset-region
+
+    message-ignored-news-headers
+
+    message-send-news-hook
+
+
+    Das eigentlich Senden erfolgt ueber (gnus-request-post method).
+
+
+
+  Bei Mail ((message-send-via-mail)):
+  
+    TODO
+  
+  
+  Bei Erfolg:
+  
+       (message-do-fcc) (kein Tweakpoint, sondern Fcc-Header-Verarbeitung,
+                         siehe Impl.)
+  
+       message-send-actions
+  
+  
+  message-kill-buffer-on-exit
+  
+  message-exit-actions (s. (message-do-actions))
+  
+
+
+------
+
+Summary- oder Message-Buffer =&gt; F =&gt; gnus-summary-followup-with-original
+
+verschiedene Stacktraces in chronologischer Reihenfolge:
+
+Return value: (152747)
+  gnus-summary-work-articles(nil)
+* byte-code("..." [gnus-summary-followup gnus-summary-work-articles n force-news] 3)
+* gnus-summary-followup-with-original(nil)
+  call-interactively(gnus-summary-followup-with-original)
+
+
+
+Entering:
+* gnus-copy-article-buffer()
+* gnus-post-news(nil "ger.ct" [152747 "Re: Microsoft mu~ ja ziemlich verzweifelt sein..." "\"Matthias Eissing\" &lt;MEissing@gmx.de&gt;" "Sat, 22 May 2004 16:34:11 +0200" "&lt;40af64e8@news02.heise.de&gt;" "&lt;871xldjz6c.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40ae6cf0@news02.heise.de&gt; &lt;slrncasvrp.3bb.s_kraste@smk.imweber.dyndns.org&gt; &lt;40aefe1f$1@news02.heise.de&gt; &lt;871xlcww3n.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40af3df0@news02.heise.de&gt; &lt;87wu34vcp1.fsf@320025674319-0001.dialin.t-online.de&gt;" 1399 13 "news.arcor-ip.de ger.ct:152747" nil] "*Article*" (152747) nil nil)
+* gnus-summary-followup((152747) nil)
+* byte-code("..." [gnus-summary-followup gnus-summary-work-articles n force-news] 3)
+* gnus-summary-followup-with-original(nil)
+  call-interactively(gnus-summary-followup-with-original)
+
+
+gnus-post-news benutzt das Makro gnus-setup-message...
+
+Tweakpoint hier:
+
+  message-mode-hook
+
+message-header-setup-hook wird temporär erweitert um:
+
+  gnus-inews-insert-gcc
+  gnus-inews-insert-archive-gcc
+  gnus-configure-posting-styles
+
+
+
+Entering:
+* message-functionp(nil)
+* message-followup(nil)
+* gnus-post-news(nil "ger.ct" [152747 "Re: Microsoft mu~ ja ziemlich verzweifelt sein..." "\"Matthias Eissing\" &lt;MEissing@gmx.de&gt;" "Sat, 22 May 2004 16:34:11 +0200" "&lt;40af64e8@news02.heise.de&gt;" "&lt;871xldjz6c.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40ae6cf0@news02.heise.de&gt; &lt;slrncasvrp.3bb.s_kraste@smk.imweber.dyndns.org&gt; &lt;40aefe1f$1@news02.heise.de&gt; &lt;871xlcww3n.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40af3df0@news02.heise.de&gt; &lt;87wu34vcp1.fsf@320025674319-0001.dialin.t-online.de&gt;" 1399 13 "news.arcor-ip.de ger.ct:152747" nil] "*Article*" (152747) nil nil)
+* gnus-summary-followup((152747) nil)
+* byte-code("..." [gnus-summary-followup gnus-summary-work-articles n force-news] 3)
+* gnus-summary-followup-with-original(nil)
+  call-interactively(gnus-summary-followup-with-original)
+
+Tweakpoint:
+
+message-followup-to-function
+
+Return value: nil
+  message-pop-to-buffer("*followup to Matthias Eissing on ger.ct*&lt;3&gt;")
+* message-followup(nil)
+* gnus-post-news(nil "ger.ct" [152747 "Re: Microsoft mu~ ja ziemlich verzweifelt sein..." "\"Matthias Eissing\" &lt;MEissing@gmx.de&gt;" "Sat, 22 May 2004 16:34:11 +0200" "&lt;40af64e8@news02.heise.de&gt;" "&lt;871xldjz6c.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40ae6cf0@news02.heise.de&gt; &lt;slrncasvrp.3bb.s_kraste@smk.imweber.dyndns.org&gt; &lt;40aefe1f$1@news02.heise.de&gt; &lt;871xlcww3n.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40af3df0@news02.heise.de&gt; &lt;87wu34vcp1.fsf@320025674319-0001.dialin.t-online.de&gt;" 1399 13 "news.arcor-ip.de ger.ct:152747" nil] "*Article*" (152747) nil nil)
+* gnus-summary-followup((152747) nil)
+* byte-code("..." [gnus-summary-followup gnus-summary-work-articles n force-news] 3)
+* gnus-summary-followup-with-original(nil)
+  call-interactively(gnus-summary-followup-with-original)
+
+
+Entering:
+* message-setup(((Subject . "Re: Microsoft mu~ ja ziemlich verzweifelt sein...") (Newsgroups . "ger.ct") (References . "&lt;871xldjz6c.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40ae6cf0@news02.heise.de&gt; &lt;slrncasvrp.3bb.s_kraste@smk.imweber.dyndns.org&gt; &lt;40aefe1f$1@news02.heise.de&gt; &lt;871xlcww3n.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40af3df0@news02.heise.de&gt; &lt;87wu34vcp1.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40af64e8@news02.heise.de&gt;")) #&lt;buffer " *gnus article copy*"&gt;)
+* message-followup(nil)
+* gnus-post-news(nil "ger.ct" [152747 "Re: Microsoft mu~ ja ziemlich verzweifelt sein..." "\"Matthias Eissing\" &lt;MEissing@gmx.de&gt;" "Sat, 22 May 2004 16:34:11 +0200" "&lt;40af64e8@news02.heise.de&gt;" "&lt;871xldjz6c.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40ae6cf0@news02.heise.de&gt; &lt;slrncasvrp.3bb.s_kraste@smk.imweber.dyndns.org&gt; &lt;40aefe1f$1@news02.heise.de&gt; &lt;871xlcww3n.fsf@320025674319-0001.dialin.t-online.de&gt; &lt;40af3df0@news02.heise.de&gt; &lt;87wu34vcp1.fsf@320025674319-0001.dialin.t-online.de&gt;" 1399 13 "news.arcor-ip.de ger.ct:152747" nil] "*Article*" (152747) nil nil)
+* gnus-summary-followup((152747) nil)
+* byte-code("..." [gnus-summary-followup gnus-summary-work-articles n force-news] 3)
+* gnus-summary-followup-with-original(nil)
+  call-interactively(gnus-summary-followup-with-original)
+
+
+
+
+-----
+
+Problem: Bei Followups auf Nachrichten mit Encoding iso-8859-15:
+"Message contains characters with unknown encoding.  Really send?"
+
+Entering:
+* mml-parse-1()
+  mml-parse()
+  mml-generate-mime()
+  message-encode-message-body()
+  message-send-news(nil)
+  message-send-via-news(nil)
+  message-send(nil)
+  message-send-and-exit(nil)
+  call-interactively(message-send-and-exit)
+
+
+Entering:
+* mm-find-mime-charset-region(696 1633)
+* byte-code("..." [nil raw no-markup-p use-ascii warn charsets contents point tag struct looking-at "&lt;#/multipart" "&lt;#multipart" mml-read-tag mml-parse-1 "&lt;#external" mml-read-part "&lt;#part" "&lt;#mml" part (type . "text/plain") t mml mm-find-mime-charset-region unknown-encoding mml-confirmation-set y-or-n-p "Message contains characters with unknown encoding.  Really send?" "Use ASCII as charset?" delq error "Edit your message to remove those characters" 2 string-match "[^ 	\n]" mml-parse-singlepart-with-multiple-charsets nstruct multipart format "Warning: Your message contains more than %d parts.  Really send? " "Edit your message to use only one charset" 1] 9)
+* mml-parse-1()
+  mml-parse()
+  mml-generate-mime()
+  message-encode-message-body()
+  message-send-news(nil)
+  message-send-via-news(nil)
+  message-send(nil)
+  message-send-and-exit(nil)
+  call-interactively(message-send-and-exit)
+
+
+Return value: (latin-iso8859-1 latin-iso8859-15 ascii)
+  mm-find-charset-region(696 1633)
+* mm-find-mime-charset-region(696 1633)
+* byte-code("..." [nil raw no-markup-p use-ascii warn charsets contents point tag struct looking-at "&lt;#/multipart" "&lt;#multipart" mml-read-tag mml-parse-1 "&lt;#external" mml-read-part "&lt;#part" "&lt;#mml" part (type . "text/plain") t mml mm-find-mime-charset-region unknown-encoding mml-confirmation-set y-or-n-p "Message contains characters with unknown encoding.  Really send?" "Use ASCII as charset?" delq error "Edit your message to remove those characters" 2 string-match "[^ 	\n]" mml-parse-singlepart-with-multiple-charsets nstruct multipart format "Warning: Your message contains more than %d parts.  Really send? " "Edit your message to use only one charset" 1] 9)
+* mml-parse-1()
+  mml-parse()
+  mml-generate-mime()
+  message-encode-message-body()
+  message-send-news(nil)
+  message-send-via-news(nil)
+  message-send(nil)
+  message-send-and-exit(nil)
+  call-interactively(message-send-and-exit)
+
+(mm-mime-charset 'latin-iso8859-15) gibt nil zurück!
+
+=&gt; Ursache offensichtlich mm-mime-mule-charset-alist
+
+  </pre>
+
+  <a href="."> back to srcdoc </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

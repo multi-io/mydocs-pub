@@ -1,0 +1,42 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/loop.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/loop.rb </h1>
+
+  <a href="loop.rb">download original</a>
+
+  <pre>
+def loop(initializer, iterator, continue_test, body)
+  initializer.call
+  while continue_test.call
+    body.call
+    iterator.call
+  end
+end
+
+i=0
+loop proc{i=0}, proc{i+=1}, proc{i&lt;10}, proc{
+  print i
+}
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

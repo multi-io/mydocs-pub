@@ -1,0 +1,41 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./lisp/scheme/test/primes.sc </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">lisp</a>/<a href="../.">scheme</a>/<a href=".">test</a>/primes.sc </h1>
+
+  <a href="primes.sc">download original</a>
+
+  <pre>
+(load "streams.sc")
+
+(define (sieve s)
+  (make-stream (stream-head s)
+               (sieve
+                (stream-filter
+                 (lambda (x) (not (= 0 (modulo x (stream-head s)))))
+                 (stream-tail s)))))
+
+(define primes
+  (sieve (make-int-interval-stream 2 '())))
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

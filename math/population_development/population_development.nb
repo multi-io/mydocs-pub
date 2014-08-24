@@ -1,0 +1,679 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.1'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[     21911,        632]*)
+(*NotebookOutlinePosition[     22543,        654]*)
+(*  CellTagsIndexPosition[     22499,        650]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+Cell[BoxData[
+    \(d[y_] := 
+      1\/2 + 1\/\[Pi]\ ArcTan[\(1\/4\) \((1 + \(1\/10000\) 
+                    Exp[y - 78])\) \((y - 78)\)]\)], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(Plot[d[y], {y, 0, 120}, 
+      PlotRange \[Rule] {{0, 120}, {0, 1}}]\)], "Input"],
+
+Cell[GraphicsData["PostScript", "\<\
+%!
+%%Creator: Mathematica
+%%AspectRatio: .61803 
+MathPictureStart
+/Mabs {
+Mgmatrix idtransform
+Mtmatrix dtransform
+} bind def
+/Mabsadd { Mabs
+3 -1 roll add
+3 1 roll add
+exch } bind def
+%% Graphics
+%%IncludeResource: font Courier
+%%IncludeFont: Courier
+/Courier findfont 10  scalefont  setfont
+% Scaling calculations
+6.93889e-18 0.00833333 0 0.618034 [
+[.16667 -0.0125 -6 -9 ]
+[.16667 -0.0125 6 0 ]
+[.33333 -0.0125 -6 -9 ]
+[.33333 -0.0125 6 0 ]
+[.5 -0.0125 -6 -9 ]
+[.5 -0.0125 6 0 ]
+[.66667 -0.0125 -6 -9 ]
+[.66667 -0.0125 6 0 ]
+[.83333 -0.0125 -9 -9 ]
+[.83333 -0.0125 9 0 ]
+[1 -0.0125 -9 -9 ]
+[1 -0.0125 9 0 ]
+[-0.0125 .12361 -18 -4.5 ]
+[-0.0125 .12361 0 4.5 ]
+[-0.0125 .24721 -18 -4.5 ]
+[-0.0125 .24721 0 4.5 ]
+[-0.0125 .37082 -18 -4.5 ]
+[-0.0125 .37082 0 4.5 ]
+[-0.0125 .49443 -18 -4.5 ]
+[-0.0125 .49443 0 4.5 ]
+[-0.0125 .61803 -6 -4.5 ]
+[-0.0125 .61803 0 4.5 ]
+[ 0 0 0 0 ]
+[ 1 .61803 0 0 ]
+] MathScale
+% Start of Graphics
+1 setlinecap
+1 setlinejoin
+newpath
+0 g
+.25 Mabswid
+[ ] 0 setdash
+.16667 0 m
+.16667 .00625 L
+s
+[(20)] .16667 -0.0125 0 1 Mshowa
+.33333 0 m
+.33333 .00625 L
+s
+[(40)] .33333 -0.0125 0 1 Mshowa
+.5 0 m
+.5 .00625 L
+s
+[(60)] .5 -0.0125 0 1 Mshowa
+.66667 0 m
+.66667 .00625 L
+s
+[(80)] .66667 -0.0125 0 1 Mshowa
+.83333 0 m
+.83333 .00625 L
+s
+[(100)] .83333 -0.0125 0 1 Mshowa
+1 0 m
+1 .00625 L
+s
+[(120)] 1 -0.0125 0 1 Mshowa
+.125 Mabswid
+.04167 0 m
+.04167 .00375 L
+s
+.08333 0 m
+.08333 .00375 L
+s
+.125 0 m
+.125 .00375 L
+s
+.20833 0 m
+.20833 .00375 L
+s
+.25 0 m
+.25 .00375 L
+s
+.29167 0 m
+.29167 .00375 L
+s
+.375 0 m
+.375 .00375 L
+s
+.41667 0 m
+.41667 .00375 L
+s
+.45833 0 m
+.45833 .00375 L
+s
+.54167 0 m
+.54167 .00375 L
+s
+.58333 0 m
+.58333 .00375 L
+s
+.625 0 m
+.625 .00375 L
+s
+.70833 0 m
+.70833 .00375 L
+s
+.75 0 m
+.75 .00375 L
+s
+.79167 0 m
+.79167 .00375 L
+s
+.875 0 m
+.875 .00375 L
+s
+.91667 0 m
+.91667 .00375 L
+s
+.95833 0 m
+.95833 .00375 L
+s
+.25 Mabswid
+0 0 m
+1 0 L
+s
+0 .12361 m
+.00625 .12361 L
+s
+[(0.2)] -0.0125 .12361 1 0 Mshowa
+0 .24721 m
+.00625 .24721 L
+s
+[(0.4)] -0.0125 .24721 1 0 Mshowa
+0 .37082 m
+.00625 .37082 L
+s
+[(0.6)] -0.0125 .37082 1 0 Mshowa
+0 .49443 m
+.00625 .49443 L
+s
+[(0.8)] -0.0125 .49443 1 0 Mshowa
+0 .61803 m
+.00625 .61803 L
+s
+[(1)] -0.0125 .61803 1 0 Mshowa
+.125 Mabswid
+0 .0309 m
+.00375 .0309 L
+s
+0 .0618 m
+.00375 .0618 L
+s
+0 .09271 m
+.00375 .09271 L
+s
+0 .15451 m
+.00375 .15451 L
+s
+0 .18541 m
+.00375 .18541 L
+s
+0 .21631 m
+.00375 .21631 L
+s
+0 .27812 m
+.00375 .27812 L
+s
+0 .30902 m
+.00375 .30902 L
+s
+0 .33992 m
+.00375 .33992 L
+s
+0 .40172 m
+.00375 .40172 L
+s
+0 .43262 m
+.00375 .43262 L
+s
+0 .46353 m
+.00375 .46353 L
+s
+0 .52533 m
+.00375 .52533 L
+s
+0 .55623 m
+.00375 .55623 L
+s
+0 .58713 m
+.00375 .58713 L
+s
+.25 Mabswid
+0 0 m
+0 .61803 L
+s
+0 0 m
+1 0 L
+1 .61803 L
+0 .61803 L
+closepath
+clip
+newpath
+.5 Mabswid
+0 .01008 m
+.04057 .01075 L
+.08481 .01159 L
+.12636 .01251 L
+.16632 .01354 L
+.20885 .01484 L
+.2498 .01635 L
+.29331 .01833 L
+.33524 .02076 L
+.37557 .02378 L
+.39599 .02567 L
+.41848 .02813 L
+.4598 .03413 L
+.48018 .03813 L
+.5021 .04361 L
+.5243 .05099 L
+.53451 .05528 L
+.54539 .06068 L
+.5563 .06724 L
+.56619 .07447 L
+.57557 .08284 L
+.58549 .09383 L
+.59602 .10882 L
+.6057 .1269 L
+.61612 .15292 L
+.62756 .19246 L
+.63828 .24249 L
+.64805 .29751 L
+.65945 .3634 L
+.67001 .41546 L
+.67972 .45262 L
+.69005 .48265 L
+.71185 .53293 L
+.72192 .56121 L
+.72741 .57792 L
+.73252 .59169 L
+.7369 .60085 L
+.73935 .6048 L
+.74158 .6077 L
+.74402 .61024 L
+.74667 .61234 L
+.74918 .61383 L
+.75148 .61487 L
+.75391 .6157 L
+.75618 .61628 L
+.75867 .61675 L
+.76135 .61712 L
+.76415 .6174 L
+.76681 .61758 L
+.7692 .6177 L
+Mistroke
+.7718 .61779 L
+.77329 .61783 L
+.77469 .61787 L
+.7773 .61791 L
+.78012 .61795 L
+.7817 .61797 L
+.78316 .61798 L
+.78561 .61799 L
+.78829 .618 L
+.79109 .61801 L
+.7937 .61802 L
+.79644 .61802 L
+.79897 .61803 L
+.80175 .61803 L
+.80315 .61803 L
+.8047 .61803 L
+.80729 .61803 L
+.81007 .61803 L
+.8127 .61803 L
+.81511 .61803 L
+.81746 .61803 L
+.81965 .61803 L
+.82205 .61803 L
+.82461 .61803 L
+.82731 .61803 L
+.82985 .61803 L
+.83213 .61803 L
+.83461 .61803 L
+.83709 .61803 L
+.83976 .61803 L
+.84227 .61803 L
+.84457 .61803 L
+.84726 .61803 L
+.84878 .61803 L
+.85019 .61803 L
+.85277 .61803 L
+.85552 .61803 L
+.85812 .61803 L
+.86093 .61803 L
+.86359 .61803 L
+.86602 .61803 L
+.86872 .61803 L
+.87025 .61803 L
+.87167 .61803 L
+.87455 .61803 L
+.87616 .61803 L
+.87763 .61803 L
+.88004 .61803 L
+.88271 .61803 L
+.88549 .61803 L
+Mistroke
+.88809 .61803 L
+.89052 .61803 L
+.89274 .61803 L
+.89531 .61803 L
+.89774 .61803 L
+.90037 .61803 L
+.90316 .61803 L
+.90579 .61803 L
+.90818 .61803 L
+.911 .61803 L
+.91259 .61803 L
+.91405 .61803 L
+.91674 .61803 L
+.91957 .61803 L
+.92225 .61803 L
+.92478 .61803 L
+.92706 .61803 L
+.92953 .61803 L
+.93222 .61803 L
+.93508 .61803 L
+.93752 .61803 L
+.94021 .61803 L
+.9427 .61803 L
+.94499 .61803 L
+.9475 .61803 L
+.95014 .61803 L
+.95245 .61803 L
+.9546 .61803 L
+.95695 .61803 L
+.95946 .61803 L
+.96199 .61803 L
+.96467 .61803 L
+.96696 .61803 L
+.96947 .61803 L
+.97089 .61803 L
+.97218 .61803 L
+.97508 .61803 L
+.97777 .61803 L
+.98032 .61803 L
+.98269 .61803 L
+.98401 .61803 L
+.98521 .61803 L
+.98633 .61803 L
+.98754 .61803 L
+.98974 .61803 L
+.99098 .61803 L
+.99234 .61803 L
+.99376 .61803 L
+.99509 .61803 L
+.99746 .61803 L
+Mistroke
+1 .61803 L
+Mfstroke
+% End of Graphics
+MathPictureEnd
+\
+\>"], "Graphics",
+  ImageSize->{288, 177.938},
+  ImageMargins->{{43, 0}, {0, 0}},
+  ImageRegion->{{0, 1}, {0, 1}},
+  ImageCache->GraphicsData["Bitmap", "\<\
+CF5dJ6E]HGAYHf4PAg9QL6QYHg<PAVmbKF5d0`40004P0000/B000`400?l00000o`00003oo`3ooolQ
+0?ooo`00o`3ooolQ0?ooo`00>`3oool4000000<0oooo0P00000S0?ooo`030000003oool0oooo0080
+oooo0P00000S0?ooo`800000103oool2000002<0oooo0P0000040?ooo`8000007`3oool4000000<0
+oooo0P0000040?ooo`800000703oool400000080oooo100000030?ooo`8000000`3oool003/0oooo
+00<000000?ooo`3oool00`3oool010000000oooo0?ooo`00000R0?ooo`050000003oool0oooo0?oo
+o`0000000P3oool00`000000oooo0?ooo`0O0?ooo`040000003oool0oooo00000080oooo00@00000
+0?ooo`3oool000008@3oool010000000oooo0?ooo`0000020?ooo`040000003oool0oooo00000200
+oooo00D000000?ooo`3oool0oooo000000020?ooo`040000003oool0oooo00000080oooo00<00000
+0?ooo`3oool06`3oool01@000000oooo0?ooo`3oool0000000D0oooo00@000000?ooo`3oool00000
+0P3oool003`0oooo00<000000?ooo`3oool00P3oool010000000oooo0?ooo`00000O0?ooo`D00000
+0P3oool010000000oooo0?ooo`00000Q0?ooo`040000003oool0oooo00000080oooo00@000000?oo
+o`3oool000008@3oool010000000oooo0?ooo`0000020?ooo`040000003oool0oooo00000200oooo
+00D000000?ooo`3oool0oooo000000020?ooo`040000003oool0oooo00000080oooo00<000000?oo
+o`3oool06`3oool00`000000oooo0?ooo`020?ooo`030000003oool0oooo0080oooo00@000000?oo
+o`3oool000000P3oool003d0oooo00D000000?ooo`3oool0oooo000000020?ooo`030000003oool0
+oooo01d0oooo00@000000?ooo`3oool000000`3oool010000000oooo0?ooo`00000Q0?ooo`<00000
+0`3oool010000000oooo0?ooo`00000R0?ooo`8000000`3oool010000000oooo0?ooo`00000P0?oo
+o`050000003oool0oooo0?ooo`0000000P3oool010000000oooo0?ooo`0000020?ooo`030000003o
+ool0oooo01/0oooo00<000000?ooo`3oool00`3oool01@000000oooo0?ooo`3oool000000080oooo
+0@0000010?ooo`40oooo000n0?ooo`040000003oool0oooo00000080oooo00<000000?ooo`3oool0
+7P3oool00`000000oooo000000030?ooo`040000003oool0oooo00000240oooo00<000000?ooo`3o
+ool00`3oool010000000oooo0?ooo`00000Q0?ooo`040000003oool0oooo00000080oooo00@00000
+0?ooo`3oool00000803oool01@000000oooo0?ooo`3oool000000080oooo00@000000?ooo`3oool0
+00000P3oool00`000000oooo0?ooo`0K0?ooo`030000003oool0oooo00@0oooo00@000000?ooo`3o
+ool000000P3oool100000040oooo0@3oool003/0oooo00@000000?ooo`3oool000000P3oool01000
+0000oooo0?ooo`00000Q0?ooo`8000000`3oool010000000oooo0?ooo`00000Q0?ooo`030000003o
+ool0oooo00<0oooo00@000000?ooo`3oool000008@3oool010000000oooo0?ooo`0000020?ooo`04
+0000003oool0oooo000001h0oooo0`0000030?ooo`040000003oool0oooo00000080oooo00@00000
+0?ooo`3oool000006`3oool3000000<0oooo00@000000?ooo`3oool000000P3oool010000000oooo
+0?ooo`0000020?ooo`00?03oool2000000@0oooo0P00000S0?ooo`030000003oool0oooo0080oooo
+0P00000S0?ooo`<000000`3oool2000002<0oooo0P0000040?ooo`8000008@3oool00`000000oooo
+0?ooo`020?ooo`800000103oool2000001h0oooo00<000000?ooo`3oool00P3oool2000000@0oooo
+0P0000030?ooo`00o`3ooolQ0?ooo`00o`3ooolQ0?ooo`00o`3ooolQ0?ooo`00o`3ooolQ0?ooo`00
+5@3ooooo000000<000002@3oool001D0oooo00<000000?ooo`3oool0:03oool00`000000oooo0?oo
+o`0W0?ooo`030000003oool0oooo02P0oooo00<000000?ooo`3oool0:03oool00`000000oooo0?oo
+o`0X0?ooo`030000003oool0oooo02P0oooo00<000000?ooo`3oool01`3oool001D0oooo4000003k
+0?ooo`005@3oool00`000000oooo0?ooo`0=0?ooob/00000d03oool001D0oooo00<000000?ooo`3o
+ool0>03ooolF00000;X0oooo000E0?ooo`030000003oool0oooo04h0oooo2`00002_0?ooo`005@3o
+ool00`000000oooo0?ooo`1I0?ooo`d00000XP3oool001D0oooo0P00001W0?ooo`P00000VP3oool0
+01D0oooo00<000000?ooo`3oool0KP3oool800000980oooo000E0?ooo`030000003oool0oooo07H0
+oooo1000002>0?ooo`005@3oool00`000000oooo0?ooo`1j0?ooo`<00000R`3oool001D0oooo00<0
+00000?ooo`3oool0O@3oool3000008P0oooo000E0?ooo`030000003oool0oooo0800oooo0P000026
+0?ooo`005@3oool00`000000oooo0?ooo`220?ooo`<00000P`3oool001D0oooo00<000000?ooo`3o
+ool0Q@3oool300000800oooo000E0?ooo`800000R@3oool2000007h0oooo000E0?ooo`030000003o
+ool0oooo08X0oooo0P00001l0?ooo`005@3oool00`000000oooo0?ooo`2<0?ooo`030000003oool0
+oooo07T0oooo000E0?ooo`030000003oool0oooo08d0oooo00<000000?ooo`3oool0N03oool001D0
+oooo00<000000?ooo`3oool0SP3oool00`000000oooo0?ooo`1g0?ooo`005@3oool00`000000oooo
+0?ooo`2?0?ooo`800000M`3oool001D0oooo00<000000?ooo`3oool0T@3oool00`000000oooo0?oo
+o`1d0?ooo`005@3oool00`000000oooo0?ooo`2B0?ooo`030000003oool0oooo07<0oooo000E0?oo
+o`800000T`3oool00`000000oooo0?ooo`1c0?ooo`005@3oool00`000000oooo0?ooo`2C0?ooo`03
+0000003oool0oooo0780oooo000E0?ooo`030000003oool0oooo09@0oooo00<000000?ooo`3oool0
+L@3oool001D0oooo00<000000?ooo`3oool0U@3oool00`000000oooo0?ooo`1`0?ooo`005@3oool0
+0`000000oooo0?ooo`2F0?ooo`030000003oool0oooo06l0oooo000E0?ooo`030000003oool0oooo
+09H0oooo00<000000?ooo`3oool0K`3oool00080oooo0P0000040?ooo`030000003oool0oooo0080
+oooo100000040?ooo`030000003oool0oooo09L0oooo00<000000?ooo`3oool0KP3oool000050?oo
+o`000000oooo0?ooo`000000203oool00`000000oooo0?ooo`050?ooo`030000003oool0oooo09L0
+oooo00<000000?ooo`3oool0KP3oool000050?ooo`000000oooo0?ooo`0000002@3oool00`000000
+oooo0?ooo`040?ooo`800000V@3oool00`000000oooo0?ooo`1]0?ooo`0000D0oooo0000003oool0
+oooo0000000:0?ooo`030000003oool0oooo00<0oooo00<000000?ooo`3oool0V03oool00`000000
+oooo0?ooo`1]0?ooo`0000D0oooo0000003oool0oooo0000000;0?ooo`030000003oool0oooo0080
+oooo00<000000?ooo`3oool0V03oool00`000000oooo0?ooo`1]0?ooo`0000D0oooo0000003oool0
+oooo000000080?ooo`040000003oool0oooo000000@0oooo00<000000?ooo`3oool0V@3oool00`00
+0000oooo0?ooo`1/0?ooo`000P3oool2000000X0oooo0P0000050?ooo`030000003oool0oooo09T0
+oooo00<000000?ooo`3oool0K03oool001D0oooo00<000000?ooo`3oool0VP3oool00`000000oooo
+0?ooo`1[0?ooo`005@3oool00`000000oooo0?ooo`2J0?ooo`030000003oool0oooo06/0oooo000E
+0?ooo`030000003oool0oooo09/0oooo00<000000?ooo`3oool0JP3oool001D0oooo0P00002L0?oo
+o`030000003oool0oooo06X0oooo000E0?ooo`030000003oool0oooo09/0oooo00<000000?ooo`3o
+ool0JP3oool001D0oooo00<000000?ooo`3oool0W03oool00`000000oooo0?ooo`1Y0?ooo`005@3o
+ool00`000000oooo0?ooo`2L0?ooo`030000003oool0oooo06T0oooo000E0?ooo`030000003oool0
+oooo09`0oooo00<000000?ooo`3oool0J@3oool001D0oooo00<000000?ooo`3oool0W@3oool00`00
+0000oooo0?ooo`1X0?ooo`005@3oool00`000000oooo0?ooo`2M0?ooo`030000003oool0oooo06P0
+oooo000E0?ooo`030000003oool0oooo09d0oooo00<000000?ooo`3oool0J03oool001D0oooo0P00
+002N0?ooo`030000003oool0oooo06P0oooo000E0?ooo`030000003oool0oooo09h0oooo00<00000
+0?ooo`3oool0I`3oool001D0oooo00<000000?ooo`3oool0WP3oool00`000000oooo0?ooo`1W0?oo
+o`005@3oool00`000000oooo0?ooo`2N0?ooo`030000003oool0oooo06L0oooo000E0?ooo`030000
+003oool0oooo09h0oooo00<000000?ooo`3oool0I`3oool001D0oooo00<000000?ooo`3oool0W`3o
+ool00`000000oooo0?ooo`1V0?ooo`005@3oool00`000000oooo0?ooo`2O0?ooo`030000003oool0
+oooo06H0oooo000E0?ooo`030000003oool0oooo09l0oooo00<000000?ooo`3oool0IP3oool001D0
+oooo0P00002P0?ooo`030000003oool0oooo06H0oooo000E0?ooo`030000003oool0oooo0:00oooo
+00<000000?ooo`3oool0I@3oool001D0oooo00<000000?ooo`3oool0X03oool00`000000oooo0?oo
+o`1U0?ooo`005@3oool00`000000oooo0?ooo`2P0?ooo`030000003oool0oooo06D0oooo000E0?oo
+o`030000003oool0oooo0:00oooo00<000000?ooo`3oool0I@3oool001D0oooo00<000000?ooo`3o
+ool0X@3oool00`000000oooo0?ooo`1T0?ooo`000P3oool2000000@0oooo00<000000?ooo`3oool0
+103oool00`000000oooo0?ooo`030?ooo`030000003oool0oooo0:40oooo00<000000?ooo`3oool0
+I03oool000050?ooo`000000oooo0?ooo`0000002P3oool00`000000oooo0?ooo`030?ooo`030000
+003oool0oooo0:40oooo00<000000?ooo`3oool0I03oool000050?ooo`000000oooo0?ooo`000000
+1`3oool5000000@0oooo0P00002R0?ooo`030000003oool0oooo06@0oooo00001@3oool000000?oo
+o`3oool0000000L0oooo00@000000?ooo`3oool000001@3oool00`000000oooo0?ooo`2Q0?ooo`03
+0000003oool0oooo06@0oooo00001@3oool000000?ooo`3oool0000000P0oooo00<000000?ooo`00
+00001@3oool00`000000oooo0?ooo`2Q0?ooo`030000003oool0oooo06@0oooo00001@3oool00000
+0?ooo`3oool0000000T0oooo0P0000050?ooo`030000003oool0oooo0:80oooo00<000000?ooo`3o
+ool0H`3oool00080oooo0P00000;0?ooo`030000003oool0oooo00<0oooo00<000000?ooo`3oool0
+XP3oool00`000000oooo0?ooo`1S0?ooo`005@3oool00`000000oooo0?ooo`2R0?ooo`030000003o
+ool0oooo06<0oooo000E0?ooo`030000003oool0oooo0:80oooo00<000000?ooo`3oool0H`3oool0
+01D0oooo00<000000?ooo`3oool0XP3oool00`000000oooo0?ooo`1S0?ooo`005@3oool200000:<0
+oooo00<000000?ooo`3oool0H`3oool001D0oooo00<000000?ooo`3oool0XP3oool00`000000oooo
+0?ooo`1S0?ooo`005@3oool00`000000oooo0?ooo`2S0?ooo`030000003oool0oooo0680oooo000E
+0?ooo`030000003oool0oooo0:<0oooo00<000000?ooo`3oool0HP3oool001D0oooo00<000000?oo
+o`3oool0X`3oool00`000000oooo0?ooo`1R0?ooo`005@3oool00`000000oooo0?ooo`2S0?ooo`03
+0000003oool0oooo0680oooo000E0?ooo`030000003oool0oooo0:<0oooo00<000000?ooo`3oool0
+HP3oool001D0oooo00<000000?ooo`3oool0X`3oool00`000000oooo0?ooo`1R0?ooo`005@3oool2
+00000:D0oooo00<000000?ooo`3oool0H@3oool001D0oooo00<000000?ooo`3oool0Y03oool00`00
+0000oooo0?ooo`1Q0?ooo`005@3oool00`000000oooo0?ooo`2T0?ooo`030000003oool0oooo0640
+oooo000E0?ooo`030000003oool0oooo0:@0oooo00<000000?ooo`3oool0H@3oool001D0oooo00<0
+00000?ooo`3oool0Y03oool00`000000oooo0?ooo`1Q0?ooo`005@3oool00`000000oooo0?ooo`2T
+0?ooo`030000003oool0oooo0640oooo000E0?ooo`030000003oool0oooo0:D0oooo00<000000?oo
+o`3oool0H03oool001D0oooo00<000000?ooo`3oool0Y@3oool00`000000oooo0?ooo`1P0?ooo`00
+5@3oool200000:H0oooo00<000000?ooo`3oool0H03oool001D0oooo00<000000?ooo`3oool0Y@3o
+ool00`000000oooo0?ooo`1P0?ooo`005@3oool00`000000oooo0?ooo`2U0?ooo`030000003oool0
+oooo0600oooo000E0?ooo`030000003oool0oooo0:D0oooo00<000000?ooo`3oool0H03oool001D0
+oooo00<000000?ooo`3oool0YP3oool00`000000oooo0?ooo`1O0?ooo`005@3oool00`000000oooo
+0?ooo`2V0?ooo`030000003oool0oooo05l0oooo00020?ooo`800000103oool00`000000oooo0?oo
+o`030?ooo`8000001@3oool00`000000oooo0?ooo`2V0?ooo`030000003oool0oooo05l0oooo0000
+1@3oool000000?ooo`3oool0000000P0oooo00@000000?ooo`3oool00000103oool00`000000oooo
+0?ooo`2V0?ooo`030000003oool0oooo05l0oooo00001@3oool000000?ooo`3oool0000000P0oooo
+00@000000?ooo`3oool00000103oool200000:L0oooo00<000000?ooo`3oool0G`3oool000050?oo
+o`000000oooo0?ooo`000000203oool3000000D0oooo00<000000?ooo`3oool0Y`3oool00`000000
+oooo0?ooo`1N0?ooo`0000D0oooo0000003oool0oooo000000080?ooo`030000003oool0oooo00D0
+oooo00<000000?ooo`3oool0Y`3oool00`000000oooo0?ooo`1N0?ooo`0000D0oooo0000003oool0
+oooo000000080?ooo`030000003oool0oooo00D0oooo00<000000?ooo`3oool0Y`3oool00`000000
+oooo0?ooo`1N0?ooo`000P3oool2000000X0oooo0`0000040?ooo`030000003oool0oooo0:L0oooo
+00<000000?ooo`3oool0GP3oool001D0oooo00<000000?ooo`3oool0Z03oool00`000000oooo0?oo
+o`1M0?ooo`005@3oool00`000000oooo0?ooo`2X0?ooo`030000003oool0oooo05d0oooo000E0?oo
+o`030000003oool0oooo0:P0oooo00<000000?ooo`3oool0G@3oool001D0oooo0P00002Y0?ooo`03
+0000003oool0oooo05d0oooo000E0?ooo`030000003oool0oooo0:T0oooo00<000000?ooo`3oool0
+G03oool001D0oooo00<000000?ooo`3oool0Z@3oool00`000000oooo0?ooo`1L0?ooo`005@3oool0
+0`000000oooo0?ooo`2Y0?ooo`030000003oool0oooo05`0oooo000E0?ooo`030000003oool0oooo
+0:T0oooo00<000000?ooo`3oool0G03oool001D0oooo00<000000?ooo`3oool0Z@3oool00`000000
+oooo0?ooo`1L0?ooo`005@3oool00`000000oooo0?ooo`2Z0?ooo`030000003oool0oooo05/0oooo
+000E0?ooo`030000003oool0oooo0:X0oooo00<000000?ooo`3oool0F`3oool001D0oooo0P00002[
+0?ooo`030000003oool0oooo05/0oooo000E0?ooo`030000003oool0oooo0:X0oooo00<000000?oo
+o`3oool0F`3oool001D0oooo00<000000?ooo`3oool0ZP3oool00`000000oooo0?ooo`1K0?ooo`00
+5@3oool00`000000oooo0?ooo`2[0?ooo`030000003oool0oooo05X0oooo000E0?ooo`030000003o
+ool0oooo0:/0oooo00<000000?ooo`3oool0FP3oool001D0oooo00<000000?ooo`3oool0Z`3oool0
+0`000000oooo0?ooo`1J0?ooo`005@3oool00`000000oooo0?ooo`2[0?ooo`030000003oool0oooo
+05X0oooo000E0?ooo`030000003oool0oooo0:`0oooo00<000000?ooo`3oool0F@3oool001D0oooo
+0P00002]0?ooo`030000003oool0oooo05T0oooo000E0?ooo`030000003oool0oooo0:d0oooo00<0
+00000?ooo`3oool0F03oool001D0oooo00<000000?ooo`3oool0[@3oool00`000000oooo0?ooo`1H
+0?ooo`005@3oool00`000000oooo0?ooo`2^0?ooo`030000003oool0oooo05L0oooo000E0?ooo`03
+0000003oool0oooo0:h0oooo00<000000?ooo`3oool0E`3oool00080oooo0P0000040?ooo`030000
+003oool0oooo00<0oooo0P0000050?ooo`030000003oool0oooo0:h0oooo00<000000?ooo`3oool0
+E`3oool000050?ooo`000000oooo0?ooo`000000203oool010000000oooo0?ooo`0000040?ooo`03
+0000003oool0oooo0:l0oooo00<000000?ooo`3oool0EP3oool000050?ooo`000000oooo0?ooo`00
+0000203oool010000000oooo0?ooo`0000040?ooo`800000/03oool00`000000oooo0?ooo`1F0?oo
+o`0000D0oooo0000003oool0oooo000000090?ooo`8000001@3oool00`000000oooo0?ooo`2`0?oo
+o`030000003oool0oooo05D0oooo00001@3oool000000?ooo`3oool0000000P0oooo00@000000?oo
+o`3oool00000103oool00`000000oooo0?ooo`2`0?ooo`030000003oool0oooo05D0oooo00001@3o
+ool000000?ooo`3oool0000000P0oooo00@000000?ooo`3oool00000103oool00`000000oooo0?oo
+o`2a0?ooo`030000003oool0oooo05@0oooo00020?ooo`8000002P3oool2000000D0oooo00<00000
+0?ooo`3oool0/@3oool00`000000oooo0?ooo`1D0?ooo`005@3oool00`000000oooo0?ooo`2b0?oo
+o`030000003oool0oooo05<0oooo000E0?ooo`030000003oool0oooo0;80oooo00<000000?ooo`3o
+ool0D`3oool001D0oooo00<000000?ooo`3oool0/`3oool00`000000oooo0?ooo`1B0?ooo`005@3o
+ool200000;@0oooo00<000000?ooo`3oool0DP3oool001D0oooo00<000000?ooo`3oool0]03oool0
+0`000000oooo0?ooo`1A0?ooo`005@3oool00`000000oooo0?ooo`2d0?ooo`030000003oool0oooo
+0540oooo000E0?ooo`030000003oool0oooo0;@0oooo00<000000?ooo`3oool0D@3oool001D0oooo
+00<000000?ooo`3oool0]@3oool00`000000oooo0?ooo`1@0?ooo`005@3oool00`000000oooo0?oo
+o`2e0?ooo`030000003oool0oooo0500oooo000E0?ooo`030000003oool0oooo0;D0oooo00<00000
+0?ooo`3oool0D03oool001D0oooo00<000000?ooo`3oool0]@3oool00`000000oooo0?ooo`1@0?oo
+o`005@3oool200000;L0oooo00<000000?ooo`3oool0C`3oool001D0oooo00<000000?ooo`3oool0
+]P3oool00`000000oooo0?ooo`1?0?ooo`005@3oool00`000000oooo0?ooo`2f0?ooo`030000003o
+ool0oooo04l0oooo000E0?ooo`030000003oool0oooo0;L0oooo00<000000?ooo`3oool0CP3oool0
+01D0oooo00<000000?ooo`3oool0]`3oool00`000000oooo0?ooo`1>0?ooo`005@3oool00`000000
+oooo0?ooo`2h0?ooo`030000003oool0oooo04d0oooo000E0?ooo`030000003oool0oooo0;P0oooo
+00<000000?ooo`3oool0C@3oool001D0oooo00<000000?ooo`3oool0^03oool00`000000oooo0?oo
+o`1=0?ooo`005@3oool200000;X0oooo00<000000?ooo`3oool0C03oool001D0oooo00<000000?oo
+o`3oool0^@3oool00`000000oooo0?ooo`1<0?ooo`005@3oool00`000000oooo0?ooo`2i0?ooo`03
+0000003oool0oooo04`0oooo000E0?ooo`030000003oool0oooo0;X0oooo00<000000?ooo`3oool0
+B`3oool001D0oooo00<000000?ooo`3oool0^P3oool00`000000oooo0?ooo`1;0?ooo`005@3oool0
+0`000000oooo0?ooo`2k0?ooo`030000003oool0oooo04X0oooo000=0?ooo`@00000103oool00`00
+0000oooo0?ooo`2k0?ooo`800000B`3oool000l0oooo00<000000?ooo`3oool00`3oool00`000000
+oooo0?ooo`2l0?ooo`<00000B@3oool000l0oooo00<000000?ooo`3oool00`3oool200000;l0oooo
+@@0000090?ooo`003`3oool00`000000oooo0?ooo`3o0?ooo`l0oooo000?0?ooo`030000003oool0
+oooo0?l0oooo3`3oool000d0oooo0`00003o0?oooa40oooo000?0?ooo`030000003oool0oooo0?l0
+oooo3`3oool00?l0oooo8@3oool00001\
+\>"],
+  ImageRangeCache->{{{0, 287}, {176.938, 0}} -> {-9.91223, -0.0817403, \
+0.467313, 0.00630106}}],
+
+Cell[BoxData[
+    TagBox[\(\[SkeletonIndicator]  Graphics  \[SkeletonIndicator]\),
+      False,
+      Editable->False]], "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(lifeexp = NIntegrate[y\ \(d'\)[y], {y, 0, 150}]\ \  // N\)], "Input"],
+
+Cell[BoxData[
+    \(75.31031150038653`\)], "Output"]
+}, Open  ]],
+
+Cell[BoxData[""], "Input"]
+},
+FrontEndVersion->"5.1 for X",
+ScreenRectangle->{{0, 1280}, {0, 1024}},
+WindowSize->{520, 682},
+WindowMargins->{{Automatic, 136}, {Automatic, 137}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+Cell[1754, 51, 151, 3, 44, "Input"],
+
+Cell[CellGroupData[{
+Cell[1930, 58, 101, 2, 27, "Input"],
+Cell[2034, 62, 19518, 551, 186, 5229, 370, "GraphicsData", "PostScript", \
+"Graphics"],
+Cell[21555, 615, 130, 3, 27, "Output"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+Cell[21722, 623, 89, 1, 27, "Input"],
+Cell[21814, 626, 52, 1, 27, "Output"]
+}, Open  ]],
+Cell[21881, 630, 26, 0, 27, "Input"]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

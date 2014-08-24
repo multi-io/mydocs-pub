@@ -1,0 +1,41 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/factorial.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/factorial.pl </h1>
+
+  <a href="factorial.pl">download original</a>
+
+  <pre>
+use bigint;
+
+sub fac($) {
+    my ($i,$res) = (shift,1);
+    for (1..$i) { $res *= $_; }
+    $res;
+}
+
+
+
+print fac(5), "\n";
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

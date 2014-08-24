@@ -1,0 +1,191 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./unfs/udp-possible-bug/ipstacks-config.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">unfs</a>/<a href=".">udp-possible-bug</a>/ipstacks-config.txt </h1>
+
+  <a href="ipstacks-config.txt">download original</a>
+
+  <pre>
+tack
+=========
+(this is a desktop machine with a simple IP configuration)
+
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.142.0   0.0.0.0         255.255.255.0   U     1      0        0 eth0
+0.0.0.0         192.168.142.1   0.0.0.0         UG    0      0        0 eth0
+
+olaf@tack:~$ /sbin/ifconfig 
+eth0      Link encap:Ethernet  HWaddr 00:22:15:fa:a1:8e  
+          inet addr:192.168.142.2  Bcast:192.168.142.255  Mask:255.255.255.0
+          inet6 addr: 2002:55b2:457a::2:2/128 Scope:Global
+          inet6 addr: fe80::222:15ff:fefa:a18e/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:950450 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:903163 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:662604312 (631.9 MiB)  TX bytes:317938058 (303.2 MiB)
+          Interrupt:17 
+
+As explained in readme.txt, the MTU of eth0 is modified to reproduce
+the problem.
+
+
+teck
+=========
+
+(Ubuntu Laptop, connected via WLAN, again with a very simple config)
+
+(this is the machine that did NOT show the problem when it, rather
+than tick (see below), was the receiver of the UDP packets)
+
+olaf@teck:~$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.142.0   0.0.0.0         255.255.255.0   U     2      0        0 wlan0
+169.254.0.0     0.0.0.0         255.255.0.0     U     1000   0        0 wlan0
+0.0.0.0         192.168.142.1   0.0.0.0         UG    0      0        0 wlan0
+
+olaf@teck:~$ ifconfig 
+wlan0     Link encap:Ethernet  HWaddr 4c:ed:de:0c:0c:c6  
+          inet addr:192.168.142.130  Bcast:192.168.142.255  Mask:255.255.255.0
+          inet6 addr: fe80::4eed:deff:fe0c:cc6/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:503894 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:328534 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:685286068 (685.2 MB)  TX bytes:33875055 (33.8 MB)
+
+
+tick
+=========
+
+Router machine. Basically has two local interfaces -- one wired (eth0)
+and one wireless (ath0) that are bridged in the linux kernel to create
+a bridge device (lanif) which all the IP communication targeted at the
+LAN (192.168.142.0/24) are routed over. There are some ppp interfaces
+for the internet connectivity and some VPNs, but those shouldn't be
+part of the problem here (they're still listed below for reference).
+
+
+The bridge device is set up like this:
+
+        ifconfig eth0 0.0.0.0
+        ifconfig ath0 0.0.0.0
+        brctl addbr lanif
+        brctl addif lanif eth0
+        brctl addif lanif ath0
+
+        ifconfig lanif up 192.168.142.1 netmask 255.255.255.0
+
+detailed configuration:
+
+olaf@tick:~$ /sbin/route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+213.191.89.2    0.0.0.0         255.255.255.255 UH    0      0        0 ppp0
+192.168.17.2    0.0.0.0         255.255.255.255 UH    0      0        0 ppp1
+192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 ppp1
+192.168.142.0   0.0.0.0         255.255.255.0   U     0      0        0 lanif
+0.0.0.0         0.0.0.0         0.0.0.0         U     0      0        0 ppp0
+
+olaf@tick:~$ /sbin/ifconfig 
+ath0      Link encap:Ethernet  HWaddr 00:1B:2F:2B:C7:A2  
+          inet6 addr: fe80::21b:2fff:fe2b:c7a2/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:2290  Metric:1
+          RX packets:2778378 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1971861 errors:0 dropped:94 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:702098634 (669.5 MiB)  TX bytes:2531315932 (2.3 GiB)
+
+eth0      Link encap:Ethernet  HWaddr 00:00:24:CC:CB:B8  
+          inet6 addr: fe80::200:24ff:fecc:cbb8/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:5168016 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:6224349 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:1203738487 (1.1 GiB)  TX bytes:1754442486 (1.6 GiB)
+          Interrupt:11 Base address:0x2000 
+
+eth1      Link encap:Ethernet  HWaddr 00:00:24:CC:CB:B9  
+          inet6 addr: fe80::200:24ff:fecc:cbb9/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:17169052 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:16617843 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2105326414 (1.9 GiB)  TX bytes:456442081 (435.2 MiB)
+          Interrupt:5 Base address:0x4100 
+
+lanif     Link encap:Ethernet  HWaddr 00:00:24:CC:CB:B8  
+          inet addr:192.168.142.1  Bcast:192.168.142.255  Mask:255.255.255.0
+          inet6 addr: fe80::200:24ff:fecc:cbb8/64 Scope:Link
+          inet6 addr: 2002:55b2:457a::2:1/128 Scope:Global
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:6278577 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:7913895 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:1209097703 (1.1 GiB)  TX bytes:4028697061 (3.7 GiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:42255 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:42255 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:8020490 (7.6 MiB)  TX bytes:8020490 (7.6 MiB)
+
+ppp0      Link encap:Point-to-Point Protocol  
+          inet addr:85.178.69.122  P-t-P:213.191.89.2  Mask:255.255.255.255
+          UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1492  Metric:1
+          RX packets:447684 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:293100 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:3 
+          RX bytes:572338765 (545.8 MiB)  TX bytes:19634404 (18.7 MiB)
+
+ppp1      Link encap:Point-to-Point Protocol  
+          inet addr:192.168.17.1  P-t-P:192.168.17.2  Mask:255.255.255.255
+          UP POINTOPOINT RUNNING NOARP MULTICAST  MTU:1500  Metric:1
+          RX packets:1342 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1357 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:3 
+          RX bytes:599773 (585.7 KiB)  TX bytes:90863 (88.7 KiB)
+
+tun6to4   Link encap:IPv6-in-IPv4  
+          inet6 addr: 2002:55b2:457a::1:2/128 Scope:Global
+          inet6 addr: ::85.178.69.122/128 Scope:Compat
+          UP RUNNING NOARP  MTU:1480  Metric:1
+          RX packets:1567 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1760 errors:9 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:1066556 (1.0 MiB)  TX bytes:692190 (675.9 KiB)
+
+wifi0     Link encap:UNSPEC  HWaddr 00-1B-2F-2B-C7-A2-00-00-00-00-00-00-00-00-00-00  
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1468032 errors:0 dropped:0 overruns:0 frame:41673
+          TX packets:2000809 errors:15207 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:280 
+          RX bytes:421407449 (401.8 MiB)  TX bytes:2622521267 (2.4 GiB)
+          Interrupt:10 
+
+  </pre>
+
+  <a href="."> back to udp-possible-bug </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

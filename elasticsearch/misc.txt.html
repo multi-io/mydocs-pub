@@ -1,0 +1,63 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./elasticsearch/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">elasticsearch</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+https://groups.google.com/forum/#!msg/elasticsearch/49q-_AgQCp8/MRol0t9asEcJ
+
+kimchy
+
+20. Jan
+
+Yes, overallocation of shards is to accommodate cluster growth in certain "data flows". For example, by default, when you create an index with elasticsearch, it has 5 shards by default, even if you use just one node. This allows the index to grow up to 5 nodes (assuming no replicas and no other indices, so you have 1 shard per node) in terms of size (read perf can be increased by increasing replicas (and nodes)).
+
+Going back to "data flow". This is the one of the most important concept to understand about your system when you use elasticsearch. Time based data (tweets, logs) can be indexed using rolling time base indices, and then, the number of shards per index are simply there so accomodate the expected size for that time frame the index is responsible for. Aliases can be used then to point to "latest" index to index to, or time base aliases can be created that point to several indices to create "bigger" time frames without needing to specify all the indices that compose that time frame.
+
+A "user" based data flow, in theory, is perfect for an index per user case. If you have enough nodes (each shard is a Lucene index, which has a cost) in the cluster to do that, thats great, and several very large scale ES users actually do that. But, if you have a small cluster (or constraint budget / HW wise), you could say, ok, I will do all on a single index, but then, that index will need quite a few shards to support potential growth. This can be problematic without doing anything else, because if you create an index with 30 shards on a single node cluster, each search request (for that user data) will need to span all 30 shards.
+
+This is where routing comes to play. You can have all the data for a user allocated to a specific shard using routing (with clever use of routing, you can actually have user data span several shards, for example, using time base routing included in the user routing value).
+
+This means that when you search for that user data, and provide the routing value, it will only go to a single shard. You can create an index with 100 shards, and you won't incur the overhead of searching across all shards for specific user data. Obviously, when you do that, you also need to filter each query to only have that specific user data. Remember also, that you can still search across several users data by simply using several routing values.
+
+For this usecase, aliases really shine. You can have a single index, lets call it users, with 50 shards. And define an alias for each user. Lets say the first user is user1, you define an alias called user1. That alias can have a routing value of "user1", which means when you index and search against that alais (as if it was an "index', i.e. /user1/_search), the routing value will be automatically applied. But, you still need to filter to only see that user data. For that, an alias can also be associated with a filter (i.e. a term filter on the user name with the user value). Then, every time you search against /user1/_search, the filter will be automatically applied.
+
+One nice aspect of it is that you can also search across several aliases. For example, /user1,user2/_search (as you can search over multiple indices), and it will "do the right thing". It will do a search with two routing values, and an "OR'ed" filter.
+
+
+
+
+http://www.sentric.ch/blog/why-we-chose-solr-4-0-instead-of-elasticsearch
+
+Luca Cavanna
+10. October 2012
+I was actually wondering the same as Jörg. What I’ve been missing the most in elasticsearch is spellchecking, but I’m sure it’ll come soon, together with grouping and a solution to the split brain issue. Regarding splitting shards, not providing it in elasticsearch was a conscious choice, since it would be very expensive and most likely lead to problems. You can work around it overallocating shards, otherwise you just need to reindex, which is more or less what you would implicitly do anyway.
+And, I think there would be more to say about them both. It’s pretty hard to make this kind of comparison, even more in a single article. I recently wrote one too about some of the things that I really like in elasticsearch, you might want to check it out: http://blog.orange11.nl/2012/09/25/whats-so-cool-about-elasticsearch/
+
+
+
+
+
+  </pre>
+
+  <a href="."> back to elasticsearch </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

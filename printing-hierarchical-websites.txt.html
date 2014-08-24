@@ -1,0 +1,49 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./printing-hierarchical-websites.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href=".">.</a>/printing-hierarchical-websites.txt </h1>
+
+  <a href="printing-hierarchical-websites.txt">download original</a>
+
+  <pre>
+(heuristic approach)
+
+example: http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/index.html
+
+
+1.
+
+wget http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/index.html
+
+
+
+2.
+
+cat index.html | perl -ne 'for (m!href="(.*?)[#"]!ig) { print $_, "\n" unless($found{$_}); $found{$_}=1; }' &gt;files.txt
+
+
+3.
+
+cat files.txt | xargs -i /bin/sh -c 'html2ps http://dev.eclipse.org/viewcvs/indextech.cgi/~checkout~/aspectj-home/doc/progguide/{} | lpr -Pbw717pap2'
+
+  </pre>
+
+  <a href="."> back to . </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

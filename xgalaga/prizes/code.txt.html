@@ -1,0 +1,154 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./xgalaga/prizes/code.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">xgalaga</a>/<a href=".">prizes</a>/code.txt </h1>
+
+  <a href="code.txt">download original</a>
+
+  <pre>
+//comments mine
+
+//prize.c:do_prizes()
+
+	      case PR_SING:
+                /** in single-shot mode, gain the ability to shoot one
+                more torpedo at the same time. in Multi-shot mode, revert to
+                single-shot mode*/
+		if(weapon == SINGLESHOT)
+		    maxtorps++;
+		else
+		    weapon = SINGLESHOT;
+		break;
+
+
+	      case PR_DOUB:
+                /** If in double-shot mode, gain the ability to shoot one
+                more torpedo at the same time. Else, switch to
+                double-shot mode and limit no. of torpedos at one time
+                to 4.*/
+
+		if(weapon == DOUBLESHOT)
+		    maxtorps++;
+		else {
+		    weapon = DOUBLESHOT;
+		    if(maxtorps &lt; 4)
+			maxtorps = 4;
+		}
+		break;
+
+
+	      case PR_TRIP:
+                /** If in triple-shot mode, gain the ability to shoot one
+                more torpedo at the same time. Else, switch to
+                triple-shot mode and limit no. of torpedos at one time
+                to 6.*/
+
+		if(weapon == TRIPLESHOT)
+		    maxtorps++;
+		else {
+		    weapon = TRIPLESHOT;
+		    if(maxtorps &lt; 6)
+			maxtorps=6;
+		}
+		break;
+
+
+	      case PR_SPEED:
+                /** increase moving speed */
+		if(movespeed &lt; MAXSPEED)
+		    movespeed++;
+		break;
+
+
+	      case PR_SHIELD:
+                /** activate shield */
+		plshield = SHIELDTIME;
+#ifdef SOUND
+		play_sound(SND_SHIELD);
+#endif
+		break;
+
+
+
+	      case PR_SMART:     //I_PR_BRAIN, pr_brain.xpm
+                /** kill all aliens */
+#ifdef SOUND
+		play_sound(SND_SMART);
+		oldPlaySounds = playSounds;
+		playSounds = 0;
+#endif
+		for(i=0;i&lt;MAXALIENS;i++) {
+		    if(aliens[i].alive &amp;&amp; !aliens[i].dying) {
+			aliens[i].dying = 1;
+			if(i &gt;= 10) {
+			    if(aliens[i].dir &lt; 0)
+				score += 50;
+			    else {
+				score += (6-(i/10))*100;
+				if(!(random()%(gotlemon ? 3 : PRIZECHANCE)))
+				    new_prize(aliens[i].x, aliens[i].y);
+			    }
+			    new_explosion(aliens[i].x, aliens[i].y, 0);
+			} else {
+			    if(aliens[i].dir &lt; 0)
+				score += 200;
+			    else {
+				ne=0; /* count how many escorts */
+				for(k = i+9;k &lt; i+12; k++) {
+				    if(aliens[k].escorting == i)
+					ne++;
+				}				    
+				score_flagship(aliens[i].x, aliens[i].y, ne);
+			    }
+			    new_explosion(aliens[i].x, aliens[i].y, 1);
+			}
+		    }
+		}
+#ifdef SOUND
+		playSounds = oldPlaySounds;
+#endif
+		break;
+
+
+
+	      case PR_LEMON:
+                /** "lemon". Kill all prices gained so far and
+                    revert to default (start-) configuration. Decrease
+                    probability of finding new prizes to 1/10th for as
+                    long as the current level runs.*/
+		gotlemon = 1;
+		maxtorps = MINTORPS;
+		weapon = 0;
+		movespeed = MINSPEED;
+		break;
+
+
+
+	      case PR_EXTRABULLET:
+                /** Increase no. of torpedos shootable at the same
+                time by one (limit 10).*/
+		if(maxtorps &lt; MAXTORPS)
+		    maxtorps++;
+		break;
+
+  </pre>
+
+  <a href="."> back to prizes </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

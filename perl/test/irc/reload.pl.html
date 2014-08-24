@@ -1,0 +1,64 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/irc/reload.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">perl</a>/<a href="../.">test</a>/<a href=".">irc</a>/reload.pl </h1>
+
+  <a href="reload.pl">download original</a>
+
+  <pre>
+# &lt;finite&gt; i mean i've got an object of class Blah::Storable. There is a
+#           reference to it in an array, in another object. There is an object
+#           method in Blah::Storable that needs to replace $self with an object
+#           read from disk. After doing that, the object (when accessed from the
+#           place that called the object method to load from disk, which is
+#           outside the module entirely) is what I want, replaced.
+# &lt;finite&gt; but in the array of object refs, I still see the old object.
+
+package Blah::Storable;
+
+sub new {
+    bless { foo=&gt;bar, baz=&gt;42}, shift;
+}
+
+
+sub replace {
+    my $self = shift;
+    my $loadedObject = { foo=&gt;hello, baz=&gt;83};
+    %{$self}=%{$loadedObject};
+}
+
+
+
+
+package main;
+
+my $obj = Blah::Storable-&gt;new;
+
+my @arr=(foo,$obj,bar);
+print $arr[1]-&gt;{baz}, "\n";  # prints 42
+
+$obj-&gt;replace;
+
+print $arr[1]-&gt;{baz}, "\n";  # prints 83
+
+  </pre>
+
+  <a href="."> back to irc </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

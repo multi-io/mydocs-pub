@@ -1,0 +1,36 @@
+  DB<48> $a=42
+
+  DB<49> x $a
+0  42
+  DB<50> x ${'a'}
+0  42
+  DB<51> $name='a'
+
+  DB<52> x ${$name}
+0  42
+  DB<53> x 'lalala' =~ /(.)/g
+
+
+Funktioniert aber nicht mit lexikalischen Variablen ("my"), nur mit
+Package-Variablen ("our", was noch?). Für "my"-Variablen "eval"
+benutzen, d.h.
+
+  DB<69> x eval("\$$name")
+0  42
+  DB<70> 
+
+
+-------------------
+
+Einige globale Variablen werden offenbar speziell behandelt: Ihr Name
+bezeichnet immer die entspr. Variable im Package main, es sei denn,
+man gibt explizit was anderes an.
+
+  DB<74> package pkg; print *ARGV;
+*main::ARGV
+  DB<73> package pkg; print *FOOBAR;
+*pkg::FOOBAR
+  DB<75> print *pkg::ARGV;
+*pkg::ARGV
+
+Siehe perlvar, da ist es dokumentiert.

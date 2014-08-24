@@ -1,0 +1,60 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/map-mixin-rcr/map_sample.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">map-mixin-rcr</a>/map_sample.rb </h1>
+
+  <a href="map_sample.rb">download original</a>
+
+  <pre>
+require "map"
+
+class MyMap
+  def get_mapped_value(key)
+    case key
+      when "age"; 52
+      when "iq"; 196
+      when "answer"; 42
+    else raise IndexError, "no such key: #{key}"
+    end
+  end
+
+  def each
+    yield("age", 52)
+    yield("iq", 196)
+    yield("answer",42)
+  end
+
+  include Map
+end
+
+m=MyMap.new
+m["iq"]      # =&gt; 196
+m.index(196) # =&gt; "iq"
+m.keys       # =&gt; ["age", "iq", "answer"]
+m.values     # =&gt; [52, 196, 42]
+m.to_a       # =&gt; [["age", 52], ["iq", 196], ["answer", 42]]
+m.reject{|k,v| v&gt;100} # =&gt; {"answer"=&gt;42, "age"=&gt;52}
+
+# etc.
+
+  </pre>
+
+  <a href="."> back to map-mixin-rcr </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

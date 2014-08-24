@@ -1,0 +1,225 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/gimmicks.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">perl</a>/gimmicks.txt </h1>
+
+  <a href="gimmicks.txt">download original</a>
+
+  <pre>
+do { } kann benutzt werden, um das Ergebnis eines Blocks als Ausdruck zu benutzen (wie `eval'?)
+
+Quasi wie eine parameterloser Closure, die sofort automatisch ausgeführt wird.
+
+$i=10; print join("\n", do { @res=(1); for (1..$i) { push @res, $res[$_-1] * $_; }; @res })
+
+Ausgabe:
+
+1
+1
+2
+6
+24
+120
+720
+5040
+40320
+362880
+3628800
+
+Hinw.: "return" in einem "do" normalerweise nicht verwenden, da (Doku):
+
+       return EXPR
+
+       return  Returns from a subroutine, 'eval', or 'do FILE'
+               with the value given in EXPR.
+
+-----
+
+Normale Closures kriegt man mit anonymen subs:
+
+  DB&lt;349&gt; x $fn2= sub($) { 5*shift; }
+0  CODE(0x867a6e4)
+   -&gt; &amp;main::__ANON__[(eval 379)[/usr/local/lib/perl5/5.6.0/perl5db.pl:1510]:2] in (eval 379)[/usr/local/lib/perl5/5.6.0/perl5db.pl:1510]:2-2
+  DB&lt;350&gt; x $fn2-&gt;(8)
+0  40
+  DB&lt;351&gt; x $fn2-&gt;(8,9)
+0  40
+  (=&gt; "($)" wurde nicht beachtet??
+  DB&lt;352&gt; 
+
+
+aber irgendwie doch nicht:
+
+  DB&lt;352&gt; x map $fn2  (4,5,6,7)
+  empty array
+  DB&lt;353&gt; x map sub($) { 5*shift; } (4,5,6,7)
+syntax error at (eval 383)[/usr/local/lib/perl5/5.6.0/perl5db.pl:1510] line 2, near "} ("
+  DB&lt;354&gt; 
+
+  DB&lt;354&gt; x map { 3*$_ } (4,5,6,7)
+0  12
+1  15
+2  18
+3  21
+  DB&lt;355&gt; x map { $fn2-&gt;($_) } (4,5,6,7)
+0  20
+1  25
+2  30
+3  35
+  DB&lt;356&gt; 
+
+(OK, map hat wohl spezielle Syntax (siehe Doku))
+
+-----
+
+"my" erzeugt Variablen mit lexikalischer Bindung, ohne "my" kriegt man
+dynamische Bindung (vollqual. Name: &lt;akt. Modulname&gt;::&lt;Variablenname&gt;)
+
+-----
+
+
+"Typeglobbing" -- Keys (Namen) in der Symboltabelle direkt umsetzen
+
+z.B.
+
+  DB&lt;8&gt; $a=42
+
+  DB&lt;9&gt; x $a
+0  42
+  DB&lt;10&gt; *b=*a
+
+  DB&lt;11&gt; x $b
+0  42
+  DB&lt;12&gt; $a++
+
+  DB&lt;13&gt; x $b
+0  43
+  DB&lt;14&gt; 
+
+Funktioniert nicht nur mit Skalaren, sondern mit allen Arten von
+Objekten (auch subs, Packages usw.)
+
+
+-----
+
+Modul "Memoize" -- Funktionsergebnisse cachen. Cache ist eine
+Hashtabelle, kann ggf. auf ein ext. File ge-tie()-d (s.u.) werden
+
+Siehe Manpage.
+
+-----
+
+tie() -- eingeb. Funktion, um für bel. Variablen das "Backend"
+(Implementation) selbst programmieren zu können
+
+Bsp. aus man perlfunc:
+
+                   use NDBM_File;
+                   tie(%HIST, 'NDBM_File', '/usr/lib/news/history', 1, 0);
+                   while (($key,$val) = each %HIST) {
+                       print $key, ' = ', unpack('L',$val), "\n";
+                   }
+                   untie(%HIST);
+
+Modul 'NDBM_File' implementiert %HIST (setzt dazu standardisiertes
+Protokoll mit best. Callback-Funktionen um, siehe man perlfunc, man
+perltie)
+
+
+-----
+
+local $/ = undef
+
+$/ im akt. Stackframe und alle aufgerufenen Frames (dynamisches
+Scoping) umdefinieren. Alte Belegung wird automatisch restauriert,
+wenn dieses Frame zerstoert wird (durch Raussprung)
+
+-----
+
+Verschachtelte capture buffers in Reg. Audrücken:
+
+Bsp.:
+  DB&lt;20&gt; x "tv_20011001.xml.gz;107024" =~ /^(tv_(\d{8})\.xml\.gz);(\d+)$/
+0  'tv_20011001.xml.gz'
+1  20011001
+2  107024
+  DB&lt;21&gt; 
+
+-----
+
+# Prototype declarations
+sub chunk( $$ );
+
+-----
+
+(shallow-) Kopie einer Liste erzeugen, Referenz darauf zurückgeben
+
+[ @list ]
+
+
+-----
+
+Slices
+
+ @days               # ($days[0], $days[1],... $days[n])
+ @days[3,4,5]        # same as ($days[3],$days[4],$days[5])
+ @days{'a','c'}      # same as ($days{'a'},$days{'c'})
+
+Indizierung von hinten
+
+ $arr[-1] -- letztes Element
+ $arr[-2] -- vorletztes Element
+ usw.
+
+-----
+
+Regexps: "Multiple matches"(?)
+
+  DB&lt;228&gt; $_='23:66ff27djd93j44je7edj43893m3m3ddkd83m3'
+
+  DB&lt;229&gt; x /(\d+)/g
+0  23
+1  66
+2  27
+3  93
+4  44
+5  7
+6  43893
+7  3
+8  3
+9  83
+10  3
+  DB&lt;230&gt; 
+
+
+
+------
+
+Modul module.pm unconditinally neuladen im interaktiven Modus (und
+auch sonst):
+
+do "module.pm"; print "$@";
+
+(das print gibt die eventuelle Fehlermeldung aus)
+
+  </pre>
+
+  <a href="."> back to perl </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

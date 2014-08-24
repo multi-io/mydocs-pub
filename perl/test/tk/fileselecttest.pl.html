@@ -1,0 +1,127 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/tk/fileselecttest.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">perl</a>/<a href="../.">test</a>/<a href=".">tk</a>/fileselecttest.pl </h1>
+
+  <a href="fileselecttest.pl">download original</a>
+
+  <pre>
+use Data::Dumper;
+use Cwd;
+use Tk;
+if ($Tk::version == 4.0) {
+  require "MultiFileSelect.pm";
+} else {
+  use Tk::FileSelect;
+}
+#use TkUtils;
+use File::Basename;
+use File::Copy;
+use strict;
+
+
+my $VERSION = "1.009 (early-access2)";	# Version number 
+my ($DEBUG) = 0;		# Debug mode on/off
+my ($DEBUGFILE);		# Location of debug file
+my ($RCFILE);			# Location of resource file
+my ($RCDIR);			# Location of resource dir
+my ($PREFS);			# Preferences file
+my ($CANCEL);			# global cancel flag
+
+
+$RCDIR="/home/olaf/tmp/tmp";
+
+my $gWm = MainWindow-&gt;new(-title =&gt; "fselect test");
+
+sub btnCallback {
+    my ($file, @files);
+
+    unless (defined($PREFS-&gt;{"lastdir"}))
+    {
+        chomp($PREFS-&gt;{"lastdir"} = Cwd::cwd() || Cwd::fastcwd() || `pwd`);
+    }
+
+
+
+    my @params = (
+                  -directory =&gt; $PREFS-&gt;{"lastdir"},
+                  -selectmode =&gt; 'multiple',
+                  '-accept' =&gt; 
+                  sub{
+                      $file = shift;
+                      return ($file =~
+                              /\.(pdb|prc|pqa)$/i &amp;&amp;
+                              -f $file);
+                  });
+
+    my $gFileSelector;
+    if ($Tk::version == 4.0) {
+        $gFileSelector = $gWm-&gt;MultiFileSelect(@params);
+    } else {
+        $gFileSelector = $gWm-&gt;FileSelect(@params);
+    }
+
+    if (scalar(@files = $gFileSelector-&gt;Show) &amp;&amp; defined($files[0])) {
+        my ($tmp);
+
+        # Jump through some hoops to compress the directory
+        # path down from "/a/b/D/../../c" to "/a/c"
+        #
+        $PREFS-&gt;{"lastdir"} = $gFileSelector-&gt;cget(-directory);
+        chomp($tmp = Cwd::cwd() || Cwd::fastcwd() || `pwd`);
+        Cwd::chdir($PREFS-&gt;{"lastdir"});
+        chomp($PREFS-&gt;{"lastdir"} = Cwd::cwd() || Cwd::fastcwd() || `pwd`);
+        chdir($tmp);
+
+        for ($tmp=$[; $tmp &lt; @files; $tmp++) {
+            $file = $files[$tmp];
+
+            if ($file =~ m|/\*$|) {
+                # copy all prc/pdb/pqa files from a dir:
+                opendir FOO, dirname($file);
+                push(@files, map($_ = dirname($file) . "/$_",
+                                 grep(/\.(prc|pdb|pqa)$/i, readdir FOO)));
+                closedir FOO;
+                next;
+            }
+
+#             # copying to a dir not supported by File::Copy in perl 5.003,
+#             # so append basename of file:
+#             unless (copy($file, "$RCDIR/" . basename($file)))
+#             {
+#                 print("Error copying $file to $RCDIR ($!)");
+#             }
+        }
+    }
+
+
+    print "you selected: " . join("\n",@files) . "\n";
+}
+
+
+$gWm-&gt;Button(-text    =&gt; "start me up",
+             -command =&gt; \&amp;btnCallback)-&gt;pack(qw/-side top -anchor w/);
+
+MainLoop;
+
+  </pre>
+
+  <a href="."> back to tk </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

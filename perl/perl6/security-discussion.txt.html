@@ -1,0 +1,1757 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/perl6/security-discussion.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">perl6</a>/security-discussion.txt </h1>
+
+  <a href="security-discussion.txt">download original</a>
+
+  <pre>
+From nobody Sat Apr 17 02:14:16 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22434
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 40474 invoked by uid 76); 23 Mar 2004 19:38:34 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 11:38:34 -0800
+Received: (qmail 6366 invoked by uid 225); 23 Mar 2004 19:38:31 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 6359 invoked by alias); 23 Mar 2004 19:38:31 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 11:38:10 -0800
+Received: (qmail 24557 invoked from network); 23 Mar 2004 19:52:34 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?172.24.18.98?) (dan@65.75.18.11)
+  by 178.94.252.64.snet.net with SMTP; 23 Mar 2004 19:52:29 -0000
+Mime-Version: 1.0
+X-Sender: dan@localhost
+Message-ID: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+Date: Tue, 23 Mar 2004 14:38:00 -0500
+To: perl6-internals@perl.org
+Subject: Safety and security
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+Okay, we'll try this again... (darned cranky mail clients)
+
+We've two big issues to deal with here--safety and security. While 
+related they aren't the same and there are different things that need 
+doing. As far as I can see it, we need four things:
+
+1) An oploop that checks branch destinations for validity
+
+2) Opcodes that check their parameters for basic sanity--valid 
+register numbers (0-31) and basically correct (ie non-NULL) register 
+contents
+
+3) An oploop that checks basic quotas, mainly run time
+
+4) Opcodes that check to see if you can actually do the thing you've requested
+
+#s 1&amp;2 are safety issues. #2, specifically, can be dealt with by the 
+opcode preprocessor, generating op bodies that do validity checking. 
+#1 needs a bounds-checking runloop, which we mostly have already. I'm 
+comfortable getting this done now, and this is what the framework 
+that's going in should be able to handle OK.
+
+#s 3&amp;4 deal with security. This... this is a dodgier issue. 
+Security's easy to get wrong and hard to get right. (Though quotas 
+are straightforward enough. Mostly) And once the framework's in 
+place, there's the issue of performance--how do we get good 
+performance in the common (insecure) case without sacrificing 
+security in the secure case?
+
+At any rate, perl 5's Safe module is a good example of the Wrong Way 
+to do security, and as such we're going to take it as a cautionary 
+tale rather than a template. For security I want to go with an 
+explicit privilege model with privilege checking in parrot's 
+internals, rather than counting on op functions to Do The Right 
+Thing. That means that IO restrictions are imposed by the IO code, 
+not the IO ops, and suchlike stuff. Generally speaking, we're going 
+to emulate the VMS quota and privilege system, as it's reasonably 
+good as these things go.
+
+If we're going to tackle this, though, we need to pull in some folks 
+who're actually competent at it before we do more than handwave about 
+the design.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:17:29 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22434
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 40474 invoked by uid 76); 23 Mar 2004 19:38:34 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 11:38:34 -0800
+Received: (qmail 6366 invoked by uid 225); 23 Mar 2004 19:38:31 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 6359 invoked by alias); 23 Mar 2004 19:38:31 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 11:38:10 -0800
+Received: (qmail 24557 invoked from network); 23 Mar 2004 19:52:34 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?172.24.18.98?) (dan@65.75.18.11)
+  by 178.94.252.64.snet.net with SMTP; 23 Mar 2004 19:52:29 -0000
+Mime-Version: 1.0
+X-Sender: dan@localhost
+Message-ID: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+Date: Tue, 23 Mar 2004 14:38:00 -0500
+To: perl6-internals@perl.org
+Subject: Safety and security
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+Okay, we'll try this again... (darned cranky mail clients)
+
+We've two big issues to deal with here--safety and security. While 
+related they aren't the same and there are different things that need 
+doing. As far as I can see it, we need four things:
+
+1) An oploop that checks branch destinations for validity
+
+2) Opcodes that check their parameters for basic sanity--valid 
+register numbers (0-31) and basically correct (ie non-NULL) register 
+contents
+
+3) An oploop that checks basic quotas, mainly run time
+
+4) Opcodes that check to see if you can actually do the thing you've requested
+
+#s 1&amp;2 are safety issues. #2, specifically, can be dealt with by the 
+opcode preprocessor, generating op bodies that do validity checking. 
+#1 needs a bounds-checking runloop, which we mostly have already. I'm 
+comfortable getting this done now, and this is what the framework 
+that's going in should be able to handle OK.
+
+#s 3&amp;4 deal with security. This... this is a dodgier issue. 
+Security's easy to get wrong and hard to get right. (Though quotas 
+are straightforward enough. Mostly) And once the framework's in 
+place, there's the issue of performance--how do we get good 
+performance in the common (insecure) case without sacrificing 
+security in the secure case?
+
+At any rate, perl 5's Safe module is a good example of the Wrong Way 
+to do security, and as such we're going to take it as a cautionary 
+tale rather than a template. For security I want to go with an 
+explicit privilege model with privilege checking in parrot's 
+internals, rather than counting on op functions to Do The Right 
+Thing. That means that IO restrictions are imposed by the IO code, 
+not the IO ops, and suchlike stuff. Generally speaking, we're going 
+to emulate the VMS quota and privilege system, as it's reasonably 
+good as these things go.
+
+If we're going to tackle this, though, we need to pull in some folks 
+who're actually competent at it before we do more than handwave about 
+the design.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:17:36 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22435
+Return-Path: &lt;jhi@iki.fi&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 80539 invoked by uid 76); 23 Mar 2004 20:58:59 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 12:58:59 -0800
+Received: (qmail 29903 invoked by uid 225); 23 Mar 2004 20:58:56 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 29899 invoked by alias); 23 Mar 2004 20:58:56 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 12:58:40 -0800
+Received: (qmail 80402 invoked by uid 1012); 23 Mar 2004 20:58:39 -0000
+To: perl6-internals@perl.org, Dan Sugalski &lt;dan@sidhe.org&gt;
+Message-ID: &lt;4060A4FD.2040609@iki.fi&gt;
+Date: Tue, 23 Mar 2004 22:58:37 +0200
+User-Agent: Mozilla Thunderbird 0.5 (Macintosh/20040208)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+CC: perl6-internals@perl.org
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+In-Reply-To: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Posted-By: 62.78.174.208
+Approved: news@nntp.perl.org
+From: jhi@iki.fi (Jarkko Hietaniemi)
+
+&gt; &gt; At any rate, perl 5's Safe module is a good example of the Wrong Way 
+&gt; to do security, and as such we're going to take it as a cautionary 
+&gt; tale rather than a template. For security I want to go with an 
+&gt; explicit privilege model with privilege checking in parrot's 
+&gt; internals, rather than counting on op functions to Do The Right 
+&gt; Thing. That means that IO restrictions are imposed by the IO code, 
+&gt; not the IO ops, and suchlike stuff. Generally speaking, we're going 
+&gt; to emulate the VMS quota and privilege system, as it's reasonably 
+&gt; good as these things go.
+
+For people who are wondering what has Dan got in his pipe today:
+http://www.sans.org/rr/papers/22/604.pdf
+And here a bit about quotas:
+http://h71000.www7.hp.com/DOC/72final/5841/5841pro_028.html#58_quotasprivilegesandprotecti
+(I swear I didn't make up the URL, HP did)
+
+&gt; If we're going to tackle this, though, we need to pull in some folks 
+&gt; who're actually competent at it before we do more than handwave about 
+&gt; the design.
+
+From nobody Sat Apr 17 02:17:38 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22444
+Return-Path: &lt;joe+perl@sunstarsys.com&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Delivered-To: moderator for perl6-internals@perl.org
+Received: (qmail 31727 invoked by uid 76); 23 Mar 2004 22:49:11 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 14:49:11 -0800
+Received: (qmail 26585 invoked by uid 225); 23 Mar 2004 22:49:06 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 26581 invoked by alias); 23 Mar 2004 22:49:06 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 14:48:50 -0800
+Received: (qmail 31495 invoked by uid 1012); 23 Mar 2004 22:48:48 -0000
+To: perl6-internals@perl.org
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+Mail-Copies-To: never
+Date: 23 Mar 2004 17:48:45 -0500
+Message-ID: &lt;87fzbzji2a.fsf@gemini.sunstarsys.com&gt;
+Lines: 24
+User-Agent: Gnus/5.09 (Gnus v5.9.0) Emacs/21.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Posted-By: 67.34.76.41
+Approved: news@nntp.perl.org
+From: joe+perl@sunstarsys.com (Joe Schaefer)
+
+dan@sidhe.org (Dan Sugalski) writes:
+
+[...]
+
+&gt; #s 3&amp;4 deal with security. This... this is a dodgier issue. Security's
+&gt; easy to get wrong and hard to get right. (Though quotas are
+&gt; straightforward enough. Mostly) And once the framework's in place,
+&gt; there's the issue of performance--how do we get good performance in
+&gt; the common (insecure) case without sacrificing security in the secure case?
+
+You might wish to consider a modular design here, similar to linux 2.6's 
+security modules (LSM)
+
+  http://www.nsa.gov/selinux/papers/module/x47.html
+
+IMO, the advantage would be that parrot apps will have a better idea 
+of what security model is appropriate. So if the modular security hooks
+can be made cheap enough, the more vexing security/performance tradeoffs 
+can be left up to the parrot apps.
+
+No clue how to achieve this though- just a thought from a member of the
+peanut gallery.
+-- 
+Joe Schaefer
+
+From nobody Sat Apr 17 02:17:41 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22438
+Return-Path: &lt;ozone@algorithm.com.au&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 20229 invoked by uid 76); 24 Mar 2004 01:40:38 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Tue, 23 Mar 2004 17:40:38 -0800
+Received: (qmail 11464 invoked by uid 225); 24 Mar 2004 01:40:35 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 11459 invoked by alias); 24 Mar 2004 01:40:35 -0000
+X-Spam-Status: No, hits=0.3 required=7.0
+	tests=NO_REAL_NAME
+X-Spam-Check-By: la.mx.develooper.com
+Received: from murray.nsw.cmis.CSIRO.AU (HELO murray.nsw.cmis.CSIRO.AU) (130.155.16.3)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Tue, 23 Mar 2004 17:40:19 -0800
+Received: from coxs-nh.nsw.cmis.csiro.au (coxs-nh.nsw.cmis.CSIRO.AU [130.155.25.7])
+	by murray.nsw.cmis.CSIRO.AU (Postfix) with ESMTP
+	id CE6CC24; Wed, 24 Mar 2004 12:40:15 +1100 (EST)
+Received: by coxs-nh.nsw.cmis.CSIRO.AU with Internet Mail Service (5.5.2657.72)
+	id &lt;FDGM4N9C&gt;; Wed, 24 Mar 2004 12:40:15 +1100
+Received: from [IPv6:::1] (pride.nsw.cmis.CSIRO.AU [130.155.16.4]) by coxs-nh.nsw.cmis.csiro.au with SMTP (Microsoft Exchange Internet Mail Service Version 5.5.2657.72)
+	id FDGM4N9B; Wed, 24 Mar 2004 12:40:12 +1100
+To: dan@sidhe.org
+Cc: perl6-internals@perl.org
+In-Reply-To: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+Mime-Version: 1.0 (Apple Message framework v613)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-ID: &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt;
+Content-Transfer-Encoding: 7bit
+Subject: Re: Safety and security
+Date: Wed, 24 Mar 2004 12:36:47 +1100
+X-Mailer: Apple Mail (2.613)
+Approved: news@nntp.perl.org
+From: ozone@algorithm.com.au
+
+On 24/03/2004, at 6:38 AM, Dan Sugalski wrote:
+
+&gt; At any rate, perl 5's Safe module is a good example of the Wrong Way 
+&gt; to do security, and as such we're going to take it as a cautionary 
+&gt; tale rather than a template. For security I want to go with an 
+&gt; explicit privilege model with privilege checking in parrot's 
+&gt; internals, rather than counting on op functions to Do The Right Thing. 
+&gt; That means that IO restrictions are imposed by the IO code, not the IO 
+&gt; ops, and suchlike stuff. Generally speaking, we're going to emulate 
+&gt; the VMS quota and privilege system, as it's reasonably good as these 
+&gt; things go.
+&gt;
+&gt; If we're going to tackle this, though, we need to pull in some folks 
+&gt; who're actually competent at it before we do more than handwave about 
+&gt; the design.
+
+This is a question without a simple answer, but does Parrot provide an 
+infrastructure so that it would be possible to have proof-carrying[1] 
+Parrot bytecode?  I'm of course not advocating that we should look into 
+proof-carrying code immediately, but I think it's important to realise 
+that PCC exists, and that Parrot should be forward-compatible with it, 
+if people want to put PCC concepts into Parrot at a later stage.
+
+1. http://www.cs.princeton.edu/sip/projects/pcc/ -- Google around for 
+plenty of other links!
+
+
+-- 
+% Andre Pang : trust.in.love.to.save
+
+From nobody Sat Apr 17 02:17:43 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22447
+Return-Path: &lt;lt@toetsch.at&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 52005 invoked by uid 76); 24 Mar 2004 13:52:32 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 05:52:32 -0800
+Received: (qmail 30449 invoked by uid 225); 24 Mar 2004 13:52:30 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 30436 invoked by alias); 24 Mar 2004 13:52:29 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from mail.nextra.at (HELO mail.nextra.at) (195.170.70.86)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Wed, 24 Mar 2004 05:52:14 -0800
+Received: from lux.leo.home (at24a01-dial-145.nextranet.at [195.170.73.145])
+	by mail.nextra.at (20030919/20030919/nextra) with ESMTP id i2ODq4Xl001047;
+	Wed, 24 Mar 2004 14:52:08 +0100 (MET)
+Received: from thu8.leo.home (thu8.leo.home [192.168.1.5])
+	by lux.leo.home (Postfix on linux 2.0.36 (i386)) with ESMTP
+	id D99B8118023; Wed, 24 Mar 2004 14:51:15 +0100 (MET)
+Received: (from lt@localhost)
+	by thu8.leo.home (8.10.2/8.10.2/SuSE Linux 8.10.0-0.3) id i2ODoVB04395;
+	Wed, 24 Mar 2004 14:50:31 +0100
+Message-ID: &lt;200403241350.i2ODoVB04395@thu8.leo.home&gt;
+To: dan@sidhe.org (Dan Sugalski)
+Subject: Re: Safety and security
+In-Reply-To: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+Reply-To: lt@toetsch.at
+Cc: perl6-internals@perl.org
+Date: Wed, 24 Mar 2004 14:50:31 +0100
+Approved: news@nntp.perl.org
+From: lt@toetsch.at (Leopold Toetsch)
+
+Dan Sugalski &lt;dan@sidhe.org&gt; wrote:
+
+&gt; At any rate, perl 5's Safe module is a good example of the Wrong Way
+&gt; to do security, and as such we're going to take it as a cautionary
+&gt; tale rather than a template.
+
+Ok. What about Ponie?
+
+leo
+
+From nobody Sat Apr 17 02:17:45 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22448
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 79130 invoked by uid 76); 24 Mar 2004 14:28:37 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 06:28:37 -0800
+Received: (qmail 17357 invoked by uid 225); 24 Mar 2004 14:28:32 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 17346 invoked by alias); 24 Mar 2004 14:28:31 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 06:28:10 -0800
+Received: (qmail 31925 invoked from network); 24 Mar 2004 14:42:35 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?10.0.1.2?) (dan@63.120.19.217)
+  by 178.94.252.64.snet.net with SMTP; 24 Mar 2004 14:42:24 -0000
+Mime-Version: 1.0
+X-Sender: dan@sprite
+Message-ID: &lt;a06010200bc8749e27496@[10.0.1.2]&gt;
+In-Reply-To: &lt;200403241350.i2ODoVB04395@thu8.leo.home&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;200403241350.i2ODoVB04395@thu8.leo.home&gt;
+Date: Wed, 24 Mar 2004 09:21:55 -0500
+To: lt@toetsch.at
+Subject: Re: Safety and security
+Cc: perl6-internals@perl.org
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 2:50 PM +0100 3/24/04, Leopold Toetsch wrote:
+&gt;Dan Sugalski &lt;dan@sidhe.org&gt; wrote:
+&gt;
+&gt;&gt;  At any rate, perl 5's Safe module is a good example of the Wrong Way
+&gt;&gt;  to do security, and as such we're going to take it as a cautionary
+&gt;&gt;  tale rather than a template.
+&gt;
+&gt;Ok. What about Ponie?
+
+What about it? Safe's one of those modules that's guaranteed to not 
+work under Ponie, as are a number of the B modules. That's OK.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:17:48 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22449
+Return-Path: &lt;rgarciasuarez@free.fr&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 95157 invoked by uid 76); 24 Mar 2004 14:51:05 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 06:51:05 -0800
+Received: (qmail 29061 invoked by uid 225); 24 Mar 2004 14:51:02 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 29052 invoked by alias); 24 Mar 2004 14:51:01 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 06:50:46 -0800
+Received: (qmail 94985 invoked by uid 1012); 24 Mar 2004 14:50:43 -0000
+Date: 24 Mar 2004 14:50:42 -0000
+To: perl6-internals@perl.org
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;200403241350.i2ODoVB04395@thu8.leo.home&gt; &lt;a06010200bc8749e27496@[10.0.1.2]&gt;
+Message-ID: &lt;slrnc6383l.i7m.rgarciasuarez@dat.local&gt;
+User-Agent: slrn/0.9.7.3 (Linux)
+X-Posted-By: 213.41.170.44
+Approved: news@nntp.perl.org
+From: rgarciasuarez@free.fr (Rafael Garcia-Suarez)
+
+Dan Sugalski wrote in perl.perl6.internals :
+&gt; At 2:50 PM +0100 3/24/04, Leopold Toetsch wrote:
+&gt;&gt;Dan Sugalski &lt;dan@sidhe.org&gt; wrote:
+&gt;&gt;
+&gt;&gt;&gt;  At any rate, perl 5's Safe module is a good example of the Wrong Way
+&gt;&gt;&gt;  to do security, and as such we're going to take it as a cautionary
+&gt;&gt;&gt;  tale rather than a template.
+&gt;&gt;
+&gt;&gt;Ok. What about Ponie?
+&gt; 
+&gt; What about it? Safe's one of those modules that's guaranteed to not 
+&gt; work under Ponie, as are a number of the B modules. That's OK.
+
+Why?
+
+OK, I understand that Ponie will compile Perl 5 source to parrot ops,
+and that Safe's interface uses perl ops. However it's a pure
+compile-time module -- it hooks into the optree construction routines --
+so it may be possible to have an equivalent of it under Ponie.
+
+(not saying that this would be necessarily a good idea, though)
+
+-- 
+rgs
+
+From nobody Sat Apr 17 02:17:51 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22451
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 54833 invoked by uid 76); 24 Mar 2004 16:36:40 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 08:36:40 -0800
+Received: (qmail 18404 invoked by uid 225); 24 Mar 2004 16:36:37 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 18399 invoked by alias); 24 Mar 2004 16:36:37 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 08:36:16 -0800
+Received: (qmail 6878 invoked from network); 24 Mar 2004 16:50:46 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?10.0.1.2?) (dan@65.75.18.11)
+  by 178.94.252.64.snet.net with SMTP; 24 Mar 2004 16:50:36 -0000
+Mime-Version: 1.0
+X-Sender: dan@localhost
+Message-ID: &lt;a06010204bc8769137608@[10.0.1.2]&gt;
+In-Reply-To: &lt;slrnc6383l.i7m.rgarciasuarez@dat.local&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;200403241350.i2ODoVB04395@thu8.leo.home&gt;
+ &lt;a06010200bc8749e27496@[10.0.1.2]&gt;
+ &lt;slrnc6383l.i7m.rgarciasuarez@dat.local&gt;
+Date: Wed, 24 Mar 2004 11:35:49 -0500
+To: Rafael Garcia-Suarez &lt;rgarciasuarez@free.fr&gt;, perl6-internals@perl.org
+Subject: Re: Safety and security
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 2:50 PM +0000 3/24/04, Rafael Garcia-Suarez wrote:
+&gt;Dan Sugalski wrote in perl.perl6.internals :
+&gt;&gt;  At 2:50 PM +0100 3/24/04, Leopold Toetsch wrote:
+&gt;&gt;&gt;Dan Sugalski &lt;dan@sidhe.org&gt; wrote:
+&gt;&gt;&gt;
+&gt;&gt;&gt;&gt;   At any rate, perl 5's Safe module is a good example of the Wrong Way
+&gt;&gt;&gt;&gt;   to do security, and as such we're going to take it as a cautionary
+&gt;&gt;&gt;&gt;   tale rather than a template.
+&gt;&gt;&gt;
+&gt;&gt;&gt;Ok. What about Ponie?
+&gt;&gt;
+&gt;&gt;  What about it? Safe's one of those modules that's guaranteed to not
+&gt;&gt;  work under Ponie, as are a number of the B modules. That's OK.
+&gt;
+&gt;Why?
+&gt;
+&gt;OK, I understand that Ponie will compile Perl 5 source to parrot ops,
+&gt;and that Safe's interface uses perl ops. However it's a pure
+&gt;compile-time module -- it hooks into the optree construction routines --
+&gt;so it may be possible to have an equivalent of it under Ponie.
+
+It may be possible, but I'd not count on it. And given how busted it 
+is, I think I'd actually prefer it not work.
+
+Anything that twiddles deep in the internals of the interpreter is 
+going to fail, and there's not a whole lot we can do about that--our 
+internals look very different, and there's a lot that just can't be 
+emulated.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:17:54 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22454
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 73227 invoked by uid 76); 24 Mar 2004 17:07:35 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 09:07:34 -0800
+Received: (qmail 2455 invoked by uid 225); 24 Mar 2004 17:07:28 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 2437 invoked by alias); 24 Mar 2004 17:07:27 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 09:07:06 -0800
+Received: (qmail 24043 invoked from network); 24 Mar 2004 17:21:23 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?10.0.1.2?) (dan@65.75.18.11)
+  by 178.94.252.64.snet.net with SMTP; 24 Mar 2004 17:21:11 -0000
+Mime-Version: 1.0
+X-Sender: dan@localhost
+Message-ID: &lt;a06010205bc876a78c9a9@[10.0.1.2]&gt;
+In-Reply-To: &lt;87fzbzji2a.fsf@gemini.sunstarsys.com&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;87fzbzji2a.fsf@gemini.sunstarsys.com&gt;
+Date: Wed, 24 Mar 2004 12:05:25 -0500
+To:  perl6-internals@perl.org
+Subject: Re: Safety and security
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 5:48 PM -0500 3/23/04, Joe Schaefer wrote:
+&gt;dan@sidhe.org (Dan Sugalski) writes:
+&gt;
+&gt;[...]
+&gt;
+&gt;&gt;  #s 3&amp;4 deal with security. This... this is a dodgier issue. Security's
+&gt;&gt;  easy to get wrong and hard to get right. (Though quotas are
+&gt;&gt;  straightforward enough. Mostly) And once the framework's in place,
+&gt;&gt;  there's the issue of performance--how do we get good performance in
+&gt;&gt;  the common (insecure) case without sacrificing security in the secure case?
+&gt;
+&gt;You might wish to consider a modular design here, similar to linux 2.6's
+&gt;security modules (LSM)
+&gt;
+&gt;   http://www.nsa.gov/selinux/papers/module/x47.html
+&gt;
+&gt;IMO, the advantage would be that parrot apps will have a better idea
+&gt;of what security model is appropriate.
+
+Well... maybe.
+
+Parrot apps don't get a whole lot of say here--this is more on the 
+order of OS level security. Not that it makes a huge difference, of 
+course.
+
+I'm not familiar with the new linux system, and I'm not *going* to 
+get familiar enough with it to make any sensible decisions, so I 
+think I'd prefer to stick with a system I'm comfortable with and that 
+I know's got a solid background. (So at least any problems are a 
+matter of implementation rather than design -- those, at least, are 
+fixable)
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:17:57 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22486
+Return-Path: &lt;joe+perl@sunstarsys.com&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Delivered-To: moderator for perl6-internals@perl.org
+Received: (qmail 8107 invoked by uid 76); 24 Mar 2004 18:06:38 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 10:06:38 -0800
+Received: (qmail 31810 invoked by uid 225); 24 Mar 2004 18:06:36 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 31798 invoked by alias); 24 Mar 2004 18:06:35 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 10:06:20 -0800
+Received: (qmail 8036 invoked by uid 1012); 24 Mar 2004 18:06:18 -0000
+To: perl6-internals@perl.org
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;87fzbzji2a.fsf@gemini.sunstarsys.com&gt; &lt;a06010205bc876a78c9a9@[10.0.1.2]&gt;
+Mail-Copies-To: never
+Date: 24 Mar 2004 13:06:17 -0500
+Message-ID: &lt;87ad26jf1i.fsf@gemini.sunstarsys.com&gt;
+Lines: 21
+User-Agent: Gnus/5.09 (Gnus v5.9.0) Emacs/21.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Posted-By: 67.34.76.41
+Approved: news@nntp.perl.org
+From: joe+perl@sunstarsys.com (Joe Schaefer)
+
+dan@sidhe.org (Dan Sugalski) writes:
+
+&gt; At 5:48 PM -0500 3/23/04, Joe Schaefer wrote:
+
+[...]
+
+&gt; &gt;IMO, the advantage would be that parrot apps will have a better idea
+&gt; &gt;of what security model is appropriate.
+&gt; 
+&gt; Well... maybe.
+&gt; 
+&gt; Parrot apps don't get a whole lot of say here--this is more on the
+&gt; order of OS level security. Not that it makes a huge difference, of course.
+
+To be specific, I was thinking about embedded parrot apps like mod_perl, 
+where it might be nice to enforce a security policy on a per-vhost
+(virtual server) basis.  That isn't something all parrot apps would 
+benefit from, of course.
+
+-- 
+Joe Schaefer
+
+From nobody Sat Apr 17 02:18:00 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22455
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 73432 invoked by uid 76); 24 Mar 2004 17:07:39 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 09:07:39 -0800
+Received: (qmail 2516 invoked by uid 225); 24 Mar 2004 17:07:35 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 2508 invoked by alias); 24 Mar 2004 17:07:34 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 09:07:13 -0800
+Received: (qmail 24065 invoked from network); 24 Mar 2004 17:21:37 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?10.0.1.2?) (dan@65.75.18.11)
+  by 178.94.252.64.snet.net with SMTP; 24 Mar 2004 17:21:25 -0000
+Mime-Version: 1.0
+X-Sender: dan@localhost
+Message-ID: &lt;a06010206bc87705e2bae@[10.0.1.2]&gt;
+In-Reply-To: &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt;
+Date: Wed, 24 Mar 2004 12:06:21 -0500
+To: ozone@algorithm.com.au
+Subject: Re: Safety and security
+Cc: perl6-internals@perl.org
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 12:36 PM +1100 3/24/04, ozone@algorithm.com.au wrote:
+&gt;On 24/03/2004, at 6:38 AM, Dan Sugalski wrote:
+&gt;
+&gt;&gt;At any rate, perl 5's Safe module is a good example of the Wrong 
+&gt;&gt;Way to do security, and as such we're going to take it as a 
+&gt;&gt;cautionary tale rather than a template. For security I want to go 
+&gt;&gt;with an explicit privilege model with privilege checking in 
+&gt;&gt;parrot's internals, rather than counting on op functions to Do The 
+&gt;&gt;Right Thing. That means that IO restrictions are imposed by the IO 
+&gt;&gt;code, not the IO ops, and suchlike stuff. Generally speaking, we're 
+&gt;&gt;going to emulate the VMS quota and privilege system, as it's 
+&gt;&gt;reasonably good as these things go.
+&gt;&gt;
+&gt;&gt;If we're going to tackle this, though, we need to pull in some 
+&gt;&gt;folks who're actually competent at it before we do more than 
+&gt;&gt;handwave about the design.
+&gt;
+&gt;This is a question without a simple answer, but does Parrot provide 
+&gt;an infrastructure so that it would be possible to have 
+&gt;proof-carrying[1] Parrot bytecode?
+
+In the general sense, no. The presence of eval and the dynamic nature 
+of the languages we're looking at pretty much shoots down most of the 
+provable bytecode work. Unfortunately.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:18:03 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22472
+Return-Path: &lt;sfink@foxglove.dnsalias.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 9316 invoked by uid 76); 25 Mar 2004 03:40:23 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 19:40:23 -0800
+Received: (qmail 1724 invoked by uid 225); 25 Mar 2004 03:40:20 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 1716 invoked by alias); 25 Mar 2004 03:40:19 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from adsl-64-175-251-19.dsl.sntc01.pacbell.net (HELO dnsalias.org) (64.175.251.19)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Wed, 24 Mar 2004 19:40:04 -0800
+Received: (from sfink@localhost)
+	by dnsalias.org (8.11.6/8.11.6) id i2P3dir22425;
+	Wed, 24 Mar 2004 19:39:44 -0800
+Date: Wed, 24 Mar 2004 19:39:44 -0800
+To: Dan Sugalski &lt;dan@sidhe.org&gt;
+Cc: ozone@algorithm.com.au, perl6-internals@perl.org
+Subject: Re: Safety and security
+Message-ID: &lt;20040325033944.GA22390@foxglove&gt;
+Mail-Followup-To: Steve Fink &lt;steve@fink.com&gt;, Dan Sugalski &lt;dan@sidhe.org&gt;,
+	ozone@algorithm.com.au, perl6-internals@perl.org
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt;
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: &lt;a06010206bc87705e2bae@[10.0.1.2]&gt;
+User-Agent: Mutt/1.4i
+Approved: news@nntp.perl.org
+From: steve@fink.com (Steve Fink)
+
+On Mar-24, Dan Sugalski wrote:
+&gt; At 12:36 PM +1100 3/24/04, ozone@algorithm.com.au wrote:
+&gt; &gt;On 24/03/2004, at 6:38 AM, Dan Sugalski wrote:
+&gt; &gt;
+&gt; &gt;This is a question without a simple answer, but does Parrot provide 
+&gt; &gt;an infrastructure so that it would be possible to have 
+&gt; &gt;proof-carrying[1] Parrot bytecode?
+&gt; 
+&gt; In the general sense, no. The presence of eval and the dynamic nature 
+&gt; of the languages we're looking at pretty much shoots down most of the 
+&gt; provable bytecode work. Unfortunately.
+
+? I'm not sure if I understand why. (Though I should warn that I did
+not read the referenced paper; my concept of PCC comes from reading a
+single CMU paper on it a couple of years ago.) My understanding of PCC
+is that it freely allows any arbitrarily complex code to be run, as
+long as you provide a machine-interpretable (and valid) proof of its
+safety along with it. Clearly, eval'ing arbitrary strings cannot be
+proved to be safe, so no such proof can be provided (or if it is, it
+will discovered to be invalid.) But that just means that you have to
+avoid unprovable constructs in your PCC-boxed code.
+
+Eval'ing a specific string *might* be provably safe, which means that
+we should have a way for an external (untrusted) compiler to not only
+produce bytecode, but also proofs of the safety of that bytecode. We'd
+also need, of course, the trusted PCC-equipped bytecode loader to
+verify the proof before executing the bytecode. (And we'd need that
+anyway to load in and prove the initial bytecode anyway.)
+
+This would largely eliminate one of the main advantages of PCC, namely
+that the expensive construction of a proof need not be paid at
+runtime, only the relatively cheap proof verification. But if it is
+only used for small, easily proven eval's, then it could still make
+sense. The fun bit would be allowing the eval'ed code's proof to
+reference aspects of the main program's proof. But perhaps the PCC
+people have that worked out already?
+
+Let me pause a second to tighten the bungee cord attached to my
+desk -- all this handwaving, and I'm starting to lift off a little.
+
+The next step into crazy land could be allowing the proofs to express
+detailed properties of strings, such that they could prove that a
+particular string could not possibly compile down to unsafe bytecode.
+This would only be useful for very restricted languages, of course,
+and I'd rather floss my brain with diamond-encrusted piano wire than
+attempt to implement such a thing, but I think it still serves as a
+proof of concept that Parrot and PCC aren't totally at odds.
+
+Back to reality. I understand that many of Parrot's features would be
+difficult to prove, but I'm not sure it's fundamentally any more
+difficult than most OO languages. (I assume PCC allows you to punt on
+proofs to some degree by inserting explicit checks for unprovable
+properties, since then the guarded code can make use of those
+properties to prove its own safety.)
+
+From nobody Sat Apr 17 02:18:06 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22477
+Return-Path: &lt;ozone@algorithm.com.au&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 83986 invoked by uid 76); 25 Mar 2004 06:38:56 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 22:38:56 -0800
+Received: (qmail 30813 invoked by uid 225); 25 Mar 2004 06:38:54 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 30807 invoked by alias); 25 Mar 2004 06:38:53 -0000
+X-Spam-Status: No, hits=0.3 required=7.0
+	tests=NO_REAL_NAME
+X-Spam-Check-By: la.mx.develooper.com
+Received: from murray.nsw.cmis.CSIRO.AU (HELO murray.nsw.cmis.CSIRO.AU) (130.155.16.3)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Wed, 24 Mar 2004 22:38:37 -0800
+Received: from coxs-nh.nsw.cmis.csiro.au (coxs-nh.nsw.cmis.CSIRO.AU [130.155.25.7])
+	by murray.nsw.cmis.CSIRO.AU (Postfix) with ESMTP
+	id 055E47B; Thu, 25 Mar 2004 17:38:35 +1100 (EST)
+Received: by coxs-nh.nsw.cmis.CSIRO.AU with Internet Mail Service (5.5.2657.72)
+	id &lt;FDGM43BZ&gt;; Thu, 25 Mar 2004 17:38:34 +1100
+Received: from [IPv6:::1] (pride.nsw.cmis.CSIRO.AU [130.155.16.4]) by coxs-nh.nsw.cmis.csiro.au with SMTP (Microsoft Exchange Internet Mail Service Version 5.5.2657.72)
+	id FDGM43BY; Thu, 25 Mar 2004 17:38:28 +1100
+To: steve@fink.com
+Cc: dan@sidhe.org, perl6-internals@perl.org
+In-Reply-To: &lt;20040325033944.GA22390@foxglove&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt;
+Mime-Version: 1.0 (Apple Message framework v613)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-ID: &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt;
+Content-Transfer-Encoding: 7bit
+Subject: Re: Safety and security
+Date: Thu, 25 Mar 2004 17:34:22 +1100
+X-Mailer: Apple Mail (2.613)
+Approved: news@nntp.perl.org
+From: ozone@algorithm.com.au
+
+On 25/03/2004, at 2:39 PM, Steve Fink wrote:
+
+&gt; On Mar-24, Dan Sugalski wrote:
+&gt;&gt; At 12:36 PM +1100 3/24/04, ozone@algorithm.com.au wrote:
+&gt;&gt;&gt; On 24/03/2004, at 6:38 AM, Dan Sugalski wrote:
+&gt;&gt;&gt;
+&gt;&gt;&gt; This is a question without a simple answer, but does Parrot provide
+&gt;&gt;&gt; an infrastructure so that it would be possible to have
+&gt;&gt;&gt; proof-carrying[1] Parrot bytecode?
+&gt;&gt;
+&gt;&gt; In the general sense, no. The presence of eval and the dynamic nature
+&gt;&gt; of the languages we're looking at pretty much shoots down most of the
+&gt;&gt; provable bytecode work. Unfortunately.
+&gt;
+&gt; ? I'm not sure if I understand why. (Though I should warn that I did
+&gt; not read the referenced paper; my concept of PCC comes from reading a
+&gt; single CMU paper on it a couple of years ago.) My understanding of PCC
+&gt; is that it freely allows any arbitrarily complex code to be run, as
+&gt; long as you provide a machine-interpretable (and valid) proof of its
+&gt; safety along with it.
+
+&gt; Clearly, eval'ing arbitrary strings cannot be proved to be safe,
+
+It can be safe.  Normally, PCC works by certifying the code during 
+compilation, and attaching the machine-checkable certificate with the 
+resulting compiled code (be that bytecode, machine code or whatever).  
+During runtime, a certificate checker then validates the certificate 
+against the provided compiled code, to assure that what the certificate 
+says it's true.
+
+If you eval an arbitrary string, the compile/evaluate stages are more 
+closely linked: you effectively run the code (and thus check the 
+certificate) immediately after compilation.
+
+The main requirement is that Parrot permits some sort of 'hooks', so 
+that
+
+     1. during compilation, a certificate of proof can be generated and 
+attached with the bytecode, and
+
+     2. before evaluation of the code, a certificate checker has to 
+validate the certificate against the code, and also that
+
+     3. Parrot's bytecode format must allow such a certificate to be 
+stored with the bytecode.
+
+&gt; Eval'ing a specific string *might* be provably safe, which means that
+&gt; we should have a way for an external (untrusted) compiler to not only
+&gt; produce bytecode, but also proofs of the safety of that bytecode. We'd
+&gt; also need, of course, the trusted PCC-equipped bytecode loader to
+&gt; verify the proof before executing the bytecode. (And we'd need that
+&gt; anyway to load in and prove the initial bytecode anyway.)
+&gt;
+&gt; This would largely eliminate one of the main advantages of PCC, namely
+&gt; that the expensive construction of a proof need not be paid at
+&gt; runtime, only the relatively cheap proof verification.
+
+If you are directly eval'ing an arbitrary string, then yes, you have to 
+generate the proof when you compile that string to PBC.  But you can 
+also provide a program/subroutine/etc as PBC with a certificate already 
+attached.
+
+&gt; Back to reality. I understand that many of Parrot's features would be
+&gt; difficult to prove, but I'm not sure it's fundamentally any more
+&gt; difficult than most OO languages.
+
+AFAIK (although I don't know that much :), the Java VM has been proved 
+secure to a large extent.
+
+
+-- 
+% Andre Pang : trust.in.love.to.save
+
+From nobody Sat Apr 17 02:18:09 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22489
+Return-Path: &lt;james@mastros.biz&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 28863 invoked by uid 76); 25 Mar 2004 11:39:50 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 03:39:50 -0800
+Received: (qmail 17128 invoked by uid 225); 25 Mar 2004 11:39:47 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 17115 invoked by alias); 25 Mar 2004 11:39:46 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 03:39:28 -0800
+Received: (qmail 28646 invoked by uid 1012); 25 Mar 2004 11:39:26 -0000
+To: perl6-internals@perl.org
+Message-ID: &lt;4062C4E9.5000402@mastros.biz&gt;
+Date: Thu, 25 Mar 2004 12:39:21 +0100
+User-Agent: Mozilla Thunderbird 0.5 (X11/20040306)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+CC: perl6-internals@perl.org
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt; &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt;
+In-Reply-To: &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt;
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Posted-By: 217.186.72.29
+Approved: news@nntp.perl.org
+From: james@mastros.biz (James Mastros)
+
+ozone@algorithm.com.au wrote:
+&gt; It can be safe.  Normally, PCC works by certifying the code during 
+&gt; compilation, and attaching the machine-checkable certificate with the 
+&gt; resulting compiled code (be that bytecode, machine code or whatever).  
+&gt; During runtime, a certificate checker then validates the certificate 
+&gt; against the provided compiled code, to assure that what the certificate 
+&gt; says it's true.
+Oh.  In that case, the fact that it's "proof carrying" is just a 
+particular case of signed code.  I think that's a solved problem in 
+parrot, at least from a design-of-bytecode perspective.  It may have 
+become unsolved recently, though.
+
+I thought proof-carrying code contained a proof, not a certificate. 
+(The difference is that a proof is verifiably true -- that is, it's 
+givens match reality, and each step is valid.  OTOH, a certificate is 
+something that we have to use judgment to decide of we want to trust or 
+not.)
+
+&gt; The main requirement is that Parrot permits some sort of 'hooks', so that
+&gt; 
+&gt;     1. during compilation, a certificate of proof can be generated and 
+&gt; attached with the bytecode, and
+&gt; 
+&gt;     2. before evaluation of the code, a certificate checker has to 
+&gt; validate the certificate against the code, and also that
+&gt; 
+&gt;     3. Parrot's bytecode format must allow such a certificate to be 
+&gt; stored with the bytecode.
+I think we're done with step 3, but not 1 and 2.
+
+&gt; If you are directly eval'ing an arbitrary string, then yes, you have to 
+&gt; generate the proof when you compile that string to PBC.  But you can 
+&gt; also provide a program/subroutine/etc as PBC with a certificate already 
+&gt; attached.
+Note that in the common case, there are no eval STRINGs (at runtime), 
+and thus all you have to do is prove that you don't eval STRING, which 
+should be a much easier proposition.
+
+&gt;&gt; Back to reality. I understand that many of Parrot's features would be
+&gt;&gt; difficult to prove, but I'm not sure it's fundamentally any more
+&gt;&gt; difficult than most OO languages.
+&gt; 
+&gt; AFAIK (although I don't know that much :), the Java VM has been proved 
+&gt; secure to a large extent.
+I suspect most code that wants to be provable will attempt to prove that 
+it does not use those features, rather then prove that it uses them safely.
+
+(As pointed out in a deleted bit of the grandparent post, this may 
+consist of proving that it has a bit set in the header that says that it 
+shouldn't be allowed to eval string, which is easy to prove, since it's 
+a verifiable given.)
+
+	-=- James Mastros
+
+From nobody Sat Apr 17 02:18:11 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22500
+Return-Path: &lt;larry@london.wall.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 43792 invoked by uid 76); 25 Mar 2004 18:32:24 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 10:32:24 -0800
+Received: (qmail 15545 invoked by uid 225); 25 Mar 2004 18:32:22 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 15540 invoked by alias); 25 Mar 2004 18:32:21 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from pimout2-ext.prodigy.net (HELO pimout2-ext.prodigy.net) (207.115.63.101)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Thu, 25 Mar 2004 10:32:05 -0800
+Received: from wall.org (adsl-64-165-201-130.dsl.snfc21.pacbell.net [64.165.201.130])
+	by pimout2-ext.prodigy.net (8.12.10/8.12.10) with ESMTP id i2PIW2Ta076552
+	for &lt;perl6-internals@perl.org&gt;; Thu, 25 Mar 2004 13:32:03 -0500
+Received: from london.wall.org (localhost.localdomain [127.0.0.1])
+	by wall.org (8.12.10/8.12.10) with ESMTP id i2PIW2bf001244
+	for &lt;perl6-internals@perl.org&gt;; Thu, 25 Mar 2004 10:32:02 -0800
+Received: (from larry@localhost)
+	by london.wall.org (8.12.10/8.12.10/Submit) id i2PIW2Xk001242
+	for perl6-internals@perl.org; Thu, 25 Mar 2004 10:32:02 -0800
+Date: Thu, 25 Mar 2004 10:32:02 -0800
+To: perl6-internals@perl.org
+Subject: Re: Safety and security
+Message-ID: &lt;20040325183201.GA946@wall.org&gt;
+Mail-Followup-To: perl6-internals@perl.org
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt; &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt; &lt;4062C4E9.5000402@mastros.biz&gt;
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: &lt;4062C4E9.5000402@mastros.biz&gt;
+User-Agent: Mutt/1.4.1i
+Approved: news@nntp.perl.org
+From: larry@wall.org (Larry Wall)
+
+Do bear in mind that Perl can execute bits of code as it's compiling,
+so if a bit of code is untrustworthy, you shouldn't be compiling it
+in the first place, unless you've prescanned it to reject C&lt;use&gt;,
+C&lt;BEGIN&gt;, and other macro definitions, or (more usefully) have hooks
+in the compiler to catch and validate those bits of code before
+running them.  Doesn't do you much good to disallow
+
+    eval 'system "rm -rf /"';
+
+at run time if you don't also catch
+
+    BEGIN { system "rm -rf /"; }
+
+at compile time...
+
+(Sorry if I'm just pointing out the obvious.)
+
+Larry
+
+From nobody Sat Apr 17 02:18:14 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22504
+Return-Path: &lt;rgarciasuarez@free.fr&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 82965 invoked by uid 76); 25 Mar 2004 19:23:12 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 11:23:12 -0800
+Received: (qmail 5120 invoked by uid 225); 25 Mar 2004 19:23:08 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 5112 invoked by alias); 25 Mar 2004 19:23:08 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 11:22:52 -0800
+Received: (qmail 82809 invoked by uid 1012); 25 Mar 2004 19:22:51 -0000
+Date: 25 Mar 2004 19:22:50 -0000
+To: perl6-internals@perl.org
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt; &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt; &lt;4062C4E9.5000402@mastros.biz&gt; &lt;20040325183201.GA946@wall.org&gt;
+Message-ID: &lt;slrnc66ce0.p6v.rgarciasuarez@dat.local&gt;
+User-Agent: slrn/0.9.7.3 (Linux)
+X-Posted-By: 213.41.170.44
+Approved: news@nntp.perl.org
+From: rgarciasuarez@free.fr (Rafael Garcia-Suarez)
+
+Larry Wall wrote in perl.perl6.internals :
+&gt; Do bear in mind that Perl can execute bits of code as it's compiling,
+&gt; so if a bit of code is untrustworthy, you shouldn't be compiling it
+&gt; in the first place, unless you've prescanned it to reject C&lt;use&gt;,
+&gt; C&lt;BEGIN&gt;, and other macro definitions, or (more usefully) have hooks
+&gt; in the compiler to catch and validate those bits of code before
+&gt; running them.  Doesn't do you much good to disallow
+&gt; 
+&gt;     eval 'system "rm -rf /"';
+&gt; 
+&gt; at run time if you don't also catch
+&gt; 
+&gt;     BEGIN { system "rm -rf /"; }
+&gt; 
+&gt; at compile time...
+
+That's mostly what Perl 5's Safe is doing. Hence my previous comment.
+
+The major flaw with this approach is that it's probably not going to
+prevent
+    eval 'while(1){}'
+or
+    eval '$x = "take this!" x 1_000_000'
+or my personal favourite, the always funny 
+    eval 'CORE::dump()'
+unless you set up a very restrictive set of allowed ops.
+
+(in each case, you abuse system resources: CPU, memory or ability to
+send a signal. I don't know how to put restrictions on all of these
+in the general case...)
+
+From nobody Sat Apr 17 02:18:17 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22506
+Return-Path: &lt;jhi@iki.fi&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 49712 invoked by uid 76); 25 Mar 2004 21:36:21 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 13:36:21 -0800
+Received: (qmail 25251 invoked by uid 225); 25 Mar 2004 21:36:19 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 25245 invoked by alias); 25 Mar 2004 21:36:18 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 13:36:02 -0800
+Received: (qmail 49489 invoked by uid 1012); 25 Mar 2004 21:36:01 -0000
+To: perl6-internals@perl.org, Rafael Garcia-Suarez &lt;rgarciasuarez@free.fr&gt;
+Message-ID: &lt;406350BF.4010903@iki.fi&gt;
+Date: Thu, 25 Mar 2004 23:35:59 +0200
+User-Agent: Mozilla Thunderbird 0.5 (Macintosh/20040208)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+CC: perl6-internals@perl.org
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt; &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt; &lt;4062C4E9.5000402@mastros.biz&gt; &lt;20040325183201.GA946@wall.org&gt; &lt;slrnc66ce0.p6v.rgarciasuarez@dat.local&gt;
+In-Reply-To: &lt;slrnc66ce0.p6v.rgarciasuarez@dat.local&gt;
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Posted-By: 62.78.174.208
+Approved: news@nntp.perl.org
+From: jhi@iki.fi (Jarkko Hietaniemi)
+
+Rafael Garcia-Suarez wrote:
+
+&gt;&gt; prevent
+&gt;     eval 'while(1){}'
+&gt; or
+&gt;     eval '$x = "take this!" x 1_000_000'
+
+Or hog both (for a small while):
+
+    eval 'while(push@a,0){}'
+
+&gt; or my personal favourite, the always funny 
+&gt;     eval 'CORE::dump()'
+&gt; unless you set up a very restrictive set of allowed ops
+&gt;
+&gt; (in each case, you abuse system resources: CPU, memory or ability to
+&gt; send a signal. I don't know how to put restrictions on all of these
+&gt; in the general case...)
+
+From nobody Sat Apr 17 02:18:19 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22530
+Return-Path: &lt;james@mastros.biz&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 19952 invoked by uid 76); 26 Mar 2004 13:57:39 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Fri, 26 Mar 2004 05:57:39 -0800
+Received: (qmail 23704 invoked by uid 225); 26 Mar 2004 13:57:37 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 23698 invoked by alias); 26 Mar 2004 13:57:36 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from onion.develooper.com (HELO onion.perl.org) (63.251.223.166)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Fri, 26 Mar 2004 05:57:18 -0800
+Received: (qmail 19794 invoked by uid 1012); 26 Mar 2004 13:57:17 -0000
+Message-ID: &lt;20040326135716.19773.qmail@onion.perl.org&gt;
+To: perl6-internals@perl.org
+Date: Fri, 26 Mar 2004 14:57:12 +0100
+User-Agent: Mozilla Thunderbird 0.5 (X11/20040306)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+Subject: Re: Safety and security
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt; &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt; &lt;4062C4E9.5000402@mastros.biz&gt; &lt;20040325183201.GA946@wall.org&gt;
+In-Reply-To: &lt;20040325183201.GA946@wall.org&gt;
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Posted-By: 217.186.68.163
+Approved: news@nntp.perl.org
+From: james@mastros.biz (James Mastros)
+
+Larry Wall wrote:
+&gt; Do bear in mind that Perl can execute bits of code as it's compiling,
+&gt; so if a bit of code is untrustworthy, you shouldn't be compiling it
+&gt; in the first place, unless you've prescanned it to reject C&lt;use&gt;,
+&gt; C&lt;BEGIN&gt;, and other macro definitions, or (more usefully) have hooks
+&gt; in the compiler to catch and validate those bits of code before
+&gt; running them.  
+In other words, the compiler must be sure to run immediate bits of code 
+with the same restrictions as it would run the real code.
+
+This isn't a parrot issue per say; it's a compiler issue, and I don't 
+see how it requires additional mechinisims for parrot, unless possibly 
+it's running one pbc (the compiler itself) with one set of 
+restrictions/quotas, and another bytecode segment (pbc generated during 
+the compile) with another set.
+
+I think we were planning on that anyway (to allow libraries to be more 
+trusted then the code that calls them, and callbacks to be less trusted).
+
+	-=- James Mastros
+
+From nobody Sat Apr 17 02:18:21 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22495
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 6384 invoked by uid 76); 25 Mar 2004 14:07:15 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 06:07:15 -0800
+Received: (qmail 9451 invoked by uid 225); 25 Mar 2004 14:07:11 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 9445 invoked by alias); 25 Mar 2004 14:07:11 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 06:06:49 -0800
+Received: (qmail 6186 invoked from network); 25 Mar 2004 14:21:26 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?10.0.1.2?) (dan@63.120.19.217)
+  by 178.94.252.64.snet.net with SMTP; 25 Mar 2004 14:21:14 -0000
+Mime-Version: 1.0
+X-Sender: dan@sprite
+Message-ID: &lt;a06010203bc8895fd6557@[10.0.1.2]&gt;
+In-Reply-To: &lt;87ad26jf1i.fsf@gemini.sunstarsys.com&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;87fzbzji2a.fsf@gemini.sunstarsys.com&gt; &lt;a06010205bc876a78c9a9@[10.0.1.2]&gt;
+ &lt;87ad26jf1i.fsf@gemini.sunstarsys.com&gt;
+Date: Thu, 25 Mar 2004 09:03:37 -0500
+To: Joe Schaefer &lt;joe+perl@sunstarsys.com&gt;, perl6-internals@perl.org
+Subject: Re: Safety and security
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 1:06 PM -0500 3/24/04, Joe Schaefer wrote:
+&gt;dan@sidhe.org (Dan Sugalski) writes:
+&gt;
+&gt;&gt;  At 5:48 PM -0500 3/23/04, Joe Schaefer wrote:
+&gt;
+&gt;[...]
+&gt;
+&gt;&gt;  &gt;IMO, the advantage would be that parrot apps will have a better idea
+&gt;&gt;  &gt;of what security model is appropriate.
+&gt;&gt;
+&gt;&gt;  Well... maybe.
+&gt;&gt;
+&gt;&gt;  Parrot apps don't get a whole lot of say here--this is more on the
+&gt;&gt;  order of OS level security. Not that it makes a huge difference, of course.
+&gt;
+&gt;To be specific, I was thinking about embedded parrot apps like mod_perl,
+&gt;where it might be nice to enforce a security policy on a per-vhost
+&gt;(virtual server) basis.  That isn't something all parrot apps would
+&gt;benefit from, of course.
+
+Ah, *that* is a different matter altogether.
+
+I'm planning an alternate mechanism for that, though it may be a bit 
+much--rather than restricting the dangerous things we make sure all 
+the dangerous things can be delegated to the embedder. So file 
+manipulation, mass memory allocation/deallocation, and real low-level 
+signal handling, for example, all get punted to the embedder, who can 
+then do whatever they want.
+
+This means that when we go read some data from a file we call, say, 
+Parrot_read, which for the base parrot'll be just read, while for an 
+embedded parrot it may call some Apache thunking layer or something 
+instead.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:18:25 2004
+Newsgroups: perl.perl6.internals,perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22507 perl.perl6.internals:22508
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 52764 invoked by uid 76); 25 Mar 2004 21:41:15 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 13:41:15 -0800
+Received: (qmail 27523 invoked by uid 225); 25 Mar 2004 21:41:11 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 27507 invoked by alias); 25 Mar 2004 21:41:10 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 13:40:49 -0800
+Received: (qmail 22878 invoked from network); 25 Mar 2004 21:55:28 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?172.24.18.98?) (dan@65.75.18.11)
+  by 178.94.252.64.snet.net with SMTP; 25 Mar 2004 21:55:23 -0000
+Mime-Version: 1.0
+X-Sender: dan@localhost
+Message-ID: &lt;a06010208bc89022a2739@[172.24.18.98]&gt;
+In-Reply-To: &lt;406350BF.4010903@iki.fi&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt;
+ &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt;
+ &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt;
+ &lt;4062C4E9.5000402@mastros.biz&gt; &lt;20040325183201.GA946@wall.org&gt;
+ &lt;slrnc66ce0.p6v.rgarciasuarez@dat.local&gt; &lt;406350BF.4010903@iki.fi&gt;
+Date: Thu, 25 Mar 2004 16:40:33 -0500
+To: Jarkko Hietaniemi &lt;jhi@iki.fi&gt;, perl6-internals@perl.org,
+ Rafael Garcia-Suarez &lt;rgarciasuarez@free.fr&gt;
+Subject: Re: Safety and security
+Cc: perl6-internals@perl.org
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 11:35 PM +0200 3/25/04, Jarkko Hietaniemi wrote:
+&gt;Rafael Garcia-Suarez wrote:
+&gt;
+&gt;&gt;&gt;  prevent
+&gt;&gt;      eval 'while(1){}'
+&gt;&gt;  or
+&gt;&gt;      eval '$x = "take this!" x 1_000_000'
+&gt;
+&gt;Or hog both (for a small while):
+&gt;
+&gt;     eval 'while(push@a,0){}'
+
+Which, if the interpreter's running with quotas, will be caught when 
+it either exceeds the allowable memory limits or CPU limits.
+
+Yay, quotas! :)
+
+&gt;  &gt; or my personal favourite, the always funny
+&gt;&gt;      eval 'CORE::dump()'
+&gt;&gt;  unless you set up a very restrictive set of allowed ops
+&gt;&gt;
+&gt;&gt;  (in each case, you abuse system resources: CPU, memory or ability to
+&gt;&gt;  send a signal. I don't know how to put restrictions on all of these
+&gt;&gt;  in the general case...)
+
+
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:18:27 2004
+Newsgroups: perl.perl6.internals,perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22507 perl.perl6.internals:22508
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 52761 invoked by uid 76); 25 Mar 2004 21:41:15 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 13:41:15 -0800
+Received: (qmail 27522 invoked by uid 225); 25 Mar 2004 21:41:11 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 27504 invoked by alias); 25 Mar 2004 21:41:10 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Thu, 25 Mar 2004 13:40:49 -0800
+Received: (qmail 22878 invoked from network); 25 Mar 2004 21:55:28 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?172.24.18.98?) (dan@65.75.18.11)
+  by 178.94.252.64.snet.net with SMTP; 25 Mar 2004 21:55:23 -0000
+Mime-Version: 1.0
+X-Sender: dan@localhost
+Message-ID: &lt;a06010208bc89022a2739@[172.24.18.98]&gt;
+In-Reply-To: &lt;406350BF.4010903@iki.fi&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt;
+ &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt;
+ &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt;
+ &lt;4062C4E9.5000402@mastros.biz&gt; &lt;20040325183201.GA946@wall.org&gt;
+ &lt;slrnc66ce0.p6v.rgarciasuarez@dat.local&gt; &lt;406350BF.4010903@iki.fi&gt;
+Date: Thu, 25 Mar 2004 16:40:33 -0500
+To: Jarkko Hietaniemi &lt;jhi@iki.fi&gt;, perl6-internals@perl.org,
+ Rafael Garcia-Suarez &lt;rgarciasuarez@free.fr&gt;
+Subject: Re: Safety and security
+Cc: perl6-internals@perl.org
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 11:35 PM +0200 3/25/04, Jarkko Hietaniemi wrote:
+&gt;Rafael Garcia-Suarez wrote:
+&gt;
+&gt;&gt;&gt;  prevent
+&gt;&gt;      eval 'while(1){}'
+&gt;&gt;  or
+&gt;&gt;      eval '$x = "take this!" x 1_000_000'
+&gt;
+&gt;Or hog both (for a small while):
+&gt;
+&gt;     eval 'while(push@a,0){}'
+
+Which, if the interpreter's running with quotas, will be caught when 
+it either exceeds the allowable memory limits or CPU limits.
+
+Yay, quotas! :)
+
+&gt;  &gt; or my personal favourite, the always funny
+&gt;&gt;      eval 'CORE::dump()'
+&gt;&gt;  unless you set up a very restrictive set of allowed ops
+&gt;&gt;
+&gt;&gt;  (in each case, you abuse system resources: CPU, memory or ability to
+&gt;&gt;  send a signal. I don't know how to put restrictions on all of these
+&gt;&gt;  in the general case...)
+
+
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:18:31 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22532
+Return-Path: &lt;dan@sidhe.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 36085 invoked by uid 76); 26 Mar 2004 14:29:14 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Fri, 26 Mar 2004 06:29:14 -0800
+Received: (qmail 6644 invoked by uid 225); 26 Mar 2004 14:29:12 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 6632 invoked by alias); 26 Mar 2004 14:29:11 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from 178.94.252.64.snet.net (HELO sprite.sidhe.org) (64.252.94.178)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with SMTP; Fri, 26 Mar 2004 06:28:50 -0800
+Received: (qmail 31659 invoked from network); 26 Mar 2004 14:43:25 -0000
+X-Scanned-By: AMaViS-ng at sidhe.org
+Received: from unknown (HELO ?172.24.18.98?) (dan@63.120.19.217)
+  by 178.94.252.64.snet.net with SMTP; 26 Mar 2004 14:43:13 -0000
+Mime-Version: 1.0
+X-Sender: dan@sprite
+Message-ID: &lt;a0601020ebc89edb30b8d@[172.24.18.98]&gt;
+In-Reply-To: &lt;20040326135716.19773.qmail@onion.perl.org&gt;
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt;
+ &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt;
+ &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt;
+ &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt;
+ &lt;4062C4E9.5000402@mastros.biz&gt; &lt;20040325183201.GA946@wall.org&gt;
+ &lt;20040326135716.19773.qmail@onion.perl.org&gt;
+Date: Fri, 26 Mar 2004 09:26:45 -0500
+To: James Mastros &lt;james@mastros.biz&gt;, perl6-internals@perl.org
+Subject: Re: Safety and security
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Approved: news@nntp.perl.org
+From: dan@sidhe.org (Dan Sugalski)
+
+At 2:57 PM +0100 3/26/04, James Mastros wrote:
+&gt;Larry Wall wrote:
+&gt;&gt;Do bear in mind that Perl can execute bits of code as it's compiling,
+&gt;&gt;so if a bit of code is untrustworthy, you shouldn't be compiling it
+&gt;&gt;in the first place, unless you've prescanned it to reject C&lt;use&gt;,
+&gt;&gt;C&lt;BEGIN&gt;, and other macro definitions, or (more usefully) have hooks
+&gt;&gt;in the compiler to catch and validate those bits of code before
+&gt;&gt;running them.
+&gt;In other words, the compiler must be sure to run immediate bits of 
+&gt;code with the same restrictions as it would run the real code.
+&gt;
+&gt;This isn't a parrot issue per say; it's a compiler issue, and I 
+&gt;don't see how it requires additional mechinisims for parrot, unless 
+&gt;possibly it's running one pbc (the compiler itself) with one set of 
+&gt;restrictions/quotas, and another bytecode segment (pbc generated 
+&gt;during the compile) with another set.
+&gt;
+&gt;I think we were planning on that anyway (to allow libraries to be 
+&gt;more trusted then the code that calls them, and callbacks to be less 
+&gt;trusted).
+
+Yup. Subroutines and methods are privilege boundaries, and code with 
+extra rights may call into less privileged code safely. We need to 
+work out the mechanism though.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+
+From nobody Sat Apr 17 02:18:35 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22534
+Return-Path: &lt;larry@london.wall.org&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 9237 invoked by uid 76); 26 Mar 2004 16:27:57 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Fri, 26 Mar 2004 08:27:57 -0800
+Received: (qmail 26518 invoked by uid 225); 26 Mar 2004 16:27:50 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 26510 invoked by alias); 26 Mar 2004 16:27:50 -0000
+X-Spam-Status: No, hits=0.0 required=7.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from pimout1-ext.prodigy.net (HELO pimout1-ext.prodigy.net) (207.115.63.77)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Fri, 26 Mar 2004 08:27:34 -0800
+Received: from wall.org (adsl-64-165-201-130.dsl.snfc21.pacbell.net [64.165.201.130])
+	by pimout1-ext.prodigy.net (8.12.10/8.12.10) with ESMTP id i2QGRVQi042596
+	for &lt;perl6-internals@perl.org&gt;; Fri, 26 Mar 2004 11:27:32 -0500
+Received: from london.wall.org (localhost.localdomain [127.0.0.1])
+	by wall.org (8.12.10/8.12.10) with ESMTP id i2QGRUbf026884
+	for &lt;perl6-internals@perl.org&gt;; Fri, 26 Mar 2004 08:27:30 -0800
+Received: (from larry@localhost)
+	by london.wall.org (8.12.10/8.12.10/Submit) id i2QGRUIa026882
+	for perl6-internals@perl.org; Fri, 26 Mar 2004 08:27:30 -0800
+Date: Fri, 26 Mar 2004 08:27:30 -0800
+To: perl6-internals@perl.org
+Subject: Re: Safety and security
+Message-ID: &lt;20040326162730.GA26772@wall.org&gt;
+Mail-Followup-To: perl6-internals@perl.org
+References: &lt;a06010200bc8638b16f58@[172.24.18.98]&gt; &lt;B733E5C2-7D33-11D8-BDF9-000A95BAC4AE@algorithm.com.au&gt; &lt;a06010206bc87705e2bae@[10.0.1.2]&gt; &lt;20040325033944.GA22390@foxglove&gt; &lt;73FC19EE-7E26-11D8-AC03-000A95BAC4AE@algorithm.com.au&gt; &lt;4062C4E9.5000402@mastros.biz&gt; &lt;20040325183201.GA946@wall.org&gt; &lt;20040326135716.19773.qmail@onion.perl.org&gt; &lt;a0601020ebc89edb30b8d@[172.24.18.98]&gt;
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: &lt;a0601020ebc89edb30b8d@[172.24.18.98]&gt;
+User-Agent: Mutt/1.4.1i
+Approved: news@nntp.perl.org
+From: larry@wall.org (Larry Wall)
+
+On Fri, Mar 26, 2004 at 09:26:45AM -0500, Dan Sugalski wrote:
+: Yup. Subroutines and methods are privilege boundaries, and code with 
+: extra rights may call into less privileged code safely. We need to 
+: work out the mechanism though.
+
+One thing you'll have to do in that case is disable the ability to peek
+outward into your dynamic scope for various tidbits, such as $CALLER::_.
+
+Larry
+
+From nobody Sat Apr 17 02:18:38 2004
+Newsgroups: perl.perl6.internals
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.internals:22469
+Return-Path: &lt;garrett@scriptpro.com&gt;
+Mailing-List: contact perl6-internals-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-internals@perl.org
+Received: (qmail 96251 invoked by uid 76); 24 Mar 2004 23:21:49 -0000
+Received: from x1.develooper.com (HELO x1.develooper.com) (63.251.223.170)
+  by onion.perl.org (qpsmtpd/0.27.1) with SMTP; Wed, 24 Mar 2004 15:21:49 -0800
+Received: (qmail 13862 invoked by uid 225); 24 Mar 2004 23:21:47 -0000
+Delivered-To: perl6-internals@perl.org
+Received: (qmail 13856 invoked by alias); 24 Mar 2004 23:21:46 -0000
+X-Spam-Status: No, hits=0.5 required=7.0
+	tests=HTML_40_50,HTML_MESSAGE
+X-Spam-Check-By: la.mx.develooper.com
+Received: from Unknown (HELO mail.scriptpro.com) (206.61.110.2)
+  by la.mx.develooper.com (qpsmtpd/0.27.1) with ESMTP; Wed, 24 Mar 2004 15:21:31 -0800
+Received: from exch_mission.scriptpro.com ([192.168.190.222]) by mail.scriptpro.com  with Microsoft SMTPSVC(5.5.1877.197.19);
+	 Wed, 24 Mar 2004 17:21:29 -0600
+Received: by EXCH_MISSION with Internet Mail Service (5.5.2657.72)
+	id &lt;GH49L6KQ&gt;; Wed, 24 Mar 2004 17:21:27 -0600
+Message-ID: &lt;71BEC0D4E1DED3118F7A009027B12028034C922B@EXCH_MISSION&gt;
+To: 'Dan Sugalski' &lt;dan@sidhe.org&gt;, perl6-internals@perl.org
+Subject: RE: Safety and security
+Date: Wed, 24 Mar 2004 17:21:17 -0600
+MIME-Version: 1.0
+X-Mailer: Internet Mail Service (5.5.2657.72)
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C411F6.B58A75D6"
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: garrett@scriptpro.com (Garrett Goebel)
+
+------_=_NextPart_001_01C411F6.B58A75D6
+Content-Type: text/plain;
+	charset="iso-8859-1"
+
+Dan Sugalski wrote:
+&gt; 
+&gt; If we're going to tackle this, though, we need to pull in some folks 
+&gt; who're actually competent at it before we do more than handwave about 
+&gt; the design.
+
+A Language-Based Approach to Security (2000)
+http://citeseer.ist.psu.edu/schneider00languagebased.html
+
+Linux Security Modules: General Security Support for the Linux Kernel (2002)
+http://citeseer.ist.psu.edu/wright02linux.html
+
+The Three Security Architectures
+http://www.canonical.org/%7Ekragen/3-sec-arch.html
+
+Capability Security Model
+http://www.erights.org/elib/capability/index.html
+http://www.erights.org/elib/capability/duals/myths.html
+
+Code Access Security in .Net
+http://msdn.microsoft.com/msdnmag/issues/02/09/SecurityinNET/
+
+Blogs of the primary CLR CAS developers
+http://blogs.gotdotnet.com/gregfee
+http://blogs.dotnetthis.com/Ivan/
+
+Java vs. .NET Security, Parts 1 + 2
+http://www.onjava.com/pub/a/onjava/2003/11/26/javavsdotnet.html
+http://www.onjava.com/pub/a/onjava/2003/12/10/javavsdotnet.html
+
+--
+Garrett Goebel
+IS Development Specialist 
+
+ScriptPro                   Direct: 913.403.5261 
+5828 Reeds Road               Main: 913.384.1008 
+Mission, KS 66202              Fax: 913.384.2180 
+www.scriptpro.com          garrett at scriptpro dot com 
+ 
+
+
+------_=_NextPart_001_01C411F6.B58A75D6--
+
+
+  </pre>
+
+  <a href="."> back to perl6 </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

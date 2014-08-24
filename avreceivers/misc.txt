@@ -1,0 +1,112 @@
+Allgemein:
+
+- Webserver auf dem Gerät?
+
+- offenes Protokoll? (cf. Verfügbarkeit 3rd party apps)
+
+- Internetradios
+
+- "zones" - Support
+
+- Rechner-Soundausgabe als Quelle anschließen -- wie am besten? Karte
+  mit Digitalausgang?
+
+- Rechner-Videoausgabe als Quelle anschließen -- wie am besten? GK mit
+  HDMI?
+
+- TV-integrierte Lautsprecher Stummschaltung?
+
+
+Onkyo TX-NR616
+http://www.amazon.de/Onkyo-TX-NR616-Netzwerk-AV-Receiver-HD-Audio/dp/B00790L8AU/ref=sr_1_6?ie=UTF8&qid=1374858721&sr=8-6&keywords=AV+Receiver#productDescription
+
+- Android-App:
+
+  - vom Hersteller: https://play.google.com/store/apps/details?id=com.onkyo.onkyoRemote
+
+    - s. Demo-Mode
+
+    - lt. Rezensionen oft instabil, Lautstärkeregelung springt...
+
+    - Video dazu: http://www.youtube.com/watch?v=rYDIJe3TxQs
+
+      (sieht so recht gut aus, aber man sieht das Gerät nicht)
+
+    - Funktionen: on/off, Quellenwahl, Laustärke, Equalizer-Presets,
+      Zone-Wahl, Tuner, Streamen von lokal gespeicherten Songs (nicht
+      reine GPlay-Songs) via DLNA, Internetradios (im Demo-Mode nicht
+      explorierbar)
+
+  - 3rd party: https://play.google.com/store/apps/details?id=laumed.onkytrollerpro
+
+    - GUI sieht extrem fummelig aus, aber mglw. stabiler
+
+- Internetradios lt. Video: vtuner, last.fm, napster
+
+  - will man garantiert nicht über die Fernbedienung machen -> App ist
+    Key (wenn man das nicht gleich komplett auf dem Smartphone/PC
+    machen will)
+
+- Device ist offenbar DLNA-Renderer
+
+- int. Webserver siehe http://www.youtube.com/watch?v=mxXtU3VpQ5s
+
+  - Funktionen: Gerätekonfiguration, Setup von Internetradio-Favorites
+
+
+ACHTUNG: Offenbar fallen bei Onkyo-Geräten öfter HDMI-Eingänge aus -- wg. systematischer Probleme mit Elkos:
+
+http://www.amazon.de/review/R3N1WO2ZV5FADN/ref=cm_cr_pr_viewpnt#R3N1WO2ZV5FADN
+
+(s.a. Google "onkyo capacitors" etc.)
+
+YT-Kanal:
+
+http://www.youtube.com/user/onkyode
+
+
+Protokoll:
+
+- https://github.com/miracle2k/onkyo-eiscp
+
+- https://sites.google.com/a/webarts.ca/toms-blog/Blog/new-blog-items/javaeiscp-integraserialcontrolprotocol
+
+- http://code.google.com/p/openhab/issues/detail?id=216
+
+- binäres Protokoll, ursprünglich für RS232
+
+- offenbar schon viel fertige Software
+
+
+
+
+Yamaha RX-V473 5.1
+http://www.amazon.de/Yamaha-RX-V473-AV-Receiver-AirPlay-Netzwerk/dp/B007Q0597G/ref=sr_1_7?ie=UTF8&qid=1374858721&sr=8-7&keywords=AV+Receiver
+
+
+- App:
+
+  - vom Hersteller: https://play.google.com/store/apps/details?id=com.yamaha.av.avcontroller
+
+    - Video dort, aber für iOS-Version (Android angeblich weitgehend identisch)
+
+    - s. Demo-Mode
+
+    - Rezensionen besser als bei Onkyo
+
+    - unklar welche Internetradios
+
+    - Funktionen: on/off, Quellenwahl, Laustärke, Equalizer-Presets,
+      Zone-Wahl, Tuner, Streamen von lokal gespeicherten Songs (nicht
+      reine GPlay-Songs) via DLNA, Internetradios (im Demo-Mode nicht
+      explorierbar)
+
+
+Protokoll:
+
+- http://files.remotecentral.com/view/7122-18701-1/yamaha_advantage_2010_receivers.html
+
+- google "YNC protocol"
+
+- apparently some sort of XML-RPC over HTTP
+

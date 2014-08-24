@@ -1,0 +1,59 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./javascript/dojo/test/test1.js </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">javascript</a>/<a href="../.">dojo</a>/<a href=".">test</a>/test1.js </h1>
+
+  <a href="test1.js">download original</a>
+
+  <pre>
+dojo.provide("test1");
+
+dojo.require("dijit.form.Button");
+dojo.require("dijit.Dialog");
+
+dojo.addOnLoad(
+    function(){
+        dojo.query("a").forEach(function(n){
+                                    n.innerHTML += "Tralala";
+                                });
+        var dlg = dijit.byId("mydialog");
+        dojo.connect(dijit.byId("showDlgBtn"), "onClick", function() {
+                         dlg.show();
+                     });
+        var dynButtons = [];
+        dojo.connect(dijit.byId("createBtnBtn"), "onClick", function() {
+                         var btn = new dijit.form.Button({label:"Say Hello"});
+                         dojo.place(btn.domNode, dojo.query("h1")[0], "after");
+                         dojo.connect(btn, "onClick", function() {
+                                          alert("Hello World!");
+                                      });
+                         dynButtons.push(btn);
+                     });
+        dojo.connect(dijit.byId("colorBtn"), "onClick", function() {
+                         dojo.forEach(dynButtons, function(btn) {
+                                          btn.attr("style", "color: green");
+                                      });
+                     });
+    });
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./aspectj/tests/ajtest1/src/de/oklischat/ajtest1/Main.java </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../../../../.">.</a>/<a href="../../../../../../.">aspectj</a>/<a href="../../../../../.">tests</a>/<a href="../../../../.">ajtest1</a>/<a href="../../../.">src</a>/<a href="../../.">de</a>/<a href="../.">oklischat</a>/<a href=".">ajtest1</a>/Main.java </h1>
+
+  <a href="Main.java">download original</a>
+
+  <pre>
+package de.oklischat.ajtest1;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+
+public class Main {
+
+    private static PropertyChangeListener loggingPCL = new PropertyChangeListener() {
+        
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            System.out.println("PropChangeEvt: src=" + evt.getSource() + ", prop=" + evt.getPropertyName() +
+                               ", old=" + evt.getOldValue() + ", new=" + evt.getNewValue());
+        }
+    };
+    
+    /**
+     * @param args
+     */
+    public static void main(String[] args) throws Exception {
+        Car c1 = new Car("c1", 0, 15);
+        c1.addPropertyChangeListener(loggingPCL);
+        Car c2 = new VW("vw2", 0, 25);
+        c2.addPropertyChangeListener(loggingPCL);
+        c1.driveFor(10);
+        c2.driveFor(10);
+        c1.setLocation(500);
+        c1.driveFor(20);
+        c2.setSpeed(-4);
+        c2.driveFor(12);
+        System.out.println("c1: " + c1);
+        System.out.println("c2: " + c2);
+    }
+
+}
+
+  </pre>
+
+  <a href="."> back to ajtest1 </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

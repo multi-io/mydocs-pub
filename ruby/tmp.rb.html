@@ -1,0 +1,65 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/tmp.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/tmp.rb </h1>
+
+  <a href="tmp.rb">download original</a>
+
+  <pre>
+module UndefinednessSupport
+
+  attr_accessor :undefined
+
+  def self.included(mod)
+    mod.module_eval &lt;&lt;-EOS
+      alias_method :_text_orig, :text
+      def text
+        if undefined
+          "&lt;UNDEFINED&gt;"
+        else
+          _text_orig
+        end
+      end
+    EOS
+  end
+
+end
+
+
+class C
+  attr_accessor :text
+
+  include UndefinednessSupport
+end
+
+
+
+c=C.new
+c.text="lalala"
+p c.text
+c.undefined = true
+p c.text
+c.undefined = false
+p c.text
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

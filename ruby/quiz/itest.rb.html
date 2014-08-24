@@ -1,0 +1,53 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/quiz/itest.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">quiz</a>/itest.rb </h1>
+
+  <a href="itest.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+INTERVAL=200
+N_INTERVALS=5_000_000
+
+found=0
+begin
+  last=0; count=0;
+  while num=STDIN.readline.to_i
+    new=num/INTERVAL
+    if new==last then
+      count+=1
+    else
+      last=new
+      found+=1 if count==1
+      count=1
+    end
+  end
+rescue EOFError
+end
+found+=1 if count==1
+
+puts found.to_f/N_INTERVALS
+
+  </pre>
+
+  <a href="."> back to quiz </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/CallersRestrictor.pm </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/CallersRestrictor.pm </h1>
+
+  <a href="CallersRestrictor.pm">download original</a>
+
+  <pre>
+package CallersRestrictor;
+
+use Exporter;
+
+@ISA = qw(Exporter);
+@EXPORT = qw(restrictCallers);
+
+
+sub restrictCallers {
+    no strict 'refs';
+    my $srcpkg = caller();
+    while (@_) {
+        my ($fname,$callers) = (shift,shift);
+        my $origfn = \&amp;{"${srcpkg}::$fname"};
+        *{"${srcpkg}::$fname"} = sub {
+            my $caller = caller();
+            unless (grep /$caller/, @$callers) {
+                print "$caller not allowed to call ${srcpkg}::$fname\n"; return;
+            }
+            $origfn-&gt;(@_);
+        }
+    }
+}
+
+1;
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

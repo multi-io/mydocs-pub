@@ -1,0 +1,45 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/mymap.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/mymap.rb </h1>
+
+  <a href="mymap.rb">download original</a>
+
+  <pre>
+module Enumerable
+  def mymap(&amp;block)
+    slf = self
+    Class.new {
+      include Enumerable
+      define_method(:each) {
+        slf.each do |elt|
+          out = block.call(elt)
+          puts "#{elt} =&gt; #{out}"
+          yield(out)
+        end
+      }
+    }.new
+  end
+end
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/letter.templ </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/letter.templ </h1>
+
+  <a href="letter.templ">download original</a>
+
+  <pre>
+&lt;%= @people %&gt; customers have debts:
+
+&lt;%my $sum = 0;%&gt;
+
+&lt;%foreach my $k (@people) {%&gt;
+
+Foo \&lt;%  Bar \&lt;%=
+Baz \&gt;
+
+customer: &lt;%= $k-&gt;{sex} eq 'm'? "Mr." : "Mrs."%&gt; &lt;%= $k-&gt;{name}%&gt; 
+is &lt;%= $k-&gt;{debt}%&gt; $ in debt.
+
+&lt;%$sum += $k-&gt;{debt};%&gt;
+
+&lt;%}%&gt;
+
+Total: &lt;%= $sum %&gt; $.
+
+&lt;%= $self-&gt;include("rsincl.templ") %&gt;
+
+Yours sincerely...
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

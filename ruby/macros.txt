@@ -1,0 +1,8 @@
+(actually, init-time code using introspection to dynamically add
+classes, fields, methods etc. to the classes being initialized)
+
+
+see impl. of ActiveRecords in "Ruby On Rails" for examples on how to
+do this. More specifically, see
+activerecord/lib/active_record/aggregations.rb in the "Ruby On Rails"
+distribution

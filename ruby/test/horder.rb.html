@@ -1,0 +1,59 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/horder.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/horder.rb </h1>
+
+  <a href="horder.rb">download original</a>
+
+  <pre>
+def foldl(enum, start)
+  result = start
+  enum.each {|x| result = yield(result,x)}
+  result
+end
+
+# foldl([4,5,6,7,8], 0){|x,y| x+y}  =&gt; 30
+
+
+def lfoldl(func,start)
+  lambda { | enum |
+    result = start
+    enum.each {|x| result = func.call(result,x)}
+    result
+  }
+end
+
+# lfoldl(lambda{|x,y| x+y}, 0).call([4,5,6,7,8])  =&gt; 30
+
+
+@lmult=lfoldl(lambda{|x,y| x*y}, 1)
+
+# @lmult.call([5,3,5,2,4])  =&gt; 600
+
+def lfac(n)
+  @lmult.call(1..n)
+  # won't work without the "@" in the @lmult identifier??
+end
+
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

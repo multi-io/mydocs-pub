@@ -1,0 +1,58 @@
+JOGL Texture Konstruktor Texture(TextureData data) {
+    // data enthält die Pixeldaten (2D -- Texture ist offenbar für 1D-
+    // oder 2D-Texturen gedacht?). In diesem Beispiel: data enthalte
+    // unkomprimierte 16Bit-2D-Texturdaten sowie
+    // data.getMipmap()==false (=> keine Mipmap-Erzeugung)
+
+    int[] tmp = new int[1];
+    gl.glGenTextures(1, tmp, 0);
+    int texId = tmp[0];
+
+    //updateImage
+    gl.glBindTexture(GL.GL_TEXTURE_2D, texID);
+    
+    gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, data.getInternalFormat(),
+                    texWidth, texHeight, data.getBorder(),
+                    data.getPixelFormat(), data.getPixelType(), null);
+
+    //updateSubImageImpl
+    int[] align = { 0 };
+    int[] rowLength = { 0 };
+    int[] skipRows = { 0 };
+    int[] skipPixels = { 0 };
+    gl.glGetIntegerv(GL.GL_UNPACK_ALIGNMENT,   align,      0); // save alignment
+    gl.glGetIntegerv(GL2.GL_UNPACK_ROW_LENGTH,  rowLength,  0); // save row length
+    gl.glGetIntegerv(GL2.GL_UNPACK_SKIP_ROWS,   skipRows,   0); // save skipped rows
+    gl.glGetIntegerv(GL2.GL_UNPACK_SKIP_PIXELS, skipPixels, 0); // save skipped pixels
+    gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, data.getAlignment());
+    gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH, rowlen);
+    gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS, srcy);
+    gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, srcx);
+
+    gl.glTexSubImage2D(GL.GL_TEXTURE_2D, //target
+                       0,  //level
+                       0,  //xoffset
+                       0,  //yoffset
+                       data.getWidth(),
+                       data.getHeight(),
+                       data.getPixelFormat(),
+                       data.getPixelType(),
+                       buffer);
+    gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT,   align[0]);      // restore alignment
+    gl.glPixelStorei(GL2.GL_UNPACK_ROW_LENGTH,  rowLength[0]);  // restore row length
+    gl.glPixelStorei(GL2.GL_UNPACK_SKIP_ROWS,   skipRows[0]);   // restore skipped rows
+    gl.glPixelStorei(GL2.GL_UNPACK_SKIP_PIXELS, skipPixels[0]); // restore skipped pixels
+    
+
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+    int wrapMode = (gl.isExtensionAvailable("GL_VERSION_1_2") || !gl.isGL2()) ? GL.GL_CLAMP_TO_EDGE : GL2.GL_CLAMP;
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, wrapMode);
+    gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, wrapMode);
+
+}
+
+
+public void bind() throws GLException {
+    GLContext.getCurrentGL().glBindTexture(GL.GL_TEXTURE_2D, texID); 
+}

@@ -1,0 +1,136 @@
+(************** Content-type: application/mathematica **************
+                     CreatedBy='Mathematica 5.1'
+
+                    Mathematica-Compatible Notebook
+
+This notebook can be used with any Mathematica-compatible
+application, such as Mathematica, MathReader or Publicon. The data
+for the notebook starts with the line containing stars above.
+
+To get the notebook into a Mathematica-compatible application, do
+one of the following:
+
+* Save the data starting with the line of stars above into a file
+  with a name ending in .nb, then open the file inside the
+  application;
+
+* Copy the data starting with the line of stars above to the
+  clipboard, then use the Paste menu command inside the application.
+
+Data for notebooks contains only printable 7-bit ASCII and can be
+sent directly in email or through ftp in text mode.  Newlines can be
+CR, LF or CRLF (Unix, Macintosh or MS-DOS style).
+
+NOTE: If you modify the data for this notebook not in a Mathematica-
+compatible application, you must delete the line below containing
+the word CacheID, otherwise Mathematica-compatible applications may
+try to use invalid cache data.
+
+For more information on notebooks and Mathematica-compatible 
+applications, contact Wolfram Research:
+  web: http://www.wolfram.com
+  email: info@wolfram.com
+  phone: +1-217-398-0700 (U.S.)
+
+Notebook reader applications are available free of charge from 
+Wolfram Research.
+*******************************************************************)
+
+(*CacheID: 232*)
+
+
+(*NotebookFileLineBreakTest
+NotebookFileLineBreakTest*)
+(*NotebookOptionsPosition[      3332,         94]*)
+(*NotebookOutlinePosition[      3963,        116]*)
+(*  CellTagsIndexPosition[      3919,        112]*)
+(*WindowFrame->Normal*)
+
+
+
+Notebook[{
+Cell["\<\
+http://freenodephysics.googlepages.com/problemsoftheweek
+
+Febuary 21st,2007
+
+A small block,of mass m,is placed on top of a frictionless Sphere of Radius \
+R,which is fixed to the ground.The block is given a small nudge so it is set \
+into motion.How far away from the point where the sphere touches the ground \
+does the block land?\
+\>", "Text"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+    \(DSolve[{\(s''\)[t] \[Equal] g\ Sin[s[t]\/r], 
+        s[0] \[Equal] 0, \(s'\)[0] \[Equal] 0.001\ r}, s, t]\)], "Input"],
+
+Cell[BoxData[
+    RowBox[{\(Solve::"ifun"\), \(\(:\)\(\ \)\), "\<\"Inverse functions are \
+being used by \\!\\(Solve\\), so some solutions may not be found; use Reduce \
+for complete solution information. \
+\\!\\(\\*ButtonBox[\\\"More\[Ellipsis]\\\", ButtonStyle->\\\"RefGuideLinkText\
+\\\", ButtonFrame->None, ButtonData:>\\\"Solve::ifun\\\"]\\)\"\>"}]], \
+"Message"],
+
+Cell[BoxData[
+    RowBox[{\(DSolve::"bvfail"\), \(\(:\)\(\ \)\), "\<\"For some branches of \
+the general solution, unable to solve the conditions. \
+\\!\\(\\*ButtonBox[\\\"More\[Ellipsis]\\\", ButtonStyle->\\\"RefGuideLinkText\
+\\\", ButtonFrame->None, ButtonData:>\\\"DSolve::bvfail\\\"]\\)\"\>"}]], \
+"Message"],
+
+Cell[BoxData[
+    RowBox[{\(DSolve::"bvfail"\), \(\(:\)\(\ \)\), "\<\"For some branches of \
+the general solution, unable to solve the conditions. \
+\\!\\(\\*ButtonBox[\\\"More\[Ellipsis]\\\", ButtonStyle->\\\"RefGuideLinkText\
+\\\", ButtonFrame->None, ButtonData:>\\\"DSolve::bvfail\\\"]\\)\"\>"}]], \
+"Message"],
+
+Cell[BoxData[
+    \({}\)], "Output"]
+}, Open  ]]
+},
+FrontEndVersion->"5.1 for X",
+ScreenRectangle->{{0, 1280}, {0, 1024}},
+WindowSize->{628, 726},
+WindowMargins->{{216, Automatic}, {93, Automatic}}
+]
+
+(*******************************************************************
+Cached data follows.  If you edit this Notebook file directly, not
+using Mathematica, you must remove the line containing CacheID at
+the top of  the file.  The cache data will then be recreated when
+you save this file from within Mathematica.
+*******************************************************************)
+
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+
+(*NotebookFileOutline
+Notebook[{
+Cell[1754, 51, 356, 9, 140, "Text"],
+
+Cell[CellGroupData[{
+Cell[2135, 64, 139, 2, 44, "Input"],
+Cell[2277, 68, 368, 6, 33, "Message"],
+Cell[2648, 76, 313, 5, 33, "Message"],
+Cell[2964, 83, 313, 5, 33, "Message"],
+Cell[3280, 90, 36, 1, 27, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+
+
+(*******************************************************************
+End of Mathematica Notebook file.
+*******************************************************************)
+

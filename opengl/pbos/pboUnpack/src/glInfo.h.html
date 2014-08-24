@@ -1,0 +1,84 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./opengl/pbos/pboUnpack/src/glInfo.h </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">opengl</a>/<a href="../../.">pbos</a>/<a href="../.">pboUnpack</a>/<a href=".">src</a>/glInfo.h </h1>
+
+  <a href="glInfo.h">download original</a>
+
+  <pre>
+///////////////////////////////////////////////////////////////////////////////
+// glInfo.h
+// ========
+// get GL vendor, version, supported extensions and other states using glGet*
+// functions and store them glInfo struct variable
+//
+// To get valid OpenGL infos, OpenGL rendering context (RC) must be opened
+// before calling glInfo::getInfo(). Otherwise it returns false.
+//
+//  AUTHOR: Song Ho Ahn (song.ahn@gmail.com)
+// CREATED: 2005-10-04
+// UPDATED: 2009-10-07
+//
+// Copyright (c) 2005 Song Ho Ahn
+///////////////////////////////////////////////////////////////////////////////
+
+#ifndef GLINFO_H
+#define GLINFO_H
+
+#include &lt;string&gt;
+#include &lt;vector&gt;
+
+// struct variable to store OpenGL info
+struct glInfo
+{
+    std::string vendor;
+    std::string renderer;
+    std::string version;
+    std::vector &lt;std::string&gt; extensions;
+    int redBits;
+    int greenBits;
+    int blueBits;
+    int alphaBits;
+    int depthBits;
+    int stencilBits;
+    int maxTextureSize;
+    int maxLights;
+    int maxAttribStacks;
+    int maxModelViewStacks;
+    int maxProjectionStacks;
+    int maxClipPlanes;
+    int maxTextureStacks;
+
+    // ctor, init all members
+    glInfo() : redBits(0), greenBits(0), blueBits(0), alphaBits(0), depthBits(0),
+               stencilBits(0), maxTextureSize(0), maxLights(0), maxAttribStacks(0),
+               maxModelViewStacks(0), maxClipPlanes(0), maxTextureStacks(0) {}
+
+    bool getInfo();                             // extract info
+    void printSelf();                           // print itself
+    bool isExtensionSupported(const std::string&amp; ext); // check if a extension is supported
+};
+
+#endif
+
+  </pre>
+
+  <a href="."> back to src </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./unix/sane.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">unix</a>/sane.txt </h1>
+
+  <a href="sane.txt">download original</a>
+
+  <pre>
+SANE (scanner access now easy) -- scanner drivers for Unix systems
+
+- user-space-based solution, no kernel modules involved
+
+- SANE defines a hardware-independent API for accessing scanner
+  devices (e.g. selecting a resolution/color depth, perform a scan for
+  a selected region, etc)
+
+- /SANE plugins/ implement this API for a specific backend (most often
+  a specific scanner)
+
+- SANE plugins are implemented as shared objects (.so files) which
+  SANE-enabled applications (e.g. The GIMP, scanimage, xsane, ...)
+  load into their address space
+
+TODO: verify
+
+- a special "plugin discovery" API is provided that apps use to
+  enumerate available plugins and load specified ones. This API is
+  implemented in a hardware-independent library and loads specified
+  plugin via dlopen(2). This means Apps have to link only this library
+  statically in order to use all available plugins
+
+- a special "net" plugin is provided which can be used to access SANE
+  plugins on other hosts on the network
+
+  - those hosts must run the SANE daemon "saned", which makes the
+    local plugins available over the net to the net plugin
+
+  - a simple host-based access control scheme is provided (nothing
+    sophisticated)
+
+  - saned can be run over inetd/tcpd
+
+  - a solution involving the net-plugin/saned may also be needed for
+    some plugins which need root access in order to be able to access
+    the scanner (since plugins are .sos and run in the context of the
+    SANE-using application, that application would otherwise have to
+    be running with root privileges)
+
+
+
+PROBLEMS (Nov. 2003):
+
+- insufficient documentation:
+
+  - no explanation of the way backend discovery works
+
+  - backend discovery via "dll" backend?
+
+  - no explanation of the relation between sane-net and saned
+
+  </pre>
+
+  <a href="."> back to unix </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

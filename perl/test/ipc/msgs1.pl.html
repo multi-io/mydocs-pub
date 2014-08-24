@@ -1,0 +1,58 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/ipc/msgs1.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">perl</a>/<a href="../.">test</a>/<a href=".">ipc</a>/msgs1.pl </h1>
+
+  <a href="msgs1.pl">download original</a>
+
+  <pre>
+#!/opt/GNU/bin/perl5.00502
+
+use IPC::SysV qw(IPC_PRIVATE IPC_RMID IPC_CREAT S_IRWXU);
+
+my $id = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU);
+my $sent = "message";
+my $type_sent = 1234;
+my $rcvd;
+my $type_rcvd;
+if (defined $id) {
+    if (msgsnd($id, pack("l a*", $type_sent, $sent), 0)) {
+	if (msgrcv($id, $rcvd, 60, 0, 0)) {
+	    ($type_rcvd, $rcvd) = unpack("l a*", $rcvd);
+	    if ($rcvd eq $sent) {
+		print "okay\n";
+	    } else {
+		print "not okay\n";
+	    }
+	} else {
+	    die "# msgrcv failed\n";
+	}
+    } else {
+	die "# msgsnd failed\n";
+    }
+    msgctl($id, IPC_RMID, 0) || die "# msgctl failed: $!\n";
+} else {
+    die "# msgget failed\n";
+}
+
+  </pre>
+
+  <a href="."> back to ipc </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

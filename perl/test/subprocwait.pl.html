@@ -1,0 +1,47 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/subprocwait.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/subprocwait.pl </h1>
+
+  <a href="subprocwait.pl">download original</a>
+
+  <pre>
+my $pid = fork();
+
+if ($pid==0) {
+    exec "sleep 15"  or die "couldn't exec: $!";
+}
+
+eval {
+    local $SIG{ALRM} = sub { die "alarm clock restart" };
+    alarm 10;
+    waitpid($pid,0);
+    alarm 0;
+};
+
+if ($@ =~ /alarm clock restart/) {
+    print "process stalled, killing it\n";
+    kill 'SIGTERM', $pid;
+}
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/Template.pm </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/Template.pm </h1>
+
+  <a href="Template.pm">download original</a>
+
+  <pre>
+package Template;
+
+use strict;
+use Carp 'croak';
+
+sub new {
+    my $self = bless {}, shift;
+    $self-&gt;load(shift) if @_;
+    $self-&gt;{out} = shift || *STDOUT;
+    my $outtype = ref $self-&gt;{out};
+    # TODO: check for '' needed because of FILEHANDLEs, but means
+    # that I can't tell scalar from ref-to-scalar here (only the latter will work)
+    unless (($outtype eq '') or ($outtype eq 'SCALAR')) {
+        croak "can't output to type $outtype";
+    }
+    $self;
+}
+
+
+sub load {
+    my ($self, $filename) = @_;
+    local $/ = "\n";
+    open(F, "&lt;$filename") or croak "couldn't open $filename: $!";
+    my $templ = "";
+    while (&lt;F&gt;) {
+        my @line = split /(?=[^\\]?)?&lt;%([^=].*?[^\\]?)%&gt;/;
+        for (my ($printed, $code) = (shift @line, shift @line);
+             defined $printed;
+             ($printed, $code) = (shift @line, shift @line)) {
+
+            $templ .= q[$self-&gt;print ( ];
+            my @printed = split(/(?=[^\\]?)&lt;%=(.*?[^\\]?)%&gt;/, $printed);
+            for (my ($text, $expr) = (shift @printed, shift @printed);
+                 defined $text;
+                 ($text, $expr) = (shift @printed, shift @printed)) {
+
+                foreach my $x ($text, $expr || do{my $x="";$x}) { $x=~s!\\&lt;%!&lt;%!g; $x=~s!\\&gt;!&gt;!g; }
+                $templ .= qq[q($text) . ];
+                $templ .= "\$self-&gt;quote_expr(scalar(do\{$expr\})) ." if $expr;
+            }
+            $templ .= q["");];
+            $templ .= $code if $code;
+        }
+    }
+    $self-&gt;{templ} = $templ;
+}
+
+
+# override to print to string, ... instead of $self-&gt;{out}
+# and/or apply transformations to the expanded text
+sub print {
+    my ($self, $string) = @_;
+    if (ref($self-&gt;{out}) eq '') {
+        print {$self-&gt;{out}} $string;
+    }
+    else {
+        ${$self-&gt;{out}} .= $string;
+    }
+}
+
+# override to apply some transformation to user expressions
+# (e.g. quote HTML/XML metacharacters etc.)
+sub quote_expr {
+    my ($self, $expr) = @_;
+    $expr;  # return the expression without any transformations by default
+}
+
+
+sub run {
+    no strict 'vars';
+    my ($self) = @_;
+    our $callingpkg;  # need dynamic scope for this so include()d sub-templates still get the original calling package's variables
+    my $prev_callingpkg = $callingpkg;
+    $callingpkg = caller() unless $callingpkg;
+    # print qq[evaling:\n$self-&gt;{templ}\n];
+    eval qq[package $callingpkg; $self-&gt;{templ}];
+    $callingpkg = $prev_callingpkg;
+    croak $@ if $@;
+}
+
+
+sub include {
+    my ($self,$filename) = @_;
+    $filename = $self unless $filename;
+    my $result = "";
+    my $subtempl = Template-&gt;new($filename, \$result);
+    $subtempl-&gt;run();
+    $result;
+}
+
+
+1;
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+;; Symptom: Expiry geht nicht in mail.misc, mail.spam
+;;          Expiry geht in mail.amazon
+
+Im Summary-Buffer:
+
+(gnus-summary-expire-articles)
+
+=> .... =>
+
+;; articles: Liste mit Nummern der als "expirable" markierten Artikel
+;;  oder der gelesenenen Artikel (bei total-expirable groups)
+;; group: Name der Gruppe, inkl. Servertyp/-name, e.g. "nnml:mail.misc"
+;;
+;; Diese Parameter werden alle noch korrekt uebergeben!
+;;
+;; Funktion sollte alle tatsaechlich zu expirenden Artikel aus articles
+;;   finden, sie expiren, Liste der nicht expireten Artikel aus articles zurueckgeben
+gnus-int.el:(gnus-request-expire-articles articles group nil)
+
+    (funcall (gnus-get-function gnus-command-method 'request-expire-articles)
+	     articles (gnus-group-real-name group) (nth 1 gnus-command-method)
+	     nil)
+
+
+=> (funcall 'nnml-request-expire-articles articles "mail.misc" "" nil)
+
+
+=> ... =>
+
+(let* ((articles gnus-newsgroup-expirable)
+       (group (gnus-group-real-name gnus-newsgroup-name))
+       (number (car articles))
+       (server "")
+       (force nil)
+       (article (nnml-article-to-file number))
+       (mod-time (nth 5 (file-attributes article)))
+       (is-old (nnmail-expired-article-p group mod-time force
+						   nnml-inhibit-expiry))
+       )
+  (nnml-possibly-change-directory group server)
+  (values
+   gnus-newsgroup-expirable gnus-newsgroup-name
+   nnml-current-directory
+   mod-time
+   is-old
+   (nnml-deletable-article-p group number)
+   )
+  (values number is-old)
+  )
+
+Schlaegt in mail.misc fehl: (nnml-article-to-file number) gibt statt
+des nnml-Dateinamens nil zurueck, obwohl number nachweisbar die Nummer
+des ersten als "expirable" markierten Artikels ist, und die
+zugehoerige Datei (~/Mail/mail/misc/<number>) existiert.
+
+NEIN! Fehlalarm. Man muss erst einen Artikel in der Gruppe zum Lesen
+angewaehlt haben, dann funktioniert es.
+
+STATTDESSEN: is-old ist in mail.misc immer nil (sollte non-nil sein,
+wenn article alt genug fuer expiry war; in mail.amazon ist das auch
+der Fall).
+
+=> LOESUNG: modification-time aller Dateien in ~/Mail/mail/misc/ steht
+auf einem Zeipunkt vor wenigen Stunden. Grund bisher unbekannt.
+
+Modification-Time der Dateien in ~/Mail/mail/amazon/ scheint korrekt
+auf dem Zeitpunkt des Empfangs der entspr. Mail zu stehen, deswegen
+funktioniert das expiry dort.

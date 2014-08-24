@@ -1,0 +1,67 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./math/fourierseries/gplotutils.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">math</a>/<a href=".">fourierseries</a>/gplotutils.rb </h1>
+
+  <a href="gplotutils.rb">download original</a>
+
+  <pre>
+require 'gplot/Gnuplot'
+include Gnuplot
+
+
+# gnuplot dataset for displaying a real (Ruby) function f:Float-&gt;Float
+class RealFunction &lt; DataSet
+
+  def initialize (f, x0, x1, opts=nil, nsteps=1000)
+    opts ||= {}
+    opts["with"] ="lines" unless opts.include? "with"
+    super("'-'", opts)
+    @f = f
+    @x0 = x0
+    @x1 = x1
+    @nsteps = nsteps
+    @dx = (x1-x0)/nsteps
+  end
+
+  def writeData (f)
+    # TODO: if f is undefined for all x in [@x0,some_x], then
+    #       [@x0,some_x] isn't included in the plot at all.
+    #       This *might* be undesired.
+    firsterr = true
+    @nsteps.times { |i|
+      x = @x0 + @dx*i
+      begin
+	y = @f.call(x)
+	f.writeln(x.to_s + " " + y.to_s)
+	firsterr = true
+      rescue StandardError
+	# only one empty line for "unplottet" intervals (see gnuplot documentation)
+	f.writeln("") if (firsterr)
+	firsterr = false
+      end
+    }
+  end
+end
+
+  </pre>
+
+  <a href="."> back to fourierseries </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

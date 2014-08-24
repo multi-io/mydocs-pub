@@ -1,0 +1,123 @@
+before git commit, stuff (files etc.) must be "staged" for
+committing. This is true for newly added files (must use "git add
+somefile" to schedule somefile for inclusion in the next commit), but
+also for files that were already part of the repository and were only
+changed locally. This is a difference to cvs or svn, where e.g. "svn
+commit" will automatically commit all locally made changes to files
+that were already in the repository. "git commit" will not commit
+anything unless it was manually staged previously. To stage a locally
+modified file f for inclusion in the next commit, use "git add f"
+again on the file even though it is in the repository
+already. Alternatively (and probably preferably), you can use "git
+commit -a" to automatically stage locally changed files and commit
+them. So "git commit -a" seems to be essentially the closest
+equivalent to "svn commit". (also, just like the latter, "git commit
+-a" will *not* stage files that were only created locally and aren't
+part of the repository yet).
+
+To undo a "git add file", use "git rm --cached file" -- that will
+"unstage" the file but not delete it in the filesystem, exactly
+undoing the effect of the git add. (TODO: this only works if file is a
+new file, not if it is a file that's already in the repository and was
+only modified locally)
+
+TODO: git add newsubdirectory apparently stages all new files in
+newsubdirectory as well..?
+
+03:58 < loops> multi_io, why do you want to "stage the directory" without any of the files staged?
+03:59 < multi_io> I want to stage files in there, only manually.
+04:00 < multi_io> looks like I can just cd thedirectory; git add file ...
+04:00 < loops> multi_io, yes.
+04:01 < loops> multi_io, you don't have to cd into the directory either... git add <dir>/{file1,file2,file3}   works as well
+
+
+
+- git log -S'sometext'
+
+  logs all commits whose diffs included sometext
+
+
+
+
+
+04:24 < multi_io> is there an actual difference between a git "repository" and a "working copy" at all?
+04:25 < ToxicFrog> it's possible to have a repository without a working copy (a "bare repo")
+04:25 < AAA_awright> multi_io: The repository is the entire history, the working copy is the single revision checked out and (presumably) being edited 
+                     (you mean that?)
+04:26 < multi_io> AAA_awright: when I like "git clone /some/local/repository", it looks like I get the whole repository
+04:26 < ToxicFrog> You do.
+04:27 < AAA_awright> And without --bare it also checks out a working copy for you, in addition
+04:27 < multi_io> so I can also just get a single checkout?
+04:27 < multi_io> hm
+04:27 < AAA_awright> multi_io: You can't as such, but you can download less by using --depth 1
+04:28 < AAA_awright> That will download just the most recent files, then you can delete .git if you wish
+04:28 < AAA_awright> idk how it works with a local filesystem repository...
+04:30 < multi_io> ah, a "bare" repository is just the contents of .git ?
+04:30 < AAA_awright> Yep
+04:31 < offby1> aw reet
+04:31 < AAA_awright> and with core.bare=true
+04:32 < multi_io> ok
+04:38 < Ilari> multi_io: Convention is to name bare repos 'foo.git'...
+
+
+07:33 < multi_io> "git fetch teck:/home/olaf/test/git/test1" worked, apparently (printed stuff like "remote: Total 10 (delta 2), reused 0 (delta 0)" 
+                  etc.pp., whatever that means exactly :-P)
+07:34 < multi_io> but now "git merge teck:/home/olaf/test/git/test1/master" only says "fatal: 'teck:/home/olaf/test/git/test1/master' does not point to a 
+                  commit"
+07:34 -!- patcito [n=pat@190.42.41.123] has quit [Remote closed the connection]
+07:35 < multi_io> ah, FETCH_HEAD seems to be a valid name designating the fetched commit
+07:37 < Adlai> multi_io: yes, git-fetch leaves FETCH_HEAD for merging
+07:38 < Adlai> you could also do 'git remote update <remote-name>' if you have it configured as a remote, and then it will update tracking branches fro 
+               you
+07:38 < Adlai> *for
+
+
+
+
+in a local repo, you can have alias names for remote repos. See also
+"git help remote". If you initially clone a remote repo, that repo
+will automatically be defined under the default alias name "origin" or
+so. Issue "git remote -v" to see all defined remote aliases, "git
+remote add name url" to add a new one, etc.
+
+To pull changes from it, use "git pull <remotename> <branch>"   
+
+
+
+
+TODO: branching/merging
+
+- common workflow: merge branches, topic branches
+
+
+
+  507  git pull origin restart-from-svn
+  508  git reset --hard
+  509  git fetch origin restart-from-svn
+  510  gitk --all &
+  511  git status MERGE_HEAD
+  512  git status HEAD
+  513  git log HEAD
+  514  git log MERGE_HEAD
+  515  git tag show
+  516  man git tag]
+  517  man git tag
+  518  ls .git/refs/tags/
+  519  ls .git/refs/tags/show 
+  520  less .git/refs/tags/show
+  521  ll .git/branches/
+  522  ll .git/refs/tags/show 
+  523  ll .git/HEAD 
+  524  cat .git/HEAD 
+  525  man git fetch
+  526  cat .git/FETCH_HEAD 
+  527  man git fetch
+  528  man git mergetool
+  529  git merge
+  530  man git mergetool
+  531  man git merge
+  532  cat .git/FETCH_HEAD 
+  533  man git pull
+  534  git merge FETCH_HEAD
+  536  git add src/de/sofd/viskit/ui/imagelist/jlistimpl/test/JListImageListTestApp.java
+  537  git commit

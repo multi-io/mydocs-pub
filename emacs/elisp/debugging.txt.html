@@ -1,0 +1,50 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./emacs/elisp/debugging.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">emacs</a>/<a href=".">elisp</a>/debugging.txt </h1>
+
+  <a href="debugging.txt">download original</a>
+
+  <pre>
+- entering the debugger:
+
+  - var. debug-on-error, fcn. toggle-debug-on-error
+
+  - var. debug-on-signal, fcn. toggle-debug-on-signal  debugs even
+    handled errors
+
+  - (debug-on-entry FCN) (FCN -- symbol)
+    M-x debug-on-entry
+    (cancel-debug-on-entry FCN)
+    M-x cancel-debug-on-entry
+
+  - explicit entry: call (debug) anywhere inside your prog
+    (preferably at a place where the return value is ignored
+
+
+- inside *Backtrace* buffer:
+
+  - most important cmds: "d" (step into), "c" (step over), "e" (eval
+    expression) (TODO: verify)
+
+  </pre>
+
+  <a href="."> back to elisp </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

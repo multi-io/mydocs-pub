@@ -1,0 +1,60 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/breakpoint/bptest.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">breakpoint</a>/bptest.rb </h1>
+
+  <a href="bptest.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby -w
+# start client with something like:
+#  ruby -r/home/olaf/wind/providerxmls/providerxmls/config/environment.rb /usr/lib/ruby/gems/1.8/gems/rails-0.9.1/lib/breakpoint_client.rb
+
+require "/home/olaf/wind/providerxmls/providerxmls/config/environment"
+require 'breakpoint'
+
+Breakpoint.activate_drb
+
+
+class Person
+
+  def initialize(name)
+    @name=name
+  end
+
+  def getname(lala)
+    breakpoint("Person#getname")
+    @name
+  end
+
+end
+
+
+
+print "press key...\n"; readline
+
+p=Person.new("Hugo")
+
+print "name=#{p.getname('foo')}\n"
+
+  </pre>
+
+  <a href="."> back to breakpoint </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

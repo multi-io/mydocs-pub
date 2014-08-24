@@ -1,0 +1,51 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./unix/logrotate/test/script_handling_rotation/logfile_write.sh </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">unix</a>/<a href="../../.">logrotate</a>/<a href="../.">test</a>/<a href=".">script_handling_rotation</a>/logfile_write.sh </h1>
+
+  <a href="logfile_write.sh">download original</a>
+
+  <pre>
+#!/bin/sh
+
+cd "`dirname $0`"
+
+set -e
+
+restart_required=''
+
+trap restart_required='yes' HUP
+
+while true; do
+    exec &gt;&gt;logfile.txt 2&gt;&amp;1
+
+    while [ -z "$restart_required" ]; do
+        date;
+        sleep 1;
+    done
+
+    #echo restart...
+    restart_required='';
+done
+
+  </pre>
+
+  <a href="."> back to script_handling_rotation </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

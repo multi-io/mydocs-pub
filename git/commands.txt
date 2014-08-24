@@ -1,0 +1,67 @@
+revert local (uncommitted) changes:
+
+git checkout HEAD -- path/to/file
+
+
+git equivalent to hg rollback:
+
+git reset --soft HEAD^
+
+
+to unstage changes:
+
+git reset HEAD <files>
+
+
+to abort a merge:
+
+git reset --hard
+
+
+clone into existing non-empty directory "foo":
+
+git clone --bare /some/where/foo.git
+mv foo.git foo/.git
+cd foo
+git config core.bare false
+git reset HEAD .
+
+
+
+<multi_io> is it possible to directly fast-forward a non-checked out branch to the checked out branch?
+[15:23] <cehteh> git push . brach:branch
+[15:24] <multi_io> i.e. I've checked out branch B, and there's a branch A in the repo which is an ancestor of B, and I want to do the equivalent of git checkout A; git merge --ff-only B; git checkout B
+
+=> git push . B:A
+
+<cmn> git branch -f A B would also work
+<cmn> and be less magical
+
+
+
+specifying commit ranges:
+
+see git help rev-list
+
+- git rev-list master: master and all commits reachable from it via "parent" relation
+
+- git rev-list master ^other: master and all commits reachable from it, but not from other, via "parent" relation
+
+from git help rev-list:
+
+       You can think of this as a set operation. Commits given on the command line form a set of commits that are reachable
+       from any of them, and then commits reachable from any of the ones given with ^ in front are subtracted from that set.
+       The remaining commits are what comes out in the command’s output. Various other options and paths parameters can be used
+       to further limit the result.
+
+several commands take commit range arguments, e.g. cherry-pick.
+
+
+directly moving HEAD pointer to any branch, without touching either
+the index or the wd (essentially a checkout without modifying the
+index or wd):
+
+git symbolic-ref HEAD refs/heads/<branch>
+
+(after which you'd probably issue a "git reset" to copy the new HEAD
+tree into the index)

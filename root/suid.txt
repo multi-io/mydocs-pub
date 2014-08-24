@@ -1,0 +1,17 @@
+Der Kernel erkennt 2 Arten von ausfuehrbaren Programmen: Binaries
+(also (meistens compilierte) Programme im Binaeformat des Systems (ELF o.ae.) mit Symboltabellen, Referenzen auf externen Bibs
+und Funktionen usw.) und Skripte. Skriptdateien beginnen mit '#!', gefolgt
+vom Namen eines Interpreters. Der Programmloader im Kernel erkennt den Typ
+des auszufuehrenden Programms selbststaendig und fuehrt im Falle eines
+Skriptes den Interpreter mit der Skriptdatei als Kommandozeilenargument aus.
+
+Das SUID-Bit ist bei Skripten unwirksam. Der Kernel
+erkennt das '#!' und startet die Programme immer unter der UID des
+aufrufenden Users (Grund: wenn Skripte SUID-root sein koennten, waeren
+trojan-horse-Attacken leicht moeglich).
+
+Das gilt auch, wenn ein SUID-gesetztes Binaeprogramm ein Skript ausfuehrt:
+Das Binary laeuft unter der UID des File-Owners, das Skript aber trotzdem
+unter der des aufrufenden Benutzers. Offenbar merkt sich der Kernel die UID des
+Aufrufers auch noch waehrend des Programmlaufs des Binaries. (hat das was
+mit den real/effective UIDs zu tun?)

@@ -1,0 +1,87 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/classes.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/classes.txt </h1>
+
+  <a href="classes.txt">download original</a>
+
+  <pre>
+see: "programming ruby", section "classes and objects"
+
+irb(main):022:0&gt; def callf(obj)
+irb(main):023:1&gt;   obj.f
+irb(main):024:1&gt; end
+nil
+irb(main):025:0&gt; s="hello"
+"hello"
+irb(main):026:0&gt; callf(s)
+NameError: undefined method `f' for "hello":String
+	from (irb):23:in `callf'
+	from (irb):26
+irb(main):027:0&gt; class &lt;&lt;s
+irb(main):028:1&gt;   def f
+irb(main):029:2&gt;     p "i am s.f!"
+irb(main):030:2&gt;   end
+irb(main):031:1&gt; end
+nil
+irb(main):032:0&gt; callf(s)
+"i am s.f!"
+nil
+irb(main):033:0&gt; 
+
+
+### class method inheritance
+
+21:04 -!- multi_io [~olaf@swangoose.isst.fhg.de] has joined #ruby-lang
+
+21:08 &lt; multi_io&gt; hmm.. it appears that class methods defined in a module 
+                  (using "def self.bla ... end") are not inherited by classes 
+                  that include that module, but class methods defined in a 
+                  class are inherited by classes deriving from that class. Is 
+                  that right?
+
+21:10 &lt; sam-&gt; multi_io: that's correct.  To get class methods from a module, 
+              you need to extend the module, not include it
+
+21:12 &lt; multi_io&gt; sam-: you mean I need to extend (with the module) the class 
+                  that should receive the module's class methods?
+21:15 &lt; sam-&gt; multi_io: right, except it's actually the instance methods of the 
+              module which become class methods on the class that extends the 
+              module
+21:15 &lt; sam-&gt; module Foo; def bar() "baz" end end
+21:15 &lt; sam-&gt; class Quux; extend Foo; end
+21:15 &lt; sam-&gt; Quux.bar #=&gt; "baz"
+21:16 &lt; multi_io&gt; sam-: OK
+21:17 &lt; sam-&gt; the best way to figure it out is to open up irb and play around
+21:22 &lt; multi_io&gt; sam-: I do that all the time, of course :)
+21:23 &lt; sam-&gt; I love irb :)
+21:23  * flowhase too
+21:23 &lt; flowhase&gt; especially since i found irb/completion.rb
+21:24 &lt; multi_io&gt; I just saw in the Rails sourcecode that one can override 
+                  self.append_features to transparently add the class methods 
+                  on "include" too.
+21:25 &lt; sam-&gt; yes
+21:25 &lt; sam-&gt; the preferred way to do that in 1.8+ is to implement 
+              Module#included
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

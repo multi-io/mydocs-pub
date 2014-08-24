@@ -1,0 +1,89 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/ObjectMethods.pm </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/ObjectMethods.pm </h1>
+
+  <a href="ObjectMethods.pm">download original</a>
+
+  <pre>
+package ObjectMethods;
+
+use Exporter;
+
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(addMethods);
+
+our $pkgidx = 0;
+
+sub addMethods($@) {
+    no strict 'refs';
+
+    my $obj = shift;
+
+    ++$pkgidx;
+    my $methodspkg = "ObjectMethods::Methods${pkgidx}";
+    @{"${methodspkg}::ISA"} = ref $obj;
+    bless $obj, $methodspkg;
+    while (@_) {
+        my ($fname,$func) = (shift,shift);
+        *{"${methodspkg}::$fname"} = $func;
+    }
+}
+
+
+1;
+
+
+__END__
+
+
+=head1 NAME
+
+ObjectMethods - Add new methods to single objects without (explicitly) creating a class
+
+=head1 SYNOPSIS
+
+use ObjectMethods qw(addMethods);
+
+my $obj = SomeClass-&gt;new(...);
+
+...
+
+addMethods($obj,
+           objmeth1 =&gt; sub { print "objmeth1 called\n"; },
+           objmeth2 =&gt; sub($$) {
+               my $obj = shift;
+               print "objmeth2 called on ",$obj-&gt;{name}, " with ",shift,"\n";
+           });
+
+$obj-&gt;objmeth1;
+$obj-&gt;objmeth2(42);
+
+
+=head1 COPYRIGHT
+
+    Copyright (c) 2004, Olaf Klischat. All Rights Reserved.
+    This module is free software. It may be used, redistributed
+        and/or modified under the same terms as Perl itself.
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

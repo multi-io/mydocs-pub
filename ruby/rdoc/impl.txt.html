@@ -1,0 +1,136 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/rdoc/impl.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">rdoc</a>/impl.txt </h1>
+
+  <a href="impl.txt">download original</a>
+
+  <pre>
+   cmdline argument                    set attr. in Rdoc#document / options
+
+/usr/bin/ruby1.8 /usr/bin/rdoc              
+ -o doc/api                                  op_dir        = arg
+ --line-numbers                              include_line_numbers = true
+ --inline-source                             inline_source = true
+ --accessor cattr_accessor=object            accessors=['cattr_accessor']; extra_accessor_flags['cattr_accessor'] = 'object'
+ --include examples                          rdoc_include = ['examples']
+ --title 'XML::Mapping -- Simple, extensible Ruby-to-XML (and back) mapper'   title='XML::...'
+ -T html                                     template = 'html'
+
+file1 file2 ...                              files = [file1,file2,...]
+
+ README README_XPATH TODO.txt doc/xpath_impl_notes.txt lib/xml/mapping.rb lib/xml/xxpath.rb lib/xml/rexml_ext.rb lib/xml/xxpath_methods.rb lib/xml/xxpath.1.rb lib/xml/mapping/version.rb lib/xml/mapping/base.rb lib/xml/mapping/standard_nodes.rb lib/xml/mapping/dynamic_scope.rb lib/xml/mapping/core_classes_mapping.rb lib/xml/xxpath/steps.rb
+
+
+(other options attrs)
+
+ generator_name = 'html'
+ generator = generators[@generator_name] # == Generator.new("rdoc/generators/html_generator.rb",
+                                                            :HTMLGenerator,
+                                                            "html")
+
+
+(
+
+Generator = Struct.new(:file_name, :class_name, :key)
+
+RDoc.GENERATORS = { "html" =&gt; Generator.new("rdoc/generators/html_generator.rb",
+                                             :HTMLGenerator,
+                                             "html"),
+                     "chm" =&gt; Generator.new("rdoc/generators/chm_generator.rb",
+                                            :CHMGenerator,
+                                            "chm"),
+                     "ri" =&gt; Generator.new("rdoc/generators/ri_generator.rb",
+                                           :RIGenerator,
+                                           "ri"),
+                     "xml" =&gt; Generator.new("rdoc/generators/xml_generator.rb",
+                                            :XMLGenerator,
+                                            "xml")
+                   }
+                     
+)
+
+
+
+RDoc#document
+
+  file_info = parse_files
+    for a "README" file:
+
+      parser = ParserFactory.parser_for(TopLevel.new("README"), "README", file's content, options, @stats)
+
+             ## == SimpleParser.new(TopLevel.new("README"), "README", file's content, options, @stats)
+
+    or, for a "*.rb" file:
+
+      parser == RubyParser.new(...)
+
+  ## file_info == array of TopLevels (see rdoc/code_objects.rb), one
+  ## for each file. For a README file, the toplevel will contain a
+  ## single comment element which holds the whole file contents, with
+  ## :include: directives expanded.
+
+
+  gen = HTMLGenerator.for(options)  # == HTMLGenerator.new(options)
+
+  Dir.chdir(options.op_dir)  # "doc/api"
+  gen.generate(file_info)
+
+      @toplevels = file_info
+      @toplevels.each do |toplevel|
+        @files &lt;&lt; HtmlFile.new(toplevel, @options, FILE_DIR)
+      end
+
+      generate_html
+
+        gen_into(@files)
+          @files.each do |item|
+            if item.document_self
+              op_file = item.path
+              File.makedirs(File.dirname(op_file))
+              File.open(op_file, "w") { |file| item.write_on(file) }
+                                                   HtmlFile#write_on(f)
+                                                     value_hash
+                                                     template = TemplatePage.new(RDoc::Page::BODY,
+                                                                  RDoc::Page::FILE_PAGE,
+                                                                  RDoc::Page::METHOD_LIST)
+                                                     template.write_html_on(f, @values)
+
+                                                     expands the mentioned templates
+                                                     (RDoc::Page::BODY, RDoc::Page::FILE_PAGE,
+                                                     RDoc::Page::METHOD_LIST) (defined in html.rb).
+                                                     METHOD_LIST contains:
+                                                       %description%
+                                                     This expands to the value of @values['description'],
+                                                     which is set in value_hash to markup(@context.comment)
+                                                     (@context is the toplevel passed to the contructor above,
+                                                     and @context.comment is the "raw" content of the
+                                                     README file.
+
+                                                     Description of markup (=&gt; MarkUp#markup) follows below.
+                                                   end
+
+            end
+          end
+
+  </pre>
+
+  <a href="."> back to rdoc </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

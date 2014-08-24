@@ -1,0 +1,65 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/gd/demos/polys.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">perl</a>/<a href="../../.">test</a>/<a href="../.">gd</a>/<a href=".">demos</a>/polys.pl </h1>
+
+  <a href="polys.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl
+
+use GD;
+
+$im = new GD::Image(225,180);
+$black = $im-&gt;colorAllocate(0, 0, 0);
+$white = $im-&gt;colorAllocate(255, 255, 255);        
+$red = $im-&gt;colorAllocate(255, 0, 0);      
+$blue = $im-&gt;colorAllocate(0,0,255);
+$yellow = $im-&gt;colorAllocate(255,250,205);
+
+# Create a triangle
+$poly = new GD::Polygon;
+$poly-&gt;addPt(0,50);
+$poly-&gt;addPt(25,25);
+$poly-&gt;addPt(50,50);
+$im-&gt;filledPolygon($poly,$blue);
+
+# offset it down and to the right
+$poly-&gt;offset(100,100);
+$im-&gt;filledPolygon($poly,$red);
+
+# make it twice as wide and move it upward a bit
+$poly-&gt;map(50,50,100,100,10,10,110,60);
+$im-&gt;filledPolygon($poly,$yellow);
+
+# make it real tall
+$poly-&gt;map($poly-&gt;bounds,50,20,80,160);
+$im-&gt;filledPolygon($poly,$white);
+
+binmode STDOUT;
+
+# print the image to stdout
+print $im-&gt;png;
+
+
+  </pre>
+
+  <a href="."> back to demos </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

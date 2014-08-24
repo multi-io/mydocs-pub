@@ -1,0 +1,124 @@
+when does the kernel request what modules (using kmod/modprobe)?
+
+
+
+certain aliases, e.g. block-major-8 => sd_mod, seem to be hard-coded
+into modprobe, but may be overridden in modules.conf (so, when
+modules.conf defines an alias for block-major-8, sd_mod won't be
+loaded anymore unless explicitly configured).
+
+modprobe is called by the kernel (kernel/kmod.c).
+
+
+
+
+- accessing a character device node causes the corresponding
+  char-major-<num> to be requested.
+
+- accessing a block device node (e.g. /dev/sda) causes the
+  corresponding block-major-<num> to be requested.
+
+- scsi_hostadapter ...
+
+- ... (TODO)
+
+-----
+
+Now, you want to load the whole USB storage stack (usb-storage,
+usb-uhci, usbcore, sd_mod, scsi_mod) on (e.g.) "mount -t vfat /dev/sda
+/mnt/usbs":
+
+# "hardware abstraction layer"
+alias usb_host_controller usb-uhci
+
+# applications
+below usb-storage usb_host_controller
+
+below block-major-8 usb-storage
+
+
+You now have to call the mount command *twice* to make it work. On the
+1st call, all modules are loaded:
+
+
+$ mount -t vfat /dev/sda /mnt/usbs
+mount: /dev/sda is not a valid block device
+$ 
+
+syslog:
+
+Dec 25 03:11:25 tock kernel: kmod: requesting module: vfat
+Dec 25 03:11:25 tock kernel: kmod: requesting module: block-major-8
+Dec 25 03:11:25 tock kernel: SCSI subsystem driver Revision: 1.00
+Dec 25 03:11:25 tock kernel: usb.c: registered new driver hub
+Dec 25 03:11:25 tock kernel: usb-uhci.c: $Revision: 1.1 $ time 01:25:55 Dec 25 2004
+Dec 25 03:11:25 tock kernel: usb-uhci.c: High bandwidth mode enabled
+Dec 25 03:11:25 tock kernel: PCI: Found IRQ 9 for device 00:04.2
+Dec 25 03:11:25 tock kernel: PCI: Sharing IRQ 9 with 00:0d.0
+Dec 25 03:11:25 tock kernel: usb-uhci.c: USB UHCI at I/O 0xd400, IRQ 9
+Dec 25 03:11:25 tock kernel: usb-uhci.c: Detected 2 ports
+Dec 25 03:11:25 tock kernel: usb.c: new USB bus registered, assigned bus number 1
+Dec 25 03:11:25 tock kernel: hub.c: USB hub found
+Dec 25 03:11:25 tock kernel: hub.c: 2 ports detected
+Dec 25 03:11:25 tock kernel: usb-uhci.c: v1.275:USB Universal Host Controller Interface driver
+Dec 25 03:11:25 tock kernel: Initializing USB Mass Storage driver...
+Dec 25 03:11:25 tock kernel: usb.c: registered new driver usb-storage
+Dec 25 03:11:25 tock kernel: USB Mass Storage support registered.
+Dec 25 03:11:25 tock kernel: kmod: requesting module: scsi_hostadapter
+Dec 25 03:11:25 tock kernel: hub.c: new USB device 00:04.2-2, assigned address 2
+[kurze Pause]
+Dec 25 03:11:26 tock kernel: scsi0 : SCSI emulation for USB Mass Storage devices
+Dec 25 03:11:26 tock kernel:   Vendor: Q-MAX     Model: USB Flash Drive   Rev: 1.11
+Dec 25 03:11:26 tock kernel:   Type:   Direct-Access                      ANSI SCSI revision: 02
+Dec 25 03:11:26 tock kernel: Attached scsi removable disk sda at scsi0, channel 0, id 0, lun 0
+Dec 25 03:11:26 tock kernel: SCSI device sda: 516096 512-byte hdwr sectors (264 MB)
+Dec 25 03:11:26 tock kernel: sda: Write Protect is off
+Dec 25 03:11:26 tock kernel:  sda:
+
+loaded modules:
+
+Module                  Size  Used by    Not tainted
+sd_mod                 10012   0  (autoclean) (unused)
+usb-storage            21948   0  (autoclean) (unused)
+usb-uhci               21316   0  (autoclean) (unused)
+usbcore                34816   0  (autoclean) [usb-storage usb-uhci]
+scsi_mod               83304   2  (autoclean) [sd_mod usb-storage]
+vfat                    9308   0  (autoclean)
+fat                    29304   0  (autoclean) [vfat]
+
+
+
+But only on the 2nd call the partition is actually mounted:
+
+$ mount -t vfat /dev/sda /mnt/usbs
+$
+
+syslog:
+
+Dec 25 03:12:28 tock kernel: kmod: requesting module: nls_cp437
+Dec 25 03:12:29 tock kernel: kmod: requesting module: nls_iso8859-1
+
+This is apparently caused by the asynchronous nature of kmod.c's
+operation...
+
+
+(the "kmod: requesting module: <bla>" outputs are caused by [1]).
+
+
+[1]
+
+patch to log each invocation of komd/request_module (in the hope that
+we'll learn something more about when what modules are requested)
+
+--- linux-2.4.21/kernel/kmod.c.orig     Sat Aug  3 02:39:46 2002
++++ linux-2.4.21/kernel/kmod.c  Sat Dec 25 01:07:11 2004
+@@ -156,6 +156,9 @@
+        char *argv[] = { modprobe_path, "-s", "-k", "--", (char*)module_name, NULL };
+        int ret;
+ 
++        printk(KERN_INFO
++               "kmod: requesting module: %s\n", (char*) module_name);
++
+        ret = exec_usermodehelper(modprobe_path, argv, envp);
+        if (ret) {
+                printk(KERN_ERR

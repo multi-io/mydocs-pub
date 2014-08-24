@@ -1,0 +1,52 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./wgetbug.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href=".">.</a>/wgetbug.txt </h1>
+
+  <a href="wgetbug.txt">download original</a>
+
+  <pre>
+URL:
+
+http://groups.google.com/groups?hl=en&amp;lr=&amp;ie=UTF-8&amp;oe=UTF-8&amp;q=walrus&amp;btnG=Google+Search
+
+
+Debug: proto='http'; host='groups.google.com'; path='/groups'; args='hl=en&amp;lr=&amp;ie=UTF-8&amp;oe=UTF-8&amp;q=walrus&amp;btnG=Google+Search'; user:pass='(null):(null)'.
+
+
+wgetwof 'http://groups.google.com/groups?hl=en&amp;lr=&amp;ie=UTF-8&amp;oe=UTF-8&amp;q=walrus&amp;btnG=Google+Search'
+
+==&gt;
+-------snip--------
+wwwoffled[27518] Information: HTTP Proxy connection from host tack (192.168.0.2).
+wwwoffled[27518] Information: Forked wwwoffles -spool (pid=27528).
+wwwoffles[27528] Information: URL='http://groups.google.com/groups?hl=en&amp;lr=&amp;ie=UTF-8&amp;oe=UTF-8&amp;q=walrus&amp;btnG=Google+Search'.
+wwwoffles[27528] Debug: proto='http'; host='groups.google.com'; path='/groups'; args='hl=en&amp;lr=&amp;ie=UTF-8&amp;oe=UTF-8&amp;q=walrus&amp;btnG=Google+Search'; user:pass='(null):(null)'.
+wwwoffles[27528] Information: Cache Access Status='Cached Page Used'.
+wwwoffled[27518] Information: Child wwwoffles exited with status 0 (pid=27528).
+wwwoffled[27518] Debug: Currently running: 0 servers total, 0 fetchers.
+-------snap--------
+
+
+
+  </pre>
+
+  <a href="."> back to . </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

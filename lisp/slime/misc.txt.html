@@ -1,0 +1,125 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./lisp/slime/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">lisp</a>/<a href=".">slime</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+- alle SLIME-Buffer lassen sich Emacs-üblich mit "q" schließen
+
+- in den Tastenkombis kann die letzte Taste mit oder ohne Control
+  gedrückt werden
+
+- wichtige Kommandos (aus dem Manual):
+
+`C-c C-k'
+     `slime-compile-and-load-file'
+     Compile and load the current buffer's source file.
+
+`C-c M-k'
+     `slime-compile-file'
+     Compile (but don't load) the current buffer's source file.
+
+`C-c C-c'
+     `slime-compile-defun'
+     Compile the top-level form at point.
+
+`M-.'
+     `slime-edit-definition'
+     Go to the definition of the symbol at point.
+
+`M-,'
+     `slime-pop-find-definition-stack' Go back from a definition found
+     with `M-.'. This gives multi-level backtracking when `M-.' has
+     been used several times.
+
+`C-M-x'
+     `slime-eval-defun'
+     Evaluate top-level form.
+
+`C-c C-e'
+     `slime-eval-last-expression'
+     Evaluate the expression before point.
+
+`C-c C-p'
+     `slime-pprint-eval-last-expression'
+     Evaluate the expression before point and pretty-print the result.
+
+`C-c C-r'
+     `slime-eval-region'
+     Evaluate the region.
+
+`C-c :'
+     `slime-interactive-eval'
+     Evaluate an expression read from the minibuffer.
+
+`M-x slime-scratch'
+     Create a `*slime-scratch*' buffer. In this buffer you can enter
+     Lisp expressions and evaluate them with `C-j', like in Emacs's
+     `*scratch*' buffer.
+
+`M-x slime'
+     slime starten
+
+`C-c C-d d'
+     `slime-describe-symbol'
+     Describe the symbol at point.
+
+`C-c C-d a'
+     `slime-apropos'
+     Apropos search. Search Lisp symbol names for a substring match and
+     present their documentation strings. By default the external
+     symbols of all packages are searched. With a prefix argument you
+     can choose a specific package and whether to include unexported
+     symbols.
+
+`M-TAB'
+     `slime-complete-symbol'
+     Complete the symbol at point. Note that three styles of completion
+     are available in SLIME, and the default differs from normal Emacs
+     completion. *Note Emacs-side customization::.
+
+`SPC'
+     `slime-space'
+     The space key inserts a space and also looks up and displays the
+     argument list for the function at point, if there is one.
+
+`C-c C-s'
+     `slime-insert-arglist'
+     Looks up and inserts into the current buffer the argument list for
+     the function at point, if there is one.
+
+`C-c C-m'
+     `slime-macroexpand-1'
+     Macroexpand the expression at point once.
+
+`C-c M-m'
+     `slime-macroexpand-all'
+     Fully macroexpand the expression at point.
+
+`C-c I'
+     `slime-inspect'
+     Inspect the value of an expression entered in the minibuffer.
+
+  </pre>
+
+  <a href="."> back to slime </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/print_classes_methods.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/print_classes_methods.rb </h1>
+
+  <a href="print_classes_methods.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+
+def print_module(mod)
+
+  (mod.instance_methods - ((mod.ancestors-[mod]).map{|a|a.instance_methods}).flatten).each {|m|
+    print "#{mod}.#{m}\n"
+  }
+  (mod.methods - (mod.ancestors - [mod]).map{|a|a.methods}.flatten).each {|m|
+    print "#{mod}.#{m}    (class method)\n"
+  }
+end
+
+def print_all_modules
+  ObjectSpace.each_object(Module) {|mod|
+    print_module(mod)
+  }
+end
+
+def print_modules(name_match=nil)
+  name_match = /#{name_match}/ if name_match.kind_of? String
+  ObjectSpace.each_object(Module) {|mod|
+    print_module(mod) if (if name_match then mod.name =~ name_match else yield(mod) end)
+  }
+end
+
+
+
+if __FILE__ == $0
+  print_all_modules
+end
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,253 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./root/iptables.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">root</a>/iptables.txt </h1>
+
+  <a href="iptables.txt">download original</a>
+
+  <pre>
+iptables -- System vom Kernelmodulen (ab Kernel 2.4), Teil des
+Netzwerkcodes (IP-Stack) im Kernel. Bietet die Möglichkeit, IP-Pakete
+anhand von statischen Regeln zu filtern/manipulieren usw.
+
+Filterung geschieht durch deklarativ in kernel-internen
+Datenstrukturen festgehaltene Regeln. Änderung dieser Datenstrukturen
+geschieht vom Userspace aus mit dem Programm iptables(8).
+
+IP-Forwarding wird aktiviert durch
+
+echo 1 &gt;/proc/sys/net/ipv4/ip_forward
+
+
+RTFM: man iptables, IP-Masquerading-Howto
+
+
+Die Datenstrukturen sehen grob so aus:
+
+
+//Auf oberster Ebene gibt es Tabellen
+&lt;topmost&gt;: list&lt;Table&gt; &lt;&lt;singleton&gt;&gt;
+
+
+//Jede Tabelle hat einen Namen und eine Sequenz von Chains
+Table:
+  name: string
+  chains: list[Chain]
+
+//Eine Chain enthält eine Policy (Default-Paketverarbeitungsregel, siehe unten)
+//und eine Sequenz von Regeln
+Chain:
+  name: string
+  policy: ACCEPT | DROP | QUEUE | RETURN | user_defined_chain_name: string  //policy nur in vordefinierten Chains, nicht in vom Benutzer erzeugten Chains
+  rules: list[Rule]
+
+
+Defaultmaessig existieren folgendende Instanzen der Datenstrukturen:
+
+Table:
+  name="filter"
+  chains=(
+   Chain:
+     name="INPUT"
+     policy= ACCEPT
+     rules= ()
+
+   Chain:
+     name="FORWARD"
+     policy= ACCEPT
+     rules= ()
+
+   Chain:
+     name="OUTPUT"
+     policy= ACCEPT
+     rules= ()
+
+  )
+
+
+Table:
+  name="nat"
+  chains=(
+   Chain:
+     name="PREROUTING"
+     policy= ACCEPT
+     rules= ()
+
+   Chain:
+     name="POSTROUTING"
+     policy= ACCEPT
+     rules= ()
+
+   Chain:
+     name="OUTPUT"
+     policy= ACCEPT
+     rules= ()
+
+  )
+
+
+Table:
+  name="mangle"
+  chains=(
+   Chain:
+     name="PREROUTING"
+     policy: ACCEPT
+     rules: ()
+
+   Chain:
+     name="OUTPUT"
+     policy= ACCEPT
+     rules= ()
+
+  )
+
+
+
+Ein zu verarbeitendes Paket wird zunächst nach Standardregeln in
+best. Chains in best. Tabellen eingeordnet. Die Standardregeln sind:
+
+- Pakete, von diesem Rechner stammen (von einem Prozess auf diesem
+  Rechner erzeugt wurden), kommen nach filter/OUTPUT
+
+- Pakete, die an diesen Rechner adressiert sind, kommen nach
+  filter/INPUT
+
+- zu routende Pakete (stammen von einem anderen Rechner, sind
+  adressiert an einen anderen Rechner) kommen nach filter/FORWARD
+
+TODO: Die Tabellen "nat" und "mangle" muss ich mir noch näher
+anschauen.
+
+Anschließend werden die Regeln in der Chain der Reihe nach abgesucht,
+bis eine gefunden wird, die auf das zu verarbeitende Paket "matcht"
+(wird über Attribute der Regel besteimmt -- s.u.). Wird eine solche
+Regel gefunden, entscheidet sie über das weitere Schicksal des
+Pakets. Wird keine solche Regel gefunden, entscheidet die Policy der
+Chain über das Paket: ACCEPT bedeutet "Paket akzeptieren,
+d.h. durchlassen", DROP bedeutet "Paket wegwerfen", QUEUE bedeutet "im
+Userspace weiterverarbeiten (TODO: elaborate)", RETURN bedeutet "in
+aufrufender Chain (muss existieren) mit der Verbeitung fortfahren
+(Regeln in einer Chain können Pakete an andere Chains weiterschicken
+-- s.u.)".
+
+
+//Eine Regel
+Rule:
+
+  /////////////////////////////////////////////////////
+  //--- Attribute, die zur Entscheidung, ob diese Regel
+  //    ein geg. Paket "matcht", herangezogen werden
+
+  //Protokoll des zu verarbeitenden Pakets (IP definiert
+  //ein "protocol"-Headerfeld). Default: all
+  protocol: tcp | udp | icmp | all
+
+  //Quelladresse, Zieladresse
+  source: IPAdddress
+  destination: IPAdddress
+
+  //NW-Interface, über das das Paket hereinkam
+  in_iface: NWInterface
+
+  //NW-Interface, über das das Paket hinausgehen wird
+  in_iface: NWInterface
+
+  //erweiterte Matching-Regeln, die die Entscheidung an
+  //andere Kernelmodule writerleiten (da gibt es etliche --
+  //siehe "man iptables" und Kernelkonfiguration)
+  extended_matching_rules: list[(match_module, module_options)]
+
+
+  /////////////////////////////////////////////////////
+  //--- Weiterverarbeitung des Pakets im Falle eines
+  //    erfolgreichen Matches
+
+  //Paket kann akzeptiert, weggeschmissen, an andere Chain
+  //(derselben Tabelle?) weitergeleitet, ..... werden
+  //Siehe Dokumentation
+  target: chainname: string | ACCEPT | DROP | LOG | TOS | ...
+
+
+Manipulation der Datenstrukturen mit iptables(8):
+
+-- Alle Chains einer Tabelle mit allen ihren Regeln listen:
+
+  iptables [-t &lt;table&gt;] -L -v
+
+  wird die table nicht angegeben, wird "filter" angenommen. Gilt auch
+  für alle anderen iptables-Aufrufe.
+
+
+-- Alle Chains einer Tabelle löschen:
+
+  iptables [-t &lt;table&gt;] -F
+
+
+-- Policy einer Chain setzen (nur in vordefinierten Chains)
+
+  iptables [-t &lt;table&gt;] -P &lt;chainname&gt; &lt;policy&gt;
+
+  &lt;policy&gt; == ACCEPT | DROP | QUEUE | RETURN | &lt;user-defined chain name&gt;
+
+
+-- neue Regel an eine Chain anhaengen
+
+  iptables [-t &lt;table&gt;] -A &lt;chainname&gt; &lt;rule-specification...&gt;
+
+
+  &lt;rule-specification&gt; spezifiziert die Attribute der Regel, z.B.
+
+  -p &lt;port&gt;
+  -s &lt;source-address&gt;
+  -d &lt;dest-address&gt;
+  -i &lt;in-interface&gt;
+  -o &lt;out-interface&gt;
+  -m &lt;match-extension-module&gt; &lt;module-specific options...&gt;
+
+  -j &lt;target-spec&gt;
+
+    &lt;target-spec&gt; == ACCEPT | DROP | QUEUE | RETURN | &lt;user-defined chain name&gt;
+      (siehe oben)
+
+
+-- neue Regel irgendwo in eine Chain einfuegen
+
+  iptables [-t &lt;table&gt;] -I &lt;chainname&gt; [&lt;rulenum&gt;] &lt;rule-specification...&gt;
+
+  &lt;rulenum&gt;: 1-basierter Index der Regel, *vor* der die neue Regel
+  eingefuegt werden soll. Default: 1 (neue Regel an den Anfang setzen)
+
+
+-- Regel irgendwo in einer Chain loeschen
+
+  iptables [-t &lt;table&gt;] -D &lt;chainname&gt; [&lt;rulenum&gt;] 
+
+
+-- Regel ersetzen...
+
+
+-- neue benutzerdefinierte Chain anlegen
+
+  iptables [-t &lt;table&gt;] -N &lt;chainname&gt;
+
+  </pre>
+
+  <a href="."> back to root </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

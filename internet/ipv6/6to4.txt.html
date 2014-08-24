@@ -1,0 +1,80 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./internet/ipv6/6to4.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">internet</a>/<a href=".">ipv6</a>/6to4.txt </h1>
+
+  <a href="6to4.txt">download original</a>
+
+  <pre>
+http://de.wikipedia.org/wiki/6to4
+http://www.ietf.org/rfc/rfc3056.txt
+
+works like this:
+
+You have a host in the IPv4 internet, and you want it to become a host
+in the IPv6 internet.
+
+You construct your host's globally unique IPv6 address (actually, 2^80
+globally unique IPv6 addresses in a /48 IPv6 network) from its
+globally unique IPv4 address like this:
+
+IPv6 network address = 2002:[the IPv4 address]
+
+e.g. IPv4 address = 100.200.100.200 =&gt;
+     IPv6 network address = 2002:64c8:64c8::/48
+
+(0x2002 is 16 bits, your IPv4 address has 32 bits, IPv6 addresses have
+128 bits, so 80 bits remain)
+
+(The 0x2002 is the "well-known" prefix reserved for IPv6 hosts that
+connect to the IPv6 internet via the 6to4 protocol)
+
+For sending an IPv6 packet to a desired target IPv6 host, you
+construct the packet with target address=that host's IPv6 address
+(call it T), source address=any IPv6 address from your IPv6 network as
+constructed above.
+
+You then wrap this IPv6 packet as payload into an IPv4 packet, as
+specified by 6to4 (RFC 3056), and send it via IPv4 to one of the
+public "6to4 gateways" (those are hosts that live in the IPv4 internet
+as well as in the IPv6 internet). The gateway unwraps your IPv6 packet
+and sends it on over the IPv6 internet to T.
+
+When the T host sends an IPv6 (response) packet to you, it will
+construct that packet with target address=your 6to4 IPv6 address. This
+packet will at some point reach a 6to4 gateway (not necessarily the
+same one that previously sent on the packet originating from you),
+which will wrap the packet into an IPv4 packet and send it via IPv4 to
+your host, which unwraps the IPv6 packet again and delivers it to the
+local IPv6 stack.
+
+List of public 6to4 gateways:
+
+http://www.kfu.com/~nsayer/6to4/
+
+As a measure of convenience, there is the special, well-known anycast
+IPv4 address 192.88.99.1, which routers should automatically forward
+to the nearest 6to4 gateway (see RFC 3068) so you won't have to pick a
+6to4 gateway by hand.
+
+  </pre>
+
+  <a href="."> back to ipv6 </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

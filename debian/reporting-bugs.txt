@@ -1,0 +1,33 @@
+05:16 < multi_io> when I report a bug against a package, how can I take part in
+                  a possibly ensuing discussion of the bugreport? Where and how
+                  would such a discussion take place?
+05:17 < Azar> multi_io: no discussion, you only get a reply by mail
+05:17 < multi_io> Azar: you mean an automated reply?
+05:18 < Azar> yep
+05:19 < multi_io> sounds like an inefficient way to sort out any additional
+                  questions the package maintainer might have :-)
+05:19 < Azar> multi_io: maintainers don't have time to chat
+05:21 < multi_io> Azar: what about this discussion:
+http://groups.google.com/group/linux.debian.bugs.dist/browse_frm/thread/df80e9d35b1d5615/bfe719890a5520c0?lnk=st&q=aptitude+no+error+message&rnum=3#bfe719890a5520c0
+05:21 < multi_io> to me this looks like a bug report mail with a reply by a
+                  human being
+05:22 < Azar> multi_io: then go there and talk, I dont have e-mail to be able
+              to participate on usenet
+05:23 < multi_io> Azar: how do you know this is a real newsgroup, not just an
+                  NNTP mirror of a mailing list?
+05:24 < Azar> multi_io: I assumed
+05:24 < Azar> but "linux.debian.bugs.dist" sounds like a newsgroup
+05:24 < CompWizrd> yeah, you can access that with email to
+                   400415@bugs.debian.org
+05:24 < CompWizrd> it's just a mirror of the BTS
+05:25 < Azar> CompWizrd: yeah only I don't have email
+05:25 < multi_io> CompWizrd: and how do I read followups by other people? via
+                  NNTP?
+05:26 < multi_io> Azar: you assumed, aha :-P
+05:26 < CompWizrd> multi_io: http://bugs.debian.org/400415
+05:26 < Azar> my isp decided to implement asinine javascript on my webmail so
+              now I don't have email
+05:31 < multi_io> CompWizrd: ok, so I subscribe to bug nr. N by sending a mail
+                  to N-subscribe@bugs.debian.org, and then take part in the
+                  discussion by sending/receiving mail to/from
+                  N@bugs.debian.org ?

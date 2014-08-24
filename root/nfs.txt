@@ -1,0 +1,9 @@
+Man will wohl NFS 3.
+
+Dafuer braucht man:
+
+nfs-utils >=0.1.6
+mount >= 2.10m
+
+kernel >= 2.4
+

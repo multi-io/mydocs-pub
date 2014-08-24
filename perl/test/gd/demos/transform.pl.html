@@ -1,0 +1,63 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/gd/demos/transform.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../../.">.</a>/<a href="../../../.">perl</a>/<a href="../../.">test</a>/<a href="../.">gd</a>/<a href=".">demos</a>/transform.pl </h1>
+
+  <a href="transform.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl
+
+use GD;
+
+# test scaling, translation, transformation
+$im = new GD::Image(380,225);
+$black = $im-&gt;colorAllocate(0, 0, 0);
+$white = $im-&gt;colorAllocate(255, 255, 255);        
+$red = $im-&gt;colorAllocate(255, 0, 0);      
+$blue = $im-&gt;colorAllocate(0,0,255);
+$yellow = $im-&gt;colorAllocate(255,250,205);
+
+# Create a triangle
+$poly = new GD::Polygon;
+$poly-&gt;toPt(50,50);
+$poly-&gt;toPt(100,0);
+$poly-&gt;toPt(-50,50);
+$poly-&gt;toPt(-50,-50);
+
+$im-&gt;filledPolygon($poly,$yellow);
+
+# Stretch it a bit
+$poly-&gt;scale(1.8,1.0);
+$poly-&gt;offset(100,0);
+$im-&gt;filledPolygon($poly,$red);
+
+# Rotate it
+$poly-&gt;transform(0.55,0.20,0.0,1,-25,50);
+$im-&gt;filledPolygon($poly,$blue);
+
+binmode STDOUT;
+
+print $im-&gt;png;
+
+  </pre>
+
+  <a href="."> back to demos </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./mongodb/test/sharding/commands.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">mongodb</a>/<a href="../.">test</a>/<a href=".">sharding</a>/commands.txt </h1>
+
+  <a href="commands.txt">download original</a>
+
+  <pre>
+olaf@tack:~/doc/mydocs/mongodb/test/sharding$ mongo
+MongoDB shell version: 2.0.5
+connecting to: test
+mongos&gt; use admin;
+switched to db admin
+mongos&gt; db.runCommand( { addshard : "localhost:10000" } )
+{ "shardAdded" : "shard0000", "ok" : 1 }
+mongos&gt; db.runCommand( { addshard : "localhost:10001" } )
+{ "shardAdded" : "shard0001", "ok" : 1 }
+mongos&gt; db.runCommand( { enablesharding : "normize" } )
+{ "ok" : 1 }
+mongos&gt; db.runCommand( { shardcollection : "normize.companyProfileXmlElement", key : {uuid : 1} } )
+{
+	"proposedKey" : {
+		"uuid" : 1
+	},
+	"curIndexes" : [
+		{
+			"v" : 1,
+			"key" : {
+				"_id" : 1
+			},
+			"ns" : "normize.companyProfileXmlElement",
+			"name" : "_id_"
+		}
+	],
+	"ok" : 0,
+	"errmsg" : "please create an index over the sharding key before sharding."
+}
+
+(ein paar tausend Dokumente einfüllen, damit er ausreichend Werte für den Shardkey hat(?))
+
+mongos&gt; use normize;
+switched to db normize
+mongos&gt; db.companyProfileXmlElement.ensureIndex({uuid:1});
+mongos&gt; use admin;
+switched to db admin
+mongos&gt; db.runCommand( { shardcollection : "normize.companyProfileXmlElement", key : {uuid : 1} } )
+{ "collectionsharded" : "normize.companyProfileXmlElement", "ok" : 1 }
+mongos&gt; db.runCommand( { shardcollection : "normize.companyProfileXmlElement", key : {uuid : 1} } )
+{ "ok" : 0, "errmsg" : "already sharded" }
+mongos&gt; 
+
+
+  </pre>
+
+  <a href="."> back to sharding </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

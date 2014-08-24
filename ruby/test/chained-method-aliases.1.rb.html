@@ -1,0 +1,66 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/chained-method-aliases.1.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/chained-method-aliases.1.rb </h1>
+
+  <a href="chained-method-aliases.1.rb">download original</a>
+
+  <pre>
+class C
+
+  def meth
+    puts "m"
+  end
+
+  def wr1(wrapped_action)
+    puts "wr1 in"
+    self.send wrapped_action
+    puts "wr1 out"
+  end
+
+  def wr2(wrapped_action)
+    puts "wr2 in"
+    self.send wrapped_action
+    puts "wr2 out"
+  end
+
+  wrapper = :wr1
+  action = :meth
+
+  wrapped_method = "_meth_doit"
+  alias_method wrapped_method.intern, :meth
+
+  class_eval &lt;&lt;-EOS2
+         def #{action}
+           #{wrapper.to_s}(:#{wrapped_method})
+         end
+  EOS2
+
+
+end
+
+
+
+C.new.meth
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

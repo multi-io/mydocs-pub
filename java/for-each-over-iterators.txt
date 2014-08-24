@@ -1,0 +1,103 @@
+03:55 < multi_io> is there a specific reason why you can't loop through a 
+                  java.util.Iterator using the enhanced for loop?
+03:55 < r0bby> multi_io: why would you need to?
+03:55 < Sou|cutter> multi_io: because it doesn't implement Iterable, I suppose
+03:55 < Fanook> multi_io: because the iterator isn't Iterable. foreach the 
+                collection instead
+03:56 < multi_io> Sou|cutter: yeah, that's the technical reason. I ask why it 
+                  was designed that way.
+03:56 < r0bby> multi_io: ask Sun.
+03:56 < Fanook> because the foreach is to avoid the iterator boilerplate
+03:56 < multi_io> sometimes you don't have a collection, only an iterator
+03:56 < Sou|cutter> yes, throw your question into the sun
+03:56 < Sou|cutter> :)
+03:56 < r0bby> you ask here as if we wrote the api
+03:57 < Fanook> i've written AN api...
+03:57 < multi_io> I ask because I might have overlooked something
+03:57 < r0bby> multi_io: while(iter.hasNext()) { ... }
+04:00 < multi_io> I ask because I might have overlooked some reason why 
+                  designing the for loop to be able to loop through iterators 
+                  is a bad idea
+04:01 < nmx> why would you have an iterator instead of a collection?
+04:01 < Fanook> it's not. the foreach is to reduce the boilerplate for simple 
+                iteration
+04:01 < nmx> the iterator came from somewhere
+04:02 < multi_io> nmx: think
+04:02 < multi_io> non-resetable streams...
+04:02 < multi_io> an iterator over all lines of the standard input
+04:03 < Fanook> think Scanner
+04:03 < multi_io> for (String line: System.in.linesIterator()) { ... }
+04:04 < nmx> i would say that in that case, the stream should be iterable
+04:04 < multi_io> well, you could fake a collection around that, but its 
+                  iterator() method would work only once :-P
+04:04 < Fanook> think while(in.read()){...}
+04:05 < r0bby> while(scanner.hasNext() { System.out.println(scan.next()); }
+04:05 < r0bby> s/scan/scanner/
+04:06 < nmx> right, so if InputStream or whatever the class is has an 
+             iterator() method, it should be Iterable as well... doesn't that 
+             follow or am i missing something?
+04:06 < Fanook> the CLASS is iterable, not the ITERATOR
+04:06 < nmx> yes
+04:06 < nmx> so you would pass that to the foreach
+04:07 < nmx> eliminating the discussion
+04:08 < Fanook> iterating over an input stream just sounds weird, especially 
+                since we have classes/patterns like Scanner/while(hasNext){...} 
+                which are designed for that sort of thing
+04:08 < nmx> mogunus: it is impossible for us to provide a complete answer 
+             without source code. i would guess you haven't imported whatever 
+             class you're trying to use
+04:08 < multi_io> nmx: you mean like for (String line: System.in) { ... } ?
+04:09 < Fanook> i'm wondering where you found a stream that gives you an 
+                iterator
+04:09 < nmx> no
+04:09 < nmx> i'm not saying it DOES, i'm saying it SHOULD, by your logic
+04:09 < r0bby> nmx: ...
+04:09 < multi_io> System.in wouldn't have an iterator() method normally, 
+                  because it could have more than one iterator (over all lines, 
+                  all words, all characters, whatever)
+04:09 < Fanook> not by MY logic
+04:10 < nmx> Fanook: the general "you", sorry :)
+04:10 < nmx> does the linesIterator method exist or was that hypothetical?
+04:10 < Fanook> mogunus: it looks like you have 2 classes named Address in your 
+                namespace and you're not telling the compiler which one you 
+                want to use
+04:10 < multi_io> nmx: hypothetical
+04:10 < nmx> multi_io: ah, i see.
+04:10 < multi_io> it was a means to show why one could have an iterator without 
+                  a collection
+04:11 < mogunus> Fanook: you're right, I just explicitely imported 
+                 javax.mail.Address and it worked
+04:11 < nmx> multi_io: if you're trying to prove that a hypothetical situation 
+             is possible, it would help to provide an actual example
+04:11 < mogunus> Fanook: nmx : thanks all
+04:12 < nmx> multi_io: i suppose the Scanner case is an odd one.
+04:13 < multi_io> Fanook: the C++ STL can give you iterators over  streams
+04:18 < ojacobson> Are you packaging commons yourself or is it in your 
+                   container's lib (or in your ear file, if you have one, 
+                   outside the WAR)?
+04:18 < ojacobson> It looks a lot like classloader goofiness
+04:19 < WaREX> I am packaging with netbeans, I checked that inside the WAR file 
+               there is the WEB-INF/classes/log4j.properties file
+04:20 < Fanook> multi_io: the c++ STL is overly verbose and isn't the only 
+                standard utility library. GNU has one, Boost, there's probably 
+                one more i don't know of
+05:10 < multi_io> it appears I'm gathering a bunch of feature requests for Sun 
+                  here
+05:10 < multi_io> make for() able to use Iterators, make j.util.Collections's 
+                  constructor protected
+05:11 < ojacobson> I guarantee you both will be closed nearly immediately
+05:11 < ojacobson> the former "duplicate" the latter "won't fix"
+05:14 < ojacobson> (Using an iterator in a for loop is pretty close to trivial 
+                   anyways... create a one-line Iterable implementation that 
+                   returns the iterator you have and iterate over that.  
+                   Commons-Collections might even have one.)
+05:15 < r0bby> multi_io: ojacobson pretty much knows his shit, listen.
+05:15 < ojacobson> It's a good feature, and I'd love to have it
+05:15 < ojacobson> but its absence is not a showstopper
+05:35 < multi_io> ojacobson: about the "one-line Iterable" -- even that might 
+                  be too much hassle, even more so if it's not in the standard 
+                  library. The whole point of the extended for loop is saving 
+                  one line :-P
+05:35 < ojacobson> multi_io: aye
+05:35 < ojacobson> like I said: good feature to have, already widely requested, 
+                   not a showstopper, and there's a workaround for now.

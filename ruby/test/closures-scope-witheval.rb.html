@@ -1,0 +1,46 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/closures-scope-witheval.rb </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/closures-scope-witheval.rb </h1>
+
+  <a href="closures-scope-witheval.rb">download original</a>
+
+  <pre>
+#!/usr/bin/ruby
+
+# like closures-scope.rb, but creates the proc using "eval"
+#  (for testing whether this works -- so one could generate the
+#  ruby code dynamically)
+
+
+n=10
+
+p=proc{0}
+(0..n).each do |x|
+  pprev = p
+  p = eval "proc{ x + pprev.call }"
+end
+
+print p.call
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+
+03:31 < multi_io> what I have is essentially three select boxes select1, select2, select3, where the contents of each 
+                  select depends on what is selected in the previous select
+03:31 < multi_io> ...and the contents of each select I fetch via async xhr, with the value of the previous select as 
+                  a request parameter
+03:32 < kgf> multi_io: dojo.when doesn't always return a promise. it returns what it receives, if that's a promise that's 
+             what it returns. iinm.
+03:32 < kgf> but once you HAVE a promise, .then can chain either
+03:33 < multi_io> so in the change handler of select1 I essentially have fillSelect2().then(fillSelect3)
+03:34 < kgf> wouldn't you rather the user actually /choose/ something from select 2 first?
+03:34 < snover> use dojo.when if what is being returned is a promise *or* a value
+03:35 < snover> only use .then if you know that what is returned is always a promise
+03:36 < multi_io> where each fillSelectX essentially does return 
+                  dojo.xhrGet({url:"getSelectXContents?q="+(selectX-1).getValue()}).then(function(newEntries) {selectX.set("options", 
+                  newEntries)});
+03:37 < multi_io> kgf: this was just the change handler for select1. If the user selects something in that, both 
+                  select2 and select3 have to be switched to new default values
+03:38 < kgf> multi_io: ah
+03:38 < kgf> multi_io: but it sounds like both involve xhrGet and thus promises?
+03:38 < multi_io> kgf: right
+03:40 < kgf> so you can use .then the whole way
+03:40 < multi_io> now, what I said above applies. Sometimes e.g. fillSelect2 sees that it doesn't actually need to do 
+                  the xhr call, it can just set select2's contents synchronously and return.
+03:40 < kgf> oh
+03:40 < multi_io> what I do right now in that situation is:
+03:41 < multi_io> select2.set("options", newContents); var result = new dojo.Deferred(); result.callback(); return 
+                  result;
+03:41 < kgf> yeah that's the heavyweight approach I suppose lol
+03:41 < multi_io> so I can retain that nice chaining of then calls in the caller
+03:42 < kgf> granted .then chaining is so much nicer than the alternative... dojo.when is susceptible to the same 
+             nasty nesting that .then tends to avoid.
+03:44 < multi_io> kgf: so you'd say dojo.when isn't necessarily better in my situation.
+04:16 < kgf> multi_io: you've only got 2 things going on. it's not really going to be painful there
+04:16 < kgf> but also if you've ever got a sequence of events where the first thing is a guaranteed to be a promise, iiuc
+             dojo.when is unnecessary, since .then chains both deferreds and fully-synchronous calls.
+
+---
+
+03:10 < snover> dojo.when(xhrGet(…), function (val) { dojo.when(somethingElseThatReturnsAPromiseOrValue, function 
+                (val2) { more stuff… }) })
+03:11 < multi_io> snover: right, that's how I thought it'd work, but it looks a lot uglier than chaining then() calls.
+
+
+---
+
+22:47 < multi_io> isn't it unfortunate that dojo.when does not return a promise?
+22:47 < kgf> multi_io: hehehe
+22:48 < kgf> I think so too
+22:48 < kgf> the interesting thing is if you look at kriskowal's q.js (implementation of Promises/B), when DOES return a promise
+22:48 < kgf> and it has an asap method that does what dojo.when does
+22:48 < kgf> BUT I will admit that dojo.when should be more lightweight
+22:48 < kgf> er, meaning, in its present form, it is more lightweight than promises/B's version
+22:50 < multi_io> kgf: so it's not just sloppiness of dojo guys, but they did it to be more lightweight?
+22:51 < kgf> multi_io: I reckon it was intentional
+22:51 < kgf> I'm not sure whether it's actually part of the Promises specs or not
+22:52 < kgf> I see when and asap documented in Promises/B but when isn't mentioned in Promises/A
+22:54 < multi_io> on http://wiki.commonjs.org/wiki/Promises/B it says that when returns a promise
+22:56 < kgf> multi_io: that's what I'm saying
+22:56 < kgf> dojo follows Promises/A
+22:56 < kgf> but when doesn't appear to be within the spec in that case
+22:56 -!- setsunafseisei [~chatzilla@ip68-100-149-92.dc.dc.cox.net] has joined #dojo
+22:56 < kgf> personally I've wanted to take a closer look at q.js, it seems interesting to me and well thought out
+22:56 < kgf> but in the case of when I can see pros/cons either way
+22:57 < kgf> and naturally it's possible to wrap dojo.when to always use a promise if you wanted

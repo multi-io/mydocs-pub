@@ -1,0 +1,88 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/rake/bugs.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">rake</a>/bugs.txt </h1>
+
+  <a href="bugs.txt">download original</a>
+
+  <pre>
+X-From-Line: nobody Tue Jan 11 15:07:36 2005
+To: rake-devel@rubyforge.org
+Subject: [rake] RDocTask.rdoc_target should be public, sub-tasks should be documented
+From: Olaf Klischat &lt;klischat@cs.tu-berlin.de&gt;
+Date: Tue, 11 Jan 2005 15:07:24 +0100
+Message-ID: &lt;m2mzvgvz37.fsf@cs.tu-berlin.de&gt;
+User-Agent: Gnus/5.1006 (Gnus v5.10.6) XEmacs/21.4 (Security Through Obscurity, linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Lines: 33
+Xref: tick archive.mail:472
+X-Gnus-Article-Number: 472   Tue Jan 11 15:07:36 2005
+
+I think that the method RDocTask.rdoc_target should be public, not
+private. Moreover, I'd argue that RDocTask should document the
+internal prerequisites of the tasks it generates.
+
+Rationale:
+
+For a pet project, I wanted to add additional file prerequisites to
+the rdoc task (those are files that are :include:d from the rdoc
+text). After some digging through the rake sources, I found this to be
+the only way to do that properly:
+
+Rake::RDocTask.new { |rdoc|
+  rdoc.rdoc_dir = 'doc'
+  ....
+
+  #file rdoc.rdoc_target =&gt; ['examples/company.xml','examples/company.rb']  # doesn't work -- private method!
+  file "#{rdoc.rdoc_dir}/index.html" =&gt; ['examples/company.xml','examples/company.rb']
+}
+
+Obviously, this is somewhat of a black art -- the additional files
+have to be added to the prerequisites of the internal prerequisite of
+the :rdoc task (file "#{rdoc.rdoc_dir}/index.html")[1], and that
+prerequisite is neither documented nor is the method that returns its
+name (RDocTask.rdoc_target) callable from the outside. Hence my
+proposal.
+
+Olaf
+
+[1] adding the files as prerequisites to the :rdoc task itself is a
+    nonsolution because the rdoc execution runs as the action of the
+    file "#{rdoc.rdoc_dir}/index.html" task, so the :rdoc task
+    wouldn't be run when only one of my additional files had been
+    changed.
+
+
+-----------------
+
+same argument goes for Rake::PackageTask, Rake::GemPackageTask.
+
+-----------------
+
+Rake::PackageTask should remove and recreate its package_dir each time
+it needs to rebuild a package. Otherwise, files that have been removed
+from the list of files to be archived may still be in the package_dir
+and would consequently be added to the archive again.
+
+  </pre>
+
+  <a href="."> back to rake </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

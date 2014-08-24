@@ -1,0 +1,98 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/ng/pingy.stdout.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../../.">.</a>/<a href="../../.">perl</a>/<a href="../.">test</a>/<a href=".">ng</a>/pingy.stdout.pl </h1>
+
+  <a href="pingy.stdout.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl
+
+$queuesize=100;
+$grain=10;
+
+# localhost for a baseline
+@hosts=('localhost', 'www.perl.com', 'www.yahoo.com');
+
+$path="/tmp/fifo_ping";
+unless (-p $path) {
+    unlink $fifoName;
+    # Returnwert von system() ist invers, deshalb &amp;&amp; statt ||
+    system("mkfifo",$path) &amp;&amp; die "couldn't mkfifo $path: $!";
+}
+
+
+foreach (@hosts) {
+        if ($pid=fork) {
+                push(@children, $pid);
+                $host="";
+        } else {
+                @children=();
+                $host=$_;
+                last;
+        }
+}
+
+if (! @children) {
+        undef %hosts;
+        undef $win;
+        use Net::Ping;
+        $p=new Net::Ping('icmp', 1, 128);
+
+        open(FIFO, "&gt;&gt;$path") || die;
+        select(FIFO); $|=1;
+        while(1) {
+                if ($p-&gt;ping($host, 1)) {
+                        print FIFO "$host 1 blubb\n";
+                } else {
+                        print FIFO "$host 0 blubb\n";
+                }
+                sleep 1;
+        }
+        close(FIFO);
+} else {
+        open(FIFO, "$path") || die;
+        while(&lt;FIFO&gt;) {
+                ($host, $ok)=split(/\s+/, $_);
+                push(@{$results{$host}}, $ok);
+                if (@{$results{$host}} &gt; $queuesize) {
+                        shift(@{$results{$host}});
+                }
+                disp_results(%results);
+        }
+        close(FIFO);
+}
+
+sub disp_results {
+        my(%res)=@_;
+
+        foreach(sort keys %res) {
+                my $i=0;
+                for(@{$res{$_}}) { $i++ if $_ };
+                print "hulahula $_: $i\n";
+        }
+        print "\n";
+}
+
+
+  </pre>
+
+  <a href="."> back to ng </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

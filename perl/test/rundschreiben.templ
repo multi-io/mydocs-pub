@@ -1,0 +1,21 @@
+<%= @people %> Kunden habe Schulden:
+
+<%my $sum = 0;%>
+
+<%foreach my $k (@people) {%>
+
+Foo \<%  Bar \<%=
+Baz \>
+
+Kunde: <%= $k->{sex} eq 'm'? "Herr" : "Frau"%> <%= $k->{name}%> 
+Hat <%= $k->{debt}%> Euro Schulden.
+
+<%$sum += $k->{debt};%>
+
+<%}%>
+
+Gesamt: <%= $sum %> Euro.
+
+<%= $self->include("rsincl.templ") %>
+
+Mit freundlichen...

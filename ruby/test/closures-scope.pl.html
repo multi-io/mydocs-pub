@@ -1,0 +1,42 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/test/closures-scope.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">ruby</a>/<a href=".">test</a>/closures-scope.pl </h1>
+
+  <a href="closures-scope.pl">download original</a>
+
+  <pre>
+$n=10;
+
+$p=sub{0};
+
+foreach my $x (0..$n) {
+    my $pprev = $p;
+    $p = sub{ $x + $pprev-&gt;() };
+}
+
+
+
+print $p-&gt;();
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,210 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./ruby/mixin_class_methods_global_state.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">ruby</a>/mixin_class_methods_global_state.txt </h1>
+
+  <a href="mixin_class_methods_global_state.txt">download original</a>
+
+  <pre>
+23:48 -!- Irssi: Join to #ruby-lang was synced in 1 secs
+
+23:58 &lt; multi_io&gt; what I want is a mixin that provides class methods that share 
+                  some global state
+
+
+module M
+
+  @@cv = 42
+
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def cm2
+      puts @@cv
+    end
+  end
+
+end
+
+
+class C
+  include M
+  cm2  # =&gt; should print 42, but:
+       #   in `cm': uninitialized class variable @@cv in M::ClassMethods (NameError)
+end
+
+
+Day changed to 28 Feb 2005
+
+00:01 &lt; shyouhei&gt; what about a cnostant of Array?
+00:01 &lt; shyouhei&gt; CV = [42]
+00:02 &lt; shyouhei&gt; def cv; CV[0]; end
+
+i.e.:
+
+module M
+
+  CV = [42]
+
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+
+  module ClassMethods
+    def cv
+      CV[0]
+    end
+
+    def cv=(x)
+      CV[0]=x
+    end
+  end
+
+end
+
+
+class C
+  include M
+
+  puts cv  # 42
+  self.cv=23
+  puts cv  # 23
+end
+
+
+class C2
+  include M
+
+  puts self.cv  # 23
+end
+
+
+class C3
+  include M
+end
+
+
+puts C3.cv  # 23
+
+C3.class_eval "self.cv=38"
+
+puts C3.cv  # 38
+puts C.cv   # 38
+
+
+
+00:03 &lt; shyouhei&gt; is a good old trick -- implementation of a class variable on 
+                  ruby 1.4;  before Matz introduced @@cv
+
+
+00:13 &lt; multi_io&gt; thanks
+00:14 &lt; multi_io&gt; yep, that works
+
+
+00:10 &lt; shyouhei&gt; an alternative [use Module.new{block} (&gt;1.8)]
+
+i.e.:
+
+
+module M
+  @@cv = 42
+  def self.append_features(base)
+    super
+    base.extend(ClassMethods)
+  end
+ 
+  ClassMethods = Module.new do
+    def cv
+      @@cv
+    end
+
+    def cv=(x)
+      @@cv=x
+    end
+  end
+end
+
+
+class C
+  include M
+
+  puts cv  # 42
+  self.cv=23
+  puts cv  # 23
+end
+
+
+class C2
+  include M
+
+  puts self.cv  # 23
+end
+
+
+class C3
+  include M
+end
+
+
+puts C3.cv  # 23
+
+C3.class_eval "self.cv=38"
+
+puts C3.cv  # 38
+puts C.cv   # 38
+
+
+
+
+0:27 &lt; multi_io&gt; shyouhei: your alternative works too, but I think I don't 
+                  fully understand why...
+00:27 &lt; multi_io&gt; albeit...
+00:27 &lt; multi_io&gt; maybe I do
+00:29 &lt; multi_io&gt; is it because the block is a closure and thus accesses a 
+                  different @@cv?
+00:30 &lt; shyouhei&gt; multi_io: exactly. blocks can "see" variables outside, while 
+                  module statements cannot.
+00:32 &lt; multi_io&gt; shyouhei: are there any other implications when using your 
+                  alternative? I.e. the ClassMethods behaving differently?
+00:34 &lt; shyouhei&gt; No.  The only difference is that @@cv (or any other variables 
+                  if you use) can be seen or not.
+
+(he's right I think -- at least all my unit tests kept working)
+
+00:38 &lt; shyouhei&gt; ,... maybe. Some parts of ruby are difficult than what human 
+                  beging can understand :-)
+
+00:43 &lt; multi_io&gt; hmm.. there appears to be one glitch: when using rdoc to 
+                  generate documentation for this, the ClassMethods's methods 
+                  are documented as if they belonged to the root namespace?C
+00:44 &lt; multi_io&gt; (this appears to be an rdoc problem...)
+00:44 &lt; multi_io&gt; (actually I'm surprised that rdoc generated documentation for 
+                  those methods at all...)
+
+(so I chose the 1st alternative for the time being)
+
+  </pre>
+
+  <a href="."> back to ruby </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

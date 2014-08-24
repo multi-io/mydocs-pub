@@ -1,0 +1,94 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./java/osgi/misc.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">java</a>/<a href=".">osgi</a>/misc.txt </h1>
+
+  <a href="misc.txt">download original</a>
+
+  <pre>
+[15:09] == multi_io [50f62021@gateway/web/freenode/ip.80.246.32.33] has joined #eclipse
+[15:10] == EricInBNE [~Eric@202-173-173-253.dyn.iinet.net.au] has quit [Remote host closed the connection]
+[15:13] == deSilva [~deSilva@144.187.32.17] has joined #eclipse
+[15:14] &lt;multi_io&gt; I have two projects A and B, where A depends on (uses code from) B. I want to use A and B in an RCP UI application and in a server application. The UI application is OSGI-based, the server application is not.
+[15:15] &lt;multi_io&gt; so I would configure A and B as RCP plugin projects in Eclipse (for the UI app), and as normal projects with .classpath dependecy configuration (for the server app)
+[15:16] &lt;multi_io&gt; is that a good idea?
+[15:16] &lt;rcjsuen&gt; I would just make all the Java projects OSGi bundles.
+[15:16] &lt;rcjsuen&gt; and let PDE manage the classpath that way through MANIFEST.MF
+[15:17] &lt;rcjsuen&gt; or use Neil's bndtools if you don't like pde
+[15:17] &lt;multi_io&gt; rcjsuen: but the server app isn't an RCP app (it's a normal Eclipse project that depends on A and B)...
+[15:18] &lt;rcjsuen&gt; That statement doesn't change how I feel. :)
+[15:19] &lt;mart&gt; I use that approach. We have libraries that are shared by sonar and eclipse plugins, and the libraries are all in Eclipse as PDE projects
+[15:21] &lt;mart&gt; Actually, we're using maven, so it's some m2e connector that adds the PDE classpath container.
+[15:22] &lt;paulweb515&gt; multi_io: if they're valid OSGi bundles then they're valid java jars (unless they depend on proper modularization in some way)
+[15:22] &lt;paulweb515&gt; multi_io: if they are plugins that contribute to the UI, however, I'm not sure how you could run them outside of the workbench
+[15:24] &lt;multi_io&gt; paulweb515: they don't contain UI stuff
+[15:25] &lt;paulweb515&gt; multi_io: ok, that's one less thing to worry about
+[15:26] &lt;rcjsuen&gt; Being an OSGi bundle doesn't imply that jar is a UI library. :o
+[15:27] &lt;paulweb515&gt; rcjsuen: I was just clarifying ... OSGi bundles are just jars, but a plugin that depends on the workbench would never run outside of OSGi :-)
+[15:30] &lt;multi_io&gt; paulweb515: the thing is, I don't want to include them as JARs in the server app's Properties/JavaBuildPath/Libraries because doing so would increase the turnaround time when changing stuff in A/B.
+[15:30] &lt;multi_io&gt; I want to include A and B in the server app's JavaBuildPath/Projects.
+[15:33] &lt;multi_io&gt; ...but it seems I'm getting "Build path contains duplicate entry" when I include B in A's dependecies both as a MANIFEST.MF RequireBundle and as a JavaBuildPath dependency.
+[15:34] &lt;paulweb515&gt; multi_io: for A and B, use the MANIFEST.MF and then use PDE Tools&gt;Update Classpath
+[15:34] &lt;paulweb515&gt; multi_io: that'll make sure they compile
+[15:36] &lt;paulweb515&gt; multi_io: when working on the server you can just add the dependency to the java classpath from server java project to project A or project B
+[15:45] &lt;multi_io&gt; paulweb515: looks like PDE Tools&gt;Update Classpath just removes all the JavaBuildPath dependencies...
+[15:47] &lt;paulweb515&gt; multi_io: why would that matter to you?
+[15:51] &lt;multi_io&gt; paulweb515: hm, the dependency resolution must work when I run the whole thing in a non-OSGI app (i.e. the server app)...
+[15:51] &lt;multi_io&gt; would it honor the MANIFEST.MF dependency in that case?
+[15:52] &lt;paulweb515&gt; multi_io: within eclipse, it should be fine
+[15:52] &lt;paulweb515&gt; the PDE classpath container adds the correct jars to the classpath, even when it's considered a plain java app
+[15:52] &lt;multi_io&gt; ok...
+[15:57] &lt;paulweb515&gt; I created a java project, and added org.ecilpse.jface project and o.e.swt.arch.jar to its classpath, and I was able to launch a java JFace/SWT app
+[15:57] &lt;paulweb515&gt; treating them like java projects works fine
+[16:00] &lt;paulweb515&gt; multi_io: i.e. using Update Classpath on the bundles A and B is the right thing to do.  When you create your server java project, you'll have to put whatever deps on it that you require to get it to compile and launch
+[16:01] &lt;multi_io&gt; paulweb515: so I'll configure the server app, A and B as plugin projects, declare the dependencies in the MANIFEST.MF only (not in .classpath), and then run the server app as a non-OSGI java app?
+[16:03] &lt;paulweb515&gt; multi_io: yes, and you'll add the projects A/B to the server build path
+[16:04] &lt;paulweb515&gt; fuho: Plug-in Development Environment.  It's useful for finding out what exactly implements view or editors in eclipse (for plugin developers)
+[16:06] &lt;multi_io&gt; paulweb515: by "server build path" you mean project properties / Java Build Path / Projects ?
+[16:21] &lt;multi_io&gt; paulweb515, rcjsuen: I've done some tests, and it looks like I can indeed configure a project (server app) as a plugin project and declare its dependencies as OSGI plugin dependencies (MANIFEST.MF/RequireBundle) only, and then...
+[16:22] &lt;multi_io&gt; ... run the app as a standard non-OSGI app, and it still picks up the dependencies from the manifest.mf and runs.
+[16:22] &lt;multi_io&gt; so I guess this is the preferred way to do this.
+[17:14] &lt;paulweb515&gt; multi_io: that's not really what I meant, but yes that will work as well
+[17:21] &lt;multi_io&gt; paulweb515: you meant to configure the server app as a standard java project and add the dependencies to A and B (which are plugin projects) to the server app's project properties / Java Build Path / Projects ?
+[17:21] &lt;paulweb515&gt; multi_io: yes.  Although I reguarly do what you did, create a plugin project that depens on o.e.ui so that I can write java JFace/SWT apps :-)
+[17:22] &lt;paulweb515&gt; multi_io: having the server app just a standard java project will help you manage your java classpath for the server, so you don't get too many surprises
+
+Looks like the "Build path contains duplicate entry" error does NOT
+occur when the project isn't an RCP project (i.e. it doesn't have a
+"PluginNature" entry in its .project). So with such a project, you can
+have the same dependencies in .classpath and MANIFEST.MF.  Even then
+it will still pick up MANIFEST.MF dependencies, at least when run in
+an OSGI app (not sure about when run as a Java app).
+
+[17:28] &lt;multi_io&gt; paulweb515: I noticed that, apparently, the "Build path contains duplicate entry" in A does NOT occur if I do not configure A as an OSGI project in Eclipse, and then declare the dependency on B in both MANIFEST.MF and .classpath.
+[17:29] &lt;multi_io&gt; apparently A will still be run as an OSGI plugin when the client app (RCP app with plugin dependency on A) is run.
+[17:30] &lt;multi_io&gt; does that surprise you? :-P
+[17:34] &lt;rcjsuen&gt; if you're using MANIFEST.MF, don't use .classpath
+[17:36] &lt;nitind&gt; Rather, don't modify it yourself.
+[17:36] &lt;multi_io&gt; my ultimate goal is to autogenerate both with gradle :P
+
+
+
+
+
+  </pre>
+
+  <a href="."> back to osgi </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+//if they were supported (they're not, are they?), they could be used
+//  e.g. like this:
+
+enum EventType{MOUSE_MOVED, MOUSE_CLICKED, KEY_PRESSED};
+
+interface <value EventType eventType> Listener { }
+
+interface MouseMovedListener extends Listener<MOUSE_MOVED> { void mouseMoved(...); }
+interface MouseClickedListener extends Listener<MOUSE_CLICKED> { void mouseClicked(...); }
+interface KeyPressedListener extends Listener<KEY_PRESSED> { void keyPressed(...); }
+
+
+class MyComponent {
+    void <value EventType eventType> registerListener(eventType type, Listener<eventType> listener) {
+        .....
+    }
+}
+
+
+
+usage e.g.
+
+MyComponent myComponent = ....;
+myComponent.registerListener(MOUSE_CLICKED, new MouseClickedListener() {.....});
+
+compiler checks that 2nd argument to registerListener matches the 1st argument.
+
+
+
+...or maybe even just:
+
+class MyComponent {
+    void <value EventType eventType> registerListener(Listener<eventType> listener) {
+        .....
+    }
+}
+
+MyComponent myComponent = ....;
+myComponent.registerListener<MOUSE_CLICKED>(new MouseClickedListener() {.....});
+
+
+
+
+no?

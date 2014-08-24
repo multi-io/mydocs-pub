@@ -1,0 +1,40 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./perl/test/chk4doubles.pl </title>
+</head>
+
+<body>
+
+  <h1> <a href="../../.">.</a>/<a href="../.">perl</a>/<a href=".">test</a>/chk4doubles.pl </h1>
+
+  <a href="chk4doubles.pl">download original</a>
+
+  <pre>
+#!/usr/bin/perl -w
+
+my @lines = &lt;&gt;;
+chop @lines;
+
+foreach my $line (@lines) {
+    1 == grep { $_ eq $line } @lines or die "FEHLER: Zeile \"$line\" nicht genau ein mal gefunden!\n";
+}
+
+print "Test bestanden.\n";
+
+  </pre>
+
+  <a href="."> back to test </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>
