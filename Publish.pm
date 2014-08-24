@@ -80,10 +80,8 @@ sub publish($$) {
     foreach my $_f (@{$_dir->{FILES}}) {
         my $_fqsrcname = "$_dir->{PATH}$_f";
 
-        if (!htmlizable($_fqsrcname)) {
-            copy($_fqsrcname, "${targetdir}/$_f");
-            next;
-        }
+        copy($_fqsrcname, "${targetdir}/$_f");
+        next unless (htmlizable($_fqsrcname));
 
         local $/=undef;
         open(F,"<$_fqsrcname") or die "couldn't open $_fqsrcname: $!";

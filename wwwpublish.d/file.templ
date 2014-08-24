@@ -12,6 +12,8 @@
 
   <h1> <%= $nd=@parents; join("/", map {qq[<a href="${\("../" x ($nd-- -1))}.">$_</a>]} @parents) %>/<%= $f %> </h1>
 
+  <a href="<%= $f %>">download original</a>
+
   <pre>
 <%= htmlescape $text %>
   </pre>
