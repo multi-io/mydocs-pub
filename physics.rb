@@ -61,18 +61,41 @@ grams=1e-3
 tons=1e3
 m_earth=5.975e24
 m_sun=1.985e30
-
+m_proton=1.672621777e-27
+m_electron=9.10938291e-31
+m_neutron=1.674927351e-27
 
 # energies, base unit: joule
 j=1.0
 ws=j
-mj=1e6*j
+kj=1000.0*j
+mj=1000.0*kj
+gj=1000.0*mj
+tj=1000.0*gj
+pj=1000.0*tj
 wh=3600.0*ws
 kwh=1000.0*wh
 mwh=1000.0*kwh
 gwh=1000.0*mwh
 twh=1000.0*gwh
+tons_tnt=4.184*gj
+kiloton_tnt=1000.0*tons_tnt
+megaton_tnt=1000.0*kiloton_tnt
+gigaton_tnt=1000.0*megaton_tnt
 
+# very approximate; http://impact.ese.ic.ac.uk/ImpactEffects/Chicxulub.html
+dinosaur_killer_impact_energy=1.3e8*megaton_tnt
+
+# charges, base unit: coulomb
+coulomb=1.0
+el_charge=1.602176565e-19
+
+# energies
+ev=el_charge
+kev=1000.0*ev
+mev=1000.0*kev
+gev=1000.0*mev
+tev=1000.0*gev
 
 # misc
 ly=c*year
