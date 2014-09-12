@@ -7,7 +7,7 @@ call stack (innermost (controller) last)
 
     HiddenHttpMethodFilter
 
-    DelegatingFilterProxy
+    DelegatingFilterProxy->FilterChainProxy
 
       SecurityContextPersistenceFilter
 

@@ -103,12 +103,12 @@ full trace of sample controller invocation:
 
 
 (servlet container is tomcat. The ApplicationFilterChain thing is the
-Tomcat thing that processes the sequence of web.xml-defined servlet
+Tomcat facility that processes the sequence of web.xml-defined servlet
 filters)
 
 - web.xml: the first filter-mapping in web.xml becomes "outermost" at
   runtime (i.e the one that gets to call all the other servlet
-  filters), last filter-mapping becomes "innermost" at runtime
+  filters); the last filter-mapping becomes "innermost" at runtime
   (i.e. the one that calls no other servlet filters)
 
 - usually the last one of the last (innermost) servlet filters is
@@ -117,11 +117,15 @@ filters)
   should correspond to the DelegatingFilterProxy's filter-name in
   web.xml). The bean must apparently be a subclass of Spring's
   GenericFilterBean, which is a servlet filter and a spring bean at
-  the same time. It will reference a list of other filter beans,
-  configured via the spring context rather than in web.xml. These
-  spring-configured filter beans must also be servlet filters. They're
-  configured via spring to gain better spring integration, among other
-  advantages. From the DelegatingFilterProxy API doc:
+  the same time. Normally, that bean will be a FilterChainProxy
+  (normally, this won't have to be instantiated explicitly in the
+  Spring context XML -- the Spring security sec:http macros will
+  instantiate it internally). The FilterChainProxy references a list
+  of other filter beans, configured via the spring context rather than
+  in web.xml. These spring-configured filter beans must also be
+  servlet filters. They're configured via spring to gain better spring
+  integration, among other advantages. From the DelegatingFilterProxy
+  API doc:
 
  * &lt;p&gt;&lt;code&gt;web.xml&lt;/code&gt; will usually contain a DelegatingFilterProxy definition,
  * with the specified &lt;code&gt;filter-name&lt;/code&gt; corresponding to a bean name in
@@ -140,7 +144,8 @@ filters)
 - the dispatch to the controller/view is NOT done by a servlet filter,
   but by spring's org.springframework.web.servlet.DispatcherServlet,
   which must be set up in web.xml to catch all requests. The
-  DispatcherServlet will invoked after all filters have run.
+  DispatcherServlet will be invoked by the servlet container after all
+  filters have run.
 
 
   </pre>
