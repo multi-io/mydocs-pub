@@ -1,21 +1,19 @@
 PUBHTMLDIR=$(HOME)/public_html/multi-io.github.com/mydocs
+REMOTE_SERVER=some.server.com
 
-.PHONY: update-and-publish wwwpublish update
+.PHONY: wwwpublish wwwpublish-remote ghpublish
 
-default: wwwpublish-cs
-
-update-and-publish:
-	$(MAKE) update
-	$(MAKE) wwwpublish
+default:
+	@echo 'see the Makefile for publishing options'
 
 wwwpublish:
 	mkdir --parents $(PUBHTMLDIR) && \
 	./wwwpublish $(PUBHTMLDIR)
 
-wwwpublish-cs: wwwpublish
+wwwpublish-remote: wwwpublish
 	cd $(PUBHTMLDIR) && \
-	tar cz . | ssh basta.cs.tu-berlin.de 'cd www/mydocs; gtar xz'
+	tar cz . | ssh $(REMOTE_SERVER) 'cd public_html/mydocs; gtar xz'
 
+ghpublish:
+	./gh-publish
 
-update:
-	cvs up -Pd

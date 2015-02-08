@@ -1,0 +1,221 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./php/logging.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">php</a>/logging.txt </h1>
+
+  <a href="logging.txt">download original</a>
+
+  <pre>
+PSR\Log (spec) and monolog (common implementation).
+
+
+== usage
+
+apps do this:
+
+PSR\Log\LoggerInterface $logger = ....; // e.g. in a symfony app service: $this-&gt;getContainer()-&gt;get('logger');
+
+$logger-&gt;error($message, $context);  //message is a string usually, $context an optional array -- one standardized key: 'exception'
+
+
+== PSR\Log\LoggerInterface
+
+
+interface PSR\Log\LoggerInterface
+{
+    public function emergency|alert|error|warning|notice|info|debug($message, array $context = array());
+
+    public function log($level, $message, array $context = array());
+
+    //$message is a string or object supporting __toString().
+    //$context is an array, some keys of which are standardized, e.g. 'exception'.
+    // see https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
+}
+
+
+
+== monolog\Logger (implements PSR\Log\LoggerInterface)
+
+
+/**
+ * Monolog log channel
+ *
+ * It contains a stack of Handlers and a stack of Processors,
+ * and uses them to store records that are added to it.
+ *
+ * @author Jordi Boggiano &lt;j.boggiano@seld.be&gt;
+ */
+class monolog\Logger implements PSR\Log\LoggerInterface {
+
+    /**
+     * The handler stack
+     *
+     * keys: ascending numbers
+     * values: implementations of Monolog\Handler\HandlerInterface;
+     */
+    protected $handlers;
+
+    /**
+     * Processors that will process all log records
+     *
+     * To process records of a single handler instead, add the processor on that specific handler
+     *
+     * @var callable[]
+     */
+    protected $processors;
+
+    // e.g.
+    //(overrides)
+    public function error($message, array $context = array())
+    {
+        return $this-&gt;addRecord(static::ERROR, $message, $context);
+    }
+
+    public function addRecord($level, $message, array $context = array())
+    {
+        $levelName = static::getLevelName($level);
+
+        $handlerKey = &lt;first key of $this-&gt;handlers for which the corresponding value (handler) -&gt;isHandling(array('level' =&gt; $level)&gt;;
+
+        if (null === $handlerKey) {
+            return false;
+        }
+
+        if (!static::$timezone) {
+            static::$timezone = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
+        }
+
+        $record = array(
+            'message' =&gt; (string) $message,
+            'context' =&gt; $context,
+            'level' =&gt; $level,
+            'level_name' =&gt; $levelName,
+            'channel' =&gt; $this-&gt;name,
+            'datetime' =&gt; \DateTime::createFromFormat('U.u', sprintf('%.6F', microtime(true)), static::$timezone)-&gt;setTimezone(static::$timezone),
+            'extra' =&gt; array(),
+        );
+
+        //possibly transform the record by passing it through all the defined processors (which are just callbacks)
+        foreach ($this-&gt;processors as $processor) {
+            $record = call_user_func($processor, $record);
+        }
+
+        // pass the record to ascending handlers starting at handlerKey until
+        //   one of them returns true, indicating that it handled the record
+        //   and thus no further handler should be invoked
+        while (isset($this-&gt;handlers[$handlerKey]) &amp;&amp;
+            false === $this-&gt;handlers[$handlerKey]-&gt;handle($record)) {
+            $handlerKey++;
+        }
+
+        return true;
+    }
+
+}
+
+
+
+
+== monolog handlers (Monolog\Handler\HandlerInterface)
+
+namespace Monolog\Handler;
+
+/**
+ * Interface that all Monolog Handlers must implement
+ */
+interface HandlerInterface
+{
+    /**
+     * Checks whether the given record will be handled by this handler.
+     *
+     * This is mostly done for performance reasons, to avoid calling processors for nothing.
+     *
+     * @return Boolean
+     */
+    public function isHandling(array $record);
+
+    /**
+     * Handles a record.
+     *
+     * @param  array   $record The record to handle
+     * @return Boolean true means that this handler handled the record, and that bubbling is not permitted.
+     *                        false means the record was either not processed or that this handler allows bubbling.
+     */
+    public function handle(array $record);
+
+    // implementations will use this to format the records. see below.
+    public function setFormatter(FormatterInterface $formatter);
+    public function getFormatter();
+}
+
+Many implementations:
+
+  - handlers for specific backends, e.g. stream/file, Redis, Elasticsearch, Doctrine etc.
+
+    - these all pass the record to the formatter first. Before that,
+      they pass it through a list (empty by default) of "processors",
+      which are just arbitrary record-&gt;record functions that may
+      modify the record in some way
+
+      - technically, this is done via a base class,
+        AbstractProcessingHandler, from which all the concrete-backend
+        handlers are derived. Its overridden handle() method checks
+        for $this-&gt;isHandling($record) (aborts if false), then passes
+        the record through the processors (if any) and to the
+        formatter. The result of the formatter (a string, normally) is
+        stored to $record['formatted'], and then the abstract method
+        write($record) is called, which the subclasses implement
+
+  - GroupHandler: forwards records to multiple handlers
+  
+  - FilterHandler: blocks or forwards records (to a single other
+    handler) based on a level filtering criteria
+
+  - FingersCrossedHandler: holds a single other (forwarding) handler,
+    buffers all records internally until one arrives whose level
+    exceeds a certain threshold, at which point all buffered records
+    (and, by default, all further records, whether they exceed the
+    threshold or not) will be forwarded to the forwarding handler.
+
+    Lets all records bubble through by default.
+
+
+
+== monolog formatters (Monolog\Formatter\FormatterInterface)
+
+Convert records (see above) into strings.
+
+interface FormatterInterface
+{
+    public function format(array $record);
+}
+
+
+Many implementations: simple one line per record (LineFormatter),
+JSON, HTML, Logstash event format, specialized formatters for use with
+handlers like Elasticsearch or MongoDB.
+
+Default formatter, used if nothing is configured explicitly:
+LineFormatter.
+
+  </pre>
+
+  <a href="."> back to php </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2015 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

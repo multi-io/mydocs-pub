@@ -21,17 +21,12 @@ revert local (uncommitted) changes:
 git checkout HEAD -- path/to/file
 
 
-git equivalent to hg rollback:
-
-git reset --soft HEAD^
-
-
-to unstage changes:
+unstage changes:
 
 git reset HEAD &lt;files&gt;
 
 
-to abort a merge:
+abort a merge:
 
 git reset --hard
 
@@ -108,13 +103,21 @@ setting both variables works now. e.g. GIT_AUTHOR_DATE='xxxx-xx-xxTxx:xx:xx' GIT
 
 I'm pretty sure this didn't work in 1.8, but whatever.
 
+(git 2.1.3, OSX) the above doesn't work, but this does (sets both times):
+
+(d='2015-01-13T22:08:09'; EDITOR=vim GIT_AUTHOR_DATE="$d" GIT_COMMITTER_DATE="$d" git commit --date="$d")
+
+(not sure which of the values is actually needed. Without the --date
+option, notthing is set, with --date but without the environment --
+probably only the author time)
+
   </pre>
 
   <a href="."> back to git </a>
 
   <p/>
 
-  <font size="-3">(C) 1998-2014 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+  <font size="-3">(C) 1998-2015 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
 
 </body>
 
