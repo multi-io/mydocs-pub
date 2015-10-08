@@ -2,7 +2,6 @@
 
 use strict;
 use File::Find;
-use IPC::System::Simple;
 
 my $root = {NAME => ".", PATH => "./", PARENT => undef};
 open(GITLS, "git ls-files |");

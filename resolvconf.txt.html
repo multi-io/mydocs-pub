@@ -1,0 +1,89 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./resolvconf.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href=".">.</a>/resolvconf.txt </h1>
+
+  <a href="resolvconf.txt">download original</a>
+
+  <pre>
+Mediator between programs that use the /etc/resolv.conf name resolver
+(e.g. libc and its users, caching DNS servers etc.), called "clients",
+and programs that change the resolver's data (e.g. pppd resp. its
+ip-up scripts, DHCP clients etc.), called "servers".
+
+The latter category of programs (servers) should no longer change
+/etc/resolv.conf directly, but instead call out to resolvconf to
+inform it about the change, essentially by piping the contents of a
+resolv.conf file representing the new configuration to
+/sbin/resolvconf -a &lt;network interface name&gt; (the details are poorly
+documented).
+
+Clients should register themselves to be notified when a change to the
+resolver configuration occurs. They do that by installing a script
+into /etc/resolvconf/update.d/. When a change occurs, the script will
+be called with its working directory set to a directory that contains
+the new name server records (the details are, once again, poorly
+documented -- look at existing scripts for more insight). Essentially,
+it appears the scripts can run cat `/lib/resolvconf/list-records` to
+obtain the information in a resolv.conf - like format.
+
+The most important client is probably libc. Its update script is
+called /etc/resolvconf/update.d/libc. It updates the /etc/resolv.conf
+file and then calls all scripts in /etc/resolvconf/update-libc.d/
+(resolvconf itself does not write any files directly, it only calls
+the client scripts). Thus, any programs that just want to be informed
+when /etc/resolv.conf has changed should install a script in
+/etc/resolvconf/update-libc.d/, not in /etc/resolvconf/update.d/.
+
+
+
+14:54 &lt; multi_io&gt; what is the "nameserver information record" the resolvconf(8) manpage refers to?
+14:54 &lt; multi_io&gt; where is it stored?
+14:54 &lt; cusco&gt; in /etc/resolv.conf
+14:54 -!- dbmood1 [n=david@unaffiliated/dbmoodb] has joined #debian
+14:54 &lt; Swampy&gt; afaik the kernel holds some kind aswell?
+14:55 &lt; jelly-ho&gt; multi_io: a "nameserver ..." line that ends up in /etc/resolv.conf
+14:55 &lt; cusco&gt; its the nameservers that you will request the dns lookups
+14:55 &lt; Swampy&gt; or maybe that's just nat enteries
+14:55 &lt; multi_io&gt; hmm no, the libc client script for resolvconf updates /etc/resolv.conf, AFAICS
+14:56 &lt; multi_io&gt; I'm wondering what exactly resolvconf itself does
+14:56 &lt; Ace2016&gt; updates dns server entries
+14:56 &lt; cyberia&gt; it tells the system how to resolve? :D
+14:57 &lt; multi_io&gt; yeah, I understand how it works *generally*, but not the details
+14:57 &lt; multi_io&gt; does resolvconf itself write any files?
+14:57 &lt; multi_io&gt; or does it just call the client scripts?
+14:57 &lt; multi_io&gt; (i.e. the scripts in /etc/resolvconf/update.d/)
+14:58 &lt; multi_io&gt; at that point the manpage becomes unspecific
+14:58 &lt; Ace2016&gt; doesn't it keep rewriting /etc/resolv.conf which removes any user added dns servers
+14:58 &lt; Ace2016&gt; ?
+14:59 &lt; cusco&gt; Ace2016: that is dhclient
+14:59 &lt; cyberia&gt; the resolv.conf is created and modified dynamically when using resolvconf
+14:59 &lt; Ace2016&gt; oh yea that was it
+14:59 &lt; multi_io&gt; Ace2016: the libc client script for resolvconf does that
+14:59 &lt; multi_io&gt; i.e. /etc/resolvconf/update.d/libc
+14:59 &lt; Ace2016&gt; there is a part in dhclient to comment out to stop resolv.conf being updated
+14:59 &lt; cyberia&gt; but i dont know how ;-) if you want to know, get the source
+15:03 &lt; multi_io&gt; well, I would prefer it if program authors wrote precise manpages instead of tutorial-like 
+                  ones
+
+  </pre>
+
+  <a href="."> back to . </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2015 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

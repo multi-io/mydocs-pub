@@ -23,6 +23,25 @@
 13:31 &lt; multi_io&gt; does it support them in the pattern too, by any chance?
 
 
+half-automatic indentation/beautification of html etc.
+
+- html-mode etc. must be active
+
+- position cursor at the &lt; that starts the 1st HTML element of the
+  area you want to beautify
+
+- C-x (    (start kbd macro)
+
+- Tab
+
+- C-M n    (forward-list)
+
+- return
+
+- C-x )    (stop kbd macro)
+
+- call-last-kbd-macro    (over and over)
+
   </pre>
 
   <a href="."> back to emacs </a>
