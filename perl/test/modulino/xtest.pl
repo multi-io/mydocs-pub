@@ -4,8 +4,8 @@ require './x.pl';
 
 print "xtest.pl main\n";
 
-xfunc();
+X::xfunc();
 
-$var = 23;
-xfuncvar();
+$X::var = 23;
+X::xfuncvar();
     

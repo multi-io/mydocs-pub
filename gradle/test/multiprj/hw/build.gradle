@@ -6,6 +6,7 @@ dependencies {
     compile project(':common')
 }
 
+applicationDefaultJvmArgs = ['-Dxport=$PORT']
 
 task test1 << {
     println "files of compile:"
@@ -15,5 +16,12 @@ task test1 << {
     println "deps of compile:"
     configurations.compile.dependencies.each { dep ->
         println "" + dep + ": " + dep.class 
+    }
+}
+
+startScripts {
+    doLast {
+        unixScript.text = unixScript.text.replace('\\$PORT', '$PORT') 
+        // do something like this for Windows scripts also
     }
 }

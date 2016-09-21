@@ -20,6 +20,7 @@
 
 use strict;
 use File::Find;
+use IPC::System::Simple;
 
 my $root = {NAME =&gt; ".", PATH =&gt; "./", PARENT =&gt; undef};
 open(GITLS, "git ls-files |");
@@ -86,7 +87,7 @@ system("git branch -f gh-pages FETCH_HEAD");
 
   <p/>
 
-  <font size="-3">(C) 1998-2015 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+  <font size="-3">(C) 1998-2016 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
 
 </body>
 

@@ -1,0 +1,129 @@
+TODO:
+
+- (heap) allocation with make/new
+
+- pass/return by value/reference(pointer)
+
+- channels; use goroutines as coroutines
+
+  - for producer/consumer
+
+  - for state machine
+
+    - write a webserver that outputs square numbers on each reload
+
+- reflection erwaehnen
+
+- funktionen als 1st class citizens + closures erwaehnen
+
+
+
+https://tour.golang.org/moretypes/8
+
+package main
+
+import "fmt"
+import "reflect"
+
+func main() {
+	var foo []int
+	s := []int{2, 3, 5, 7, 11, 13}
+	fmt.Println("s ==", s)
+	fmt.Println("s[1:4] ==", s[1:4])
+	foo = s[1:4]
+	fmt.Println("", foo, reflect.TypeOf(foo))
+	foo = s[2:4]
+	fmt.Println("f2 ", foo, reflect.TypeOf(foo))
+	foo = append(foo, 42)//,43,44,45,46,47)
+	foo[1] = 17
+	fmt.Println("", foo, reflect.TypeOf(foo))
+	fmt.Println("s ==", s)
+
+	// missing low index implies 0
+	fmt.Println("s[:3] ==", s[:3])
+
+	// missing high index implies len(s)
+	fmt.Println("s[4:] ==", s[4:])
+}
+
+
+
+https://tour.golang.org/moretypes/14
+
+package main
+
+import "golang.org/x/tour/pic"
+
+func Pic(dx, dy int) (result [][]uint8) {
+	result = make([][]uint8, dy)
+	for y := range result {
+		result[y] = make([]uint8, dx)
+		for x := range result[y] {
+			result[y][x] = uint8((x+y)/2)
+		}
+	}
+	return
+}
+
+func main() {
+	pic.Show(Pic)
+}
+
+
+
+
+
+
+https://tour.golang.org/moretypes/19
+
+package main
+
+import (
+	"golang.org/x/tour/wc"
+	"strings"
+)
+
+func WordCount(s string) (result map[string]int) {
+	result = make(map[string]int)
+	for _,f := range strings.Fields(s) {
+		if val, present := result[f]; present {
+			result[f] = val + 1
+		} else {
+			result[f] = 1
+		}
+	}
+	return
+}
+
+func main() {
+	wc.Test(WordCount)
+}
+
+
+
+
+https://tour.golang.org/moretypes/22
+
+package main
+
+import "fmt"
+
+// fibonacci is a function that returns
+// a function that returns an int.
+func fibonacci() func() int {
+	s1,s2 := 1, 1
+	return func() int {
+		result := s1
+		olds2 := s2
+		s2 = s1 + s2
+		s1 = olds2
+		return result
+	}
+}
+
+func main() {
+	f := fibonacci()
+	for i := 0; i < 10; i++ {
+		fmt.Println(f())
+	}
+}
