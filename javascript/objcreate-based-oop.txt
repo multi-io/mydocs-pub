@@ -1,0 +1,90 @@
+The XMLHttpRequest progress event property 'position' is deprecated. Please use 'loaded' instead.
+START ToplevelNavigationController
+o=Object.create({x: 42, g: function() { return this.x; }, s: function(v) { this.x=v; })
+Uncaught SyntaxError: Unexpected token )(…)
+o=Object.create({x: 42, g: function() { return this.x; }, s: function(v) { this.x=v; } })
+Object {}
+o.g()
+42
+o.s(23)
+undefined
+o.g()
+23
+o2=Object.create(o)
+Object {}
+o3=Object.create(o)
+Object {}
+o2.g()
+23
+o2.s(12)
+undefined
+o2.g()
+12
+o.g()
+23
+o3.g()
+23
+o.s(100)
+undefined
+o.g()
+100
+o2.g()
+12
+o3.g()
+100
+o
+Object {x: 100}
+o.g()
+100
+o2.g()
+12
+o3.g()
+100
+o.g2 = function() { return 2 * this.g(); }
+() { return 2 * this.g(); }
+o.g()
+100
+o.g2()
+200
+o2.g2()
+24
+o3.g2()
+200
+o.g()
+100
+o.g2()
+200
+o.s(123)
+undefined
+o.g2()
+246
+o2.g3=function() { reurn 3*this.g(); }
+Uncaught SyntaxError: Unexpected number(…)
+o2.g3=function() { return 3*this.g(); }
+() { return 3*this.g(); }
+o2.g()
+12
+o2.g3()
+36
+o2_2=Object.create(o2)
+Object {}
+o2.g()
+12
+o2_2.g()
+12
+o2_2.g3()
+36
+o2_2.s(42)
+undefined
+o2_2.g3()
+126
+jQuery.extend(o2, { g5: function() { return 5 * this.g(); } })
+Object {x: 12}
+o2.g()
+12
+o2.g5()
+60
+o2_2.g()
+42
+o2_2.g5()
+210
