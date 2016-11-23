@@ -1,0 +1,13 @@
+Kibana 3:
+
+- pure client-side (browser) JS app
+
+- submits Ajax requests against ES (or a custom ES proxy) directly
+
+
+
+Kibana 4:
+
+- comes with its own server side (based on node), including an
+  internal ES proxy (just pass-through atm.)
+  
