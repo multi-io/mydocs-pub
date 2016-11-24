@@ -6,6 +6,7 @@ BEGIN { @INC = ("perl/test", @INC); }
 
 use Template;
 use File::Copy;
+use File::Basename;
 
 sub htmlizable {
     local ($_) = shift;
@@ -34,6 +35,7 @@ sub htmlizable {
     m!\.launch$! or
     m!\.local$! or
     m!\.log$! or
+    m!\.md$! or
     m!\.ml$! or
     m!\.m$! or
     m!\.pac$! or
@@ -87,27 +89,36 @@ sub publish($$) {
         my $_fqsrcname = "$_dir->{PATH}$_f";
 
         copy($_fqsrcname, "${targetdir}/$_f");
-        next unless (htmlizable($_fqsrcname));
-
-        local $/=undef;
-        open(F,"<$_fqsrcname") or die "couldn't open $_fqsrcname: $!";
-        my $_text = <F>;
-        close F;
-        $target_templ = "wwwpublish.d/file.templ";
-        open(FILEHTM, ">${targetdir}/$_f.html");
-        my $tpl = Template->new("wwwpublish.d/wrapper.templ", *FILEHTM);
-
-        our $f = $_f;
-        our $fqsrcname = $_fqsrcname;
-        our $text = $_text;
-        $tpl->run();
-
-        close FILEHTM;
+        
+        if (htmlizable($_fqsrcname)) {
+            htmlize($_fqsrcname, "${targetdir}/$_f.html");
+        }
     }
 
     foreach my $d (@{$dir->{DIRS}}) {
         publish($d, "$targetdir/$d->{NAME}");
     }
+}
+
+
+sub htmlize($$) {
+    my ($srcname, $destname) = @_;
+    my ($ext) = basename($srcname) =~ /(\.[^.]+)$/;
+
+    local $/=undef;
+    open(F,"<$srcname") or die "couldn't open $srcname: $!";
+    my $_text = <F>;
+    close F;
+    our $target_templ = "wwwpublish.d/file.templ";
+    open(FILEHTM, ">$destname");
+    my $tpl = Template->new("wwwpublish.d/wrapper.templ", *FILEHTM);
+
+    our $f = basename($destname, '.html');
+    our $fqsrcname = $srcname;
+    our $text = $_text;
+    $tpl->run();
+
+    close FILEHTM;
 }
 
 
