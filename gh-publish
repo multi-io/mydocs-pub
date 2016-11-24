@@ -54,10 +54,10 @@ use File::Temp qw/tempdir/;
 use autodie qw(:all);  # needs libautodie-perl, libipc-system-simple-perl (on Debian at least)
 
 my $tmpdir = tempdir( CLEANUP => 1 );
-chomp(my $revision=`git rev-parse HEAD`);
+chomp(my $revision=`[ -d .git ] && git rev-parse HEAD || git rev-parse pub-github/master`);
 
 # --no-checkout also deletes all files in the target's index
-system("git clone --branch gh-pages --no-checkout . $tmpdir");
+system("[ -d .git ] || cd ..; git clone --branch gh-pages --no-checkout . $tmpdir");
 publish $root, $tmpdir;
 system("cd $tmpdir && git add . && git commit -m 'upgrade to $revision'");
 system("git fetch $tmpdir");
