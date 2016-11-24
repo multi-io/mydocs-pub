@@ -105,20 +105,31 @@ sub htmlize($$) {
     my ($srcname, $destname) = @_;
     my ($ext) = basename($srcname) =~ /(\.[^.]+)$/;
 
-    local $/=undef;
-    open(F,"<$srcname") or die "couldn't open $srcname: $!";
-    my $_text = <F>;
-    close F;
-    our $target_templ = "wwwpublish.d/file.templ";
-    open(FILEHTM, ">$destname");
-    my $tpl = Template->new("wwwpublish.d/wrapper.templ", *FILEHTM);
+    for ($ext) {
+        /\.md$/ and do {
+            # markdown to html
+            system('pandoc', $srcname, '-o', $destname) == 0 or die "pandoc $srcname -o $destname failed: $?";
+            last;
+        };
 
-    our $f = basename($destname, '.html');
-    our $fqsrcname = $srcname;
-    our $text = $_text;
-    $tpl->run();
+        # fallback -- generic text to html
 
-    close FILEHTM;
+        local $/=undef;
+        open(F,"<$srcname") or die "couldn't open $srcname: $!";
+        my $_text = <F>;
+        close F;
+        our $target_templ = "wwwpublish.d/file.templ";
+        open(FILEHTM, ">$destname");
+        my $tpl = Template->new("wwwpublish.d/wrapper.templ", *FILEHTM);
+
+        our $f = basename($destname, '.html');
+        our $fqsrcname = $srcname;
+        our $text = $_text;
+        $tpl->run();
+
+        close FILEHTM;
+    }
+
 }
 
 
