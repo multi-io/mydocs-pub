@@ -98,6 +98,8 @@ Everything up-to-date
 (clustermgr)oklischat@oklischat:~/src/base-passwd$
 
 
+Setting it up locally (when the local and remote branch ref already
+exist locally):
 
-
+git branch -u refs/remotes/<remote>/<rbranch>:<lbranch>
 
