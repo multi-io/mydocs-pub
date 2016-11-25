@@ -62,7 +62,7 @@ if (defined $target_dir) {
     # no target dir given => publish to gh-pages branch
 
     my $tmpdir = tempdir( CLEANUP => 1 );
-    chomp(my $revision=`[ -d .git ] && git rev-parse HEAD || git rev-parse pub-github/master`);
+    chomp(my $revision=`[ -d .git ] && git rev-parse HEAD || git merge-base HEAD pub-master`);
 
     # --no-checkout also deletes all files in the target's index
     system("[ -d .git ] || cd ..; git clone --branch gh-pages --no-checkout . $tmpdir");
