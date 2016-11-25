@@ -1,0 +1,69 @@
+<p><small> <a href="../.">.</a>/<a href=".">amqp</a>/misc.md <a href="misc.md">download original</a> </small></p>
+<hr />
+<h1 id="overview">Overview</h1>
+<p>Broker contains exchanges and queues.</p>
+<p>Publishers publish into exchanges, consumers consume queues.</p>
+<p>Broker routes messages from exchanges to queues via bindings (a binding binds a queue to an exchange).</p>
+<p>The clients (publishers and consumers), not the broker administrator, set up all these things (exchanges, queues, bindings -- collectively called AMQP entities) via AMQP &quot;API calls&quot; (similar to HTTP/REST).</p>
+<h1 id="exchanges">Exchanges</h1>
+<p>Exchanges have a type (see below), name, durability (boolean - tells whether the exchange survives a broker restart), autodelete (boolean -- tells whether the exchange is deleted after the last queue is unbound from it), arguments (broker-dependent).</p>
+<h2 id="exchange-types">Exchange Types</h2>
+<table>
+<thead>
+<tr class="header">
+<th>type</th>
+<th>default pre-declared exchange names(?)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Direct exchange</td>
+<td>(Empty string) and amq.direct</td>
+</tr>
+<tr class="even">
+<td>Fanout exchange</td>
+<td>amq.fanout</td>
+</tr>
+<tr class="odd">
+<td>Topic exchange</td>
+<td>amq.topic</td>
+</tr>
+<tr class="even">
+<td>Headers exchange</td>
+<td>amq.match (and amq.headers in RabbitMQ)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="direct-exchanges">Direct Exchanges</h2>
+<p>A queue is bound to zero or more direct exchanges with a routing key as a property (&quot;argument&quot;) of the binding. The routing key is a string field in all AMQP message headers that's matched against all the bindings</p>
+<p>There can be multiple bindings for the same direct exchange with the same routing key. In that case, messages with that routing key will be delivered via all these bindings, i.e. to multiple destination queues.</p>
+<h3 id="default-exchange">Default Exchange</h3>
+<p>Predefined direct exchange that any created queues are automatically bound to, with the routing key of the binding equal to the queue name.</p>
+<p>For example, when you declare a queue with the name of &quot;search-indexing-online&quot;, the AMQP broker will bind it to the default exchange using &quot;search-indexing-online&quot; as the routing key. Therefore, a message published to the default exchange with the routing key &quot;search-indexing-online&quot; will be routed to the queue &quot;search-indexing-online&quot;. In other words, the default exchange makes it seem like it is possible to deliver messages directly to queues, even though that is not technically what is happening.</p>
+<h2 id="fanout-exchanges">Fanout Exchanges</h2>
+<p>A fanout exchange has one or more queues bound to it (with no properties of the bindings). All messages sent into the exchange are delivered to all the bound queues, the routing key is ignored.</p>
+<h2 id="topic-exchanges">Topic Exchanges</h2>
+<p>Like direct exchanges, but the routing key properties of the bindings are patterns (e.g. billing.* or billing.<em>.</em> foo.*.bar or billing.#) that are matched against the routing key.</p>
+<h2 id="headers-exchanges">Headers Exchanges</h2>
+<p>Like direct exchanges, matches against message headers... (TODO)</p>
+<h1 id="queues">Queues</h1>
+<p>Properties of a queue:</p>
+<ul>
+<li><p>name</p></li>
+<li><p>durability (boolean - tells whether the queue survives a broker restart)</p></li>
+<li><p>autodelete (boolean -- tells whether the queue is deleted after the last consumer has disconnected)</p></li>
+<li><p>exclusive (boolean -- tells whether only one consumer can use this queue and it is autodeleted after use), arguments (broker-dependent).</p></li>
+</ul>
+<p>The name is unique. Consumer must &quot;declare&quot; the queue when connecting -- which means the consumer specifies the properties. If one by that name doesn't exist, it is created, otherwise the attributes of the existing queue must match the declaration or an error (406 PRECONDITION_FAILED) is raised.</p>
+<h1 id="consumers">Consumers</h1>
+<p>Consumers fetch messages from queues (pull API) or subscribe to a queue and have messages delivered to them (push API). When they've fetched/received a message, they must acknowledge it explicitly (preferably after they've successfully processed it), and only then will the broker delete them from the queue. A message is not acknowledged if the consumer rejects is explicitly or just dies.</p>
+<p>There is an &quot;automatic acknowledgement&quot; model in which the message is automaticaly acked right after the consumer has gotten it.</p>
+<h1 id="vhosts">Vhosts</h1>
+<p>Like webserver vhosts -- completely isolated environments in which AMQP entities live. Default vhost: /</p>
+<hr />
+<p><small>© 1998-2016 Olaf Klischat <script type="text/javascript">
+<!--
+h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x6f;&#108;&#x61;&#102;&#46;&#x6b;&#108;&#x69;&#x73;&#x63;&#104;&#x61;&#116;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x6f;&#108;&#x61;&#102;&#46;&#x6b;&#108;&#x69;&#x73;&#x63;&#104;&#x61;&#116;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript></small></p>

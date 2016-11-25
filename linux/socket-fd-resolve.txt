@@ -1,0 +1,29 @@
+root@app1:~# strace -f -p 18956
+Process 18956 attached
+read(6, ^CProcess 18956 detached
+ <detached ...>
+root@app1:~#
+root@app1:~#
+root@app1:~# ls -l /proc/18956/fd/
+total 0
+lr-x------ 1 www-data www-data 64 Feb  9 13:39 0 -> pipe:[2186249740]
+lrwx------ 1 www-data www-data 64 Feb  9 13:39 1 ->  (deleted)/tmp/tmpfPvI8Ub
+lrwx------ 1 www-data www-data 64 Feb  9 13:39 2 ->  (deleted)/tmp/tmpfPvI8Ub
+lrwx------ 1 www-data www-data 64 Feb  9 13:39 3 -> socket:[2186249854]
+lrwx------ 1 www-data www-data 64 Feb  9 13:39 4 -> socket:[2186249884]
+lrwx------ 1 www-data www-data 64 Feb  9 13:39 5 -> socket:[2186249899]
+lrwx------ 1 www-data www-data 64 Feb  9 13:39 6 -> socket:[2186254615]
+l-wx------ 1 www-data www-data 64 Feb  9 13:39 99 -> /tmp/flock-6fac0706e837b389dd6ec6b38b6982c9
+root@app1:~#
+root@app1:~# head -n1 < /proc/net/tcp ; grep -a 2186254615 /proc/net/tcp
+  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode
+ 432: 63993125:C070 25520CB9:01BB 01 00000000:00000000 00:00000000 00000000    33        0 2186254615 1 ffff88040e68b140 39 3 14 10 -1
+root@app1:~#
+
+irb(main):001:0> '25520CB9'.scan(/../).reverse.map{|x|x.to_i(16)}.join('.')
+=> "185.12.82.37"
+irb(main):002:0> 0x01BB
+=> 443
+irb(main):003:0>
+
+=> TCP-Socket, remote 185.12.82.37:443

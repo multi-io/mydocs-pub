@@ -1,0 +1,321 @@
+<p><small> <a href="../.">.</a>/<a href=".">ansible</a>/misc.md <a href="misc.md">download original</a> </small></p>
+<hr />
+<h1 id="inventory">Inventory</h1>
+<p>Inventory file name defaults to /etc/ansible/hosts. Cmdline options -i &lt;file&gt;</p>
+<h2 id="hosts-and-groups">hosts and groups:</h2>
+<pre><code>mail.example.com
+
+[webservers]
+foo.example.com
+bar.example.com
+
+[dbservers]
+one.example.com
+two.example.com</code></pre>
+<p>groups of groups:</p>
+<pre><code>[atlanta]
+host1
+host2
+
+[raleigh]
+host2
+host3
+
+[southeast:children]
+atlanta
+raleigh</code></pre>
+<p>special group &quot;all&quot; contains all hosts.</p>
+<h2 id="host-and-group-variables">Host and group variables:</h2>
+<p>(TODO verify) variables in general: one namespace for variables; variables may be set basically anywhere, i.e. at the host/inventory, play or task level (see below), and used in task invocations and templates (see below).</p>
+<p>Setting at the host/inventory level (&quot;host variables&quot;):</p>
+<ul>
+<li>directly in inventory file</li>
+</ul>
+<pre><code>myhost.foo.com var1=foo var2=bar ...
+
+[mygroup:vars]
+var3=x
+var4=y</code></pre>
+<ul>
+<li>or in separate variables yml files (suffix .yml is optional)</li>
+</ul>
+<pre><code>host_vars/&lt;hostname&gt;.yml
+host_vars/&lt;hostname&gt;/&lt;anything&gt;.yml
+group_vars/&lt;groupname&gt;.yml
+group_vars/&lt;groupname&gt;/&lt;anything&gt;.yml</code></pre>
+<p>Some variables influence ansible's built-in operations on the host(s):</p>
+<p>ansible_user, ansible_port, ansible_ssh_private_key_file, ...</p>
+<h2 id="dynamic-inventories">Dynamic inventories:</h2>
+<p>You can write scripts that provide the inventory data (including vars and all) dynamically. Existing scripts for Cobbler, AWS, OpenStack, ...</p>
+<h1 id="command-line">Command line</h1>
+<p>&quot;ansible&quot; for ad-hoc invocation of Ansible modules against inventory hosts, &quot;ansible-playbook&quot; for running Ansible playbooks (ordered collections of ansible module invocations).</p>
+<p><code>ansible [-i &lt;inventory file&gt;] [other options] &lt;hosts pattern&gt; -m &lt;module_name&gt; -a &lt;arguments&gt;</code></p>
+<p>&lt;hosts pattern&gt; is a host or group name, or multiple of those, connected with a :. Globbing with * or [startnum:endnum] allowed, e.g. 192.168.1.*, webservers:app[1:10]</p>
+<p>&lt;module_name&gt; defaults to &quot;command&quot;, which takes the command line to run as its only argument.</p>
+<p>Example: <code>ansible all -a &quot;/sbin/shutdown -h now&quot;</code></p>
+<p>Besides sshd, Ansible only requires Python on the managed host. Some modules like &quot;command&quot; don't even need that -- so you can use &quot;command&quot; to install Python, then go on using other modules. Every Ansible invocation on a host uploads all required modules to a temporary directory on the host, runs them, then cleans up.</p>
+<h2 id="common-modules">common modules:</h2>
+<p>&quot;shell&quot; module instead of &quot;command&quot; for running a shell command with pipes/redirects etc.</p>
+<p>file copy: <code>ansible atlanta -m copy -a &quot;src=/etc/hosts dest=/tmp/hosts&quot;</code></p>
+<p>file copy, expanding a template: <code>ansible timeservers -m template -a &quot;src=ntp.conf.j2 dest=/etc/ntp.conf&quot;</code></p>
+<p>file owner/mode change: <code>ansible webservers -m file -a &quot;dest=/srv/foo/b.txt mode=600 owner=mdehaan group=mdehaan&quot;</code></p>
+<p>package mgmt: <code>ansible webservers -m yum -a &quot;name=ruby state=present&quot;</code></p>
+<p>create user/group: <code>ansible all -m user -a &quot;name=foo password=&lt;crypted password here&gt;&quot;</code></p>
+<p>git clone: <code>ansible webservers -m git -a &quot;repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD&quot;</code></p>
+<p>service mgmt: <code>ansible webservers -m service -a &quot;name=httpd state=started&quot;</code></p>
+<h2 id="common-other-commandline-options-privilege-escalation">common other commandline options, privilege escalation:</h2>
+<p>Use ssh password auth (rather than PKI): <code>--ask-pass (-k)</code></p>
+<p>Run as another user, possibly using sudo: <code>-u username [--become [--ask-become-pass]]</code>.</p>
+<p>There is a corresponding set of directives, settable at the play or task level:</p>
+<pre><code>- name: Run a command as the apache user
+  command: somecommand
+  become: true
+  become_user: apache</code></pre>
+<p>There are also a corresponding variables (which, when set, will override the directive). Normally defined in the inventory.</p>
+<p>Number of parallel runs (when running on multiple hosts): <code>-f 10</code></p>
+<h1 id="modules">Modules</h1>
+<ul>
+<li><p>Named</p></li>
+<li><p>take parameters</p></li>
+<li><p>return a return value (normally a map, can be put into a variable (&quot;registered&quot;, see &quot;variables&quot; below) and processed further from there)</p></li>
+<li><p>return success state (invocation successful or not)</p></li>
+<li><p>return &quot;changed&quot; flag (did the invocation change anything in the system or not)</p></li>
+<li><p>Ansible provides some template filters to extract these pieces of information. Examples:</p></li>
+</ul>
+<pre><code>tasks:
+
+  - shell: /usr/bin/foo
+    register: result
+    ignore_errors: True
+
+  - debug: msg=&quot;it failed&quot;
+    when: result|failed
+
+  # in most cases you&#39;ll want a handler, but if you want to do something right now, this is nice
+  - debug: msg=&quot;it changed&quot;
+    when: result|changed
+
+  - debug: msg=&quot;it succeeded in Ansible &gt;= 2.1&quot;
+    when: result|succeeded
+
+  - debug: msg=&quot;it succeeded&quot;
+    when: result|success
+
+  - debug: msg=&quot;it was skipped&quot;
+    when: result|skipped</code></pre>
+<h1 id="playbooks">Playbooks</h1>
+<p>playbook 1---* play 1---* task 1--1 module invocation</p>
+<p>sample:</p>
+<pre><code>---
+- hosts: webservers
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+  tasks:
+  - name: ensure apache is at the latest version
+    yum: name=httpd state=latest
+  - name: write the apache config file
+    template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+    notify:
+    - restart apache
+  - name: ensure apache is running (and enable it at boot)
+    service: name=httpd state=started enabled=yes
+  handlers:
+    - name: restart apache
+      service: name=httpd state=restarted
+
+- hosts: databases
+  remote_user: root
+
+  tasks:
+  - name: ensure postgresql is at the latest version
+    yum: name=postgresql state=latest
+  - name: ensure that postgresql is started
+    service: name=postgresql state=started</code></pre>
+<p>Task arguments can also be specified as yml maps.</p>
+<p>Remote user, sudo method etc. can be specified per play or per task.</p>
+<p>The whole thing is run top to bottom.</p>
+<p>Hosts with failed tasks are taken out of the rotation for the entire playbook. Tasks should be idempotent, so you can just correct mistakes and run again.</p>
+<p>Variable references: {{ .. }}</p>
+<p>E.g.</p>
+<pre><code>tasks:
+  - name: create a virtual host file for {{ vhost }}
+    template: src=somefile.j2 dest=/etc/httpd/conf.d/{{ vhost }}</code></pre>
+<h2 id="handlers">Handlers</h2>
+<p>Each task (module invocation) tells Ansible whether it has made changes to the system or not. It can declare a &quot;notify&quot; clause to invoke a <em>handler</em> when it did change the system.</p>
+<p>Handler invocations are usually coalesced by Ansible, i.e. they'll be invoked at most once per host, regardless of how many tasks notify them. You can force this explicitly though via <code>module meta: flush_handlers</code>.</p>
+<p>Handler flushing is done implicitly an the end of <code>pre_tasks</code>, <code>tasks</code>, <code>post_tasks</code> sections (see below).</p>
+<pre><code>- name: template configuration file
+  template: src=template.j2 dest=/etc/foo.conf
+  notify:
+     - restart memcached
+     - restart apache
+  ...
+  handlers:
+    - name: restart memcached
+      service: name=memcached state=restarted
+    - name: restart apache
+      service: name=httpd state=restarted
+</code></pre>
+<p>(2.2) Tasks can also notify and handlers can listen to &quot;topics&quot; rather than specific handlers.</p>
+<h2 id="task-include-files">Task Include Files</h2>
+<p>Files containing a flat list of tasks, included via <code>include:</code> whereever tasks are expected (tasks section, handlers section).</p>
+<pre><code>tasks:
+  - include: tasks/foo.yml
+  - include: tasks/wordpress.yml wp_user=timmy</code></pre>
+<h2 id="playbook-includes">Playbook includes</h2>
+<p>Playbooks can include other playbooks using an <code>include:</code> statement at the top level.</p>
+<h2 id="roles">Roles</h2>
+<p>Are task include files, with built-in search paths for tasks and vars.</p>
+<p>References in plays like this:</p>
+<pre><code>- hosts: webservers
+  roles:
+     - common
+     - webservers</code></pre>
+<p>Roles defined in directories like this:</p>
+<pre><code>site.yml
+webservers.yml
+fooservers.yml
+roles/
+   common/
+     files/
+     templates/
+     tasks/
+     handlers/
+     vars/
+     defaults/
+     meta/
+   webservers/
+     files/
+     templates/
+     tasks/
+     handlers/
+     vars/
+     defaults/
+     meta/</code></pre>
+<ul>
+<li><p>Tasks read from <code>roles/&lt;role&gt;/tasks/main.yml</code> (flat list of tasks)</p></li>
+<li><p>handlers read from <code>roles/&lt;role&gt;/handlers/main.yml</code></p></li>
+<li><p>variables read from <code>roles/&lt;role&gt;/vars/main.yml</code></p></li>
+<li><p>default variables read from <code>roles/&lt;role&gt;/defaults/main.yml</code></p></li>
+</ul>
+<p>Tasks with module type <code>copy</code>, <code>script</code>, <code>template</code>, <code>include</code> can reference files in <code>roles/&lt;role&gt;/{files,templates,tasks}/</code> without path prefixes.</p>
+<p>More features:</p>
+<pre><code>- hosts: somehosts
+  roles:
+     ## normal
+     - common
+     ## parameterized
+     - { role: foo_app_instance, dir: &#39;/opt/a&#39;,  app_port: 5000 }
+     ## conditional application
+     - { role: some_role, when: &quot;ansible_os_family == &#39;RedHat&#39;&quot; }
+     ## tagged
+     - { role: foo, tags: [&quot;bar&quot;, &quot;baz&quot;] }</code></pre>
+<ul>
+<li>dependencies on other roles read from <code>roles/&lt;role&gt;/meta/main.yml</code>. Sample:</li>
+</ul>
+<pre><code>---
+# allow_duplicates: yes  # to have the same role instantiated multiple
+                         #  times if it is depended upon multiple times 
+dependencies:
+  - { role: common, some_parameter: 3 }
+  - { role: apache, apache_port: 80 }
+  - { role: postgres, dbname: blarg, other_parameter: 12 }
+  - { role: &#39;/path/to/common/roles/foo&#39;, x: 1 }</code></pre>
+<ul>
+<li><p>custom Ansible modules to be distributed with a role go into <code>roles/&lt;role&gt;/library/</code></p>
+<ul>
+<li><p>this can be used primarily for distributing internal modules for an organization; it can also be used to provide patchsets agaist core modules.</p></li>
+<li><p>generally, it is preferable to write custom modules independently of any roles, and maybe submit them to Ansible for inclusion in the core distribution</p></li>
+</ul></li>
+</ul>
+<h1 id="variables">Variables</h1>
+<p>(refresh from above)</p>
+<p>One namespace per host for variables; variables may be set basically anywhere, i.e. at the host/inventory, play or task level, and referenced directly in playbooks and in templates, usually using the notation <code>{{ var }}</code>.</p>
+<p>Variable values may be simple types (string, numbers) or arrays or maps.</p>
+<p>Variables defined in inventory vars files (see above), directly in the play or in explicitly included vars files:</p>
+<pre><code>- hosts: all
+  remote_user: root
+  vars:
+    favcolor: blue
+  vars_files:
+    - /vars/external_vars.yml</code></pre>
+<h2 id="facts-special-variables">Facts, special variables</h2>
+<p>Facts: Pre-set Variables recording system states. To see them: <code>ansible host -m setup</code>. Sample output (partial):</p>
+<pre><code>        &quot;ansible_all_ipv4_addresses&quot;: [
+            &quot;10.0.2.15&quot;,
+            &quot;192.168.33.42&quot;
+        ],
+        &quot;ansible_all_ipv6_addresses&quot;: [
+            &quot;fe80::a00:27ff:fe3a:b5b&quot;,
+            &quot;fe80::a00:27ff:fe99:c3aa&quot;
+        ],
+        &quot;ansible_architecture&quot;: &quot;x86_64&quot;,
+        &quot;ansible_bios_date&quot;: &quot;12/01/2006&quot;,
+        &quot;ansible_bios_version&quot;: &quot;VirtualBox&quot;,</code></pre>
+<p>Additional facts can be supplied via files <code>/etc/ansible/facts.d/*.fact</code> containing the new facts as JSON or an executable outputting JSON.</p>
+<p>If a task creates a *.fact file, you may re-run the setup module in order to use the new fact in the same play.</p>
+<p>Fact gathering can be turned off (mainly for speed optimization, if you know you won't need them) via <code>gather_facts:false</code>.</p>
+<ul>
+<li><p>Accessing variables on other hosts: <code>hostvars</code> variable. Value: map, keyed by hostname, of other hosts' variables. E.g. <code>hostvars[hostname][var_name]</code>. TODO variables or just facts?</p>
+<ul>
+<li>only possible if <code>hostname</code> was already accessed within the same play, or if <em>fact caching</em> is enabled in ansible.conf</li>
+</ul></li>
+<li><p><code>group_names</code>: list (array) of all the groups the current host is in.</p></li>
+<li><p><code>groups</code> list of all the groups (and hosts) in the inventory. Example: Find all IPv4 addresses of all host in a specific group:</p></li>
+</ul>
+<pre><code>{% for host in groups[&#39;app_servers&#39;] %}
+   {{ hostvars[host][&#39;ansible_eth0&#39;][&#39;ipv4&#39;][&#39;address&#39;] }}
+{% endfor %}</code></pre>
+<ul>
+<li><p><code>play_hosts</code>: list of hostnames in scope for the current play</p></li>
+<li><p><code>inventory_dir</code>, <code>inventory_file</code>, <code>playbook_dir</code>, <code>role_path</code></p></li>
+</ul>
+<h2 id="passing-vars-on-cmd-line">Passing vars on cmd line</h2>
+<p><code>ansible-playbook release.yml --extra-vars &quot;version=1.23.45 other_variable=foo&quot;</code></p>
+<h2 id="setting-vars-dynamically">setting vars dynamically</h2>
+<p>..using special <code>set_fact</code> module.</p>
+<pre><code>tasks:
+    - name: get version
+      shell: &quot;program --version&quot;
+      register: progresult
+    - set_fact: progversion=&quot;{{ progresult.stdout }}&quot;</code></pre>
+<h1 id="templates">Templates</h1>
+<p>Templating language: jinja2. Used in template files and also in expressions in yml files (in <code>when</code> and loop statements, see below).</p>
+<p>Ansible provides some macros in addition to jinja2's builtin ones.</p>
+<p>Macros work like this (examples):</p>
+<p>Definedness, Default values:</p>
+<p><code>{{ some_variable | default(5) }}</code></p>
+<p>Special default value <code>omit</code>, when used for parameters, cause the parameter to be omitted:</p>
+<pre><code>- name: touch files with an optional mode
+  file: dest={{item.path}} state=touch mode={{item.mode|default(omit)}}
+  with_items:
+    - path: /tmp/foo
+    - path: /tmp/bar
+    - path: /tmp/baz
+      mode: &quot;0444&quot;</code></pre>
+<p>List/set operations:</p>
+<p><code>{{ list1 | min }}</code></p>
+<p><code>{{ [3, 4, 2] | max }}</code></p>
+<p><code>unique</code>, <code>union</code> etc. similar.</p>
+<p>Math:</p>
+<p><code>{{ myvar | log }}</code> (ln(var))</p>
+<h1 id="conditionals-loops">Conditionals, Loops</h1>
+<p>Conditionals: boolean Jinja2 expressions added to tasks to determine whether they should run or not.</p>
+<pre><code>tasks:
+  - name: &quot;shut down Debian flavored systems&quot;
+    command: /sbin/shutdown -t now
+    when: ansible_os_family == &quot;Debian&quot;</code></pre>
+<p>TODO:</p>
+<ul>
+<li><p>blocks</p></li>
+<li><p>some special modules, e.g. group_by</p></li>
+</ul>
+<hr />
+<p><small>© 1998-2016 Olaf Klischat <script type="text/javascript">
+<!--
+h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x6f;&#108;&#x61;&#102;&#46;&#x6b;&#108;&#x69;&#x73;&#x63;&#104;&#x61;&#116;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x6f;&#108;&#x61;&#102;&#46;&#x6b;&#108;&#x69;&#x73;&#x63;&#104;&#x61;&#116;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript></small></p>

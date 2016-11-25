@@ -1,0 +1,45 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./wwwpublish.d/file_md.templ </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">wwwpublish.d</a>/file_md.templ </h1>
+
+  <a href="file_md.templ">download original</a>
+
+  <pre>
+&lt;% no strict 'refs'; no warnings; %&gt;
+
+&lt;% @parent_urls = (); for ($curr=$dir; $curr; $curr=$curr-&gt;{PARENT}) { @parent_urls = ($curr-&gt;{NAME}, @parent_urls); } %&gt;
+
+&lt;% $nd = @parent_urls; @parent_urls_names = map { [("../" x ($nd-- -1)) . '.', $_] } @parent_urls; %&gt;
+
+&lt;small&gt; &lt;%= join("/", map { '[' . $_-&gt;[1] . '](' . $_-&gt;[0] . ')' } @parent_urls_names) %&gt;/&lt;%= $f %&gt; [download original]\(&lt;%= $f %&gt;\) &lt;/small&gt;
+
+---
+
+&lt;%= $text %&gt;
+
+---
+
+&lt;small&gt;&amp;copy; 1998-&lt;%= 1900+(localtime())[5] %&gt; Olaf Klischat &lt;olaf.klischat@gmail.com&gt;&lt;/small&gt;
+
+  </pre>
+
+  <a href="."> back to wwwpublish.d </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2016 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

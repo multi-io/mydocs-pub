@@ -1,0 +1,135 @@
+<html>
+<!-- -*- html -*- -->
+
+
+
+
+
+<head>
+  <title> ./git/tracking-branches.txt </title>
+</head>
+
+<body>
+
+  <h1> <a href="../.">.</a>/<a href=".">git</a>/tracking-branches.txt </h1>
+
+  <a href="tracking-branches.txt">download original</a>
+
+  <pre>
+goal: upstream remote
+upstream=git://anonscm.debian.org/users/cjwatson/base-passwd.git, own
+remote origin=git@gitlab.syseleven.de:oklischat/sys11-base-passwd.git
+(repository empty at the beginning). Track upstream's master in local
+branch "umaster", own remote's master in local branch "master".
+
+
+
+(clustermgr)oklischat@oklischat:~/src$ git clone -o upstream -n git://anonscm.debian.org/users/cjwatson/base-passwd.git  # name the remote "upstream" instead of the default "origin", no wd checkout (-n)
+Cloning into 'base-passwd'...
+remote: Counting objects: 1275, done.
+remote: Compressing objects: 100% (448/448), done.
+remote: Total 1275 (delta 889), reused 1168 (delta 817)
+Receiving objects: 100% (1275/1275), 256.96 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (889/889), done.
+Checking connectivity... done.
+(clustermgr)oklischat@oklischat:~/src$ cd base-passwd
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ ls
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -avv
+* master                  e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+  remotes/upstream/HEAD   -&gt; upstream/master
+  remotes/upstream/master e84fe43 Policy version 3.9.6: no changes required.
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git checkout -b umaster upstream/master
+Branch umaster set up to track remote branch master from upstream.
+Switched to a new branch 'umaster'
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ ls
+COPYING         Makefile.am     README          configure.ac    debian          doc             group.master    man             passwd.master   update-passwd.c
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -avv
+  master                  e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+* umaster                 e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+  remotes/upstream/HEAD   -&gt; upstream/master
+  remotes/upstream/master e84fe43 Policy version 3.9.6: no changes required.
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ # master tracks the wrong thing, delete it
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -d master
+Deleted branch master (was e84fe43).
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -avv
+* umaster                 e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+  remotes/upstream/HEAD   -&gt; upstream/master
+  remotes/upstream/master e84fe43 Policy version 3.9.6: no changes required.
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git remote -v
+upstream        git://anonscm.debian.org/users/cjwatson/base-passwd.git (fetch)
+upstream        git://anonscm.debian.org/users/cjwatson/base-passwd.git (push)
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git remote add origin git@gitlab.syseleven.de:oklischat/sys11-base-passwd.git
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git checkout -b master
+Switched to a new branch 'master'
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -vv
+* master  e84fe43 Policy version 3.9.6: no changes required.
+  umaster e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git push origin master
+Total 0 (delta 0), reused 0 (delta 0)
+To git@gitlab.syseleven.de:oklischat/sys11-base-passwd.git
+ * [new branch]      master -&gt; master
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -vv
+* master  e84fe43 Policy version 3.9.6: no changes required.         # &lt;&lt;- doesn't track newly created origin/master??
+  umaster e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -avv
+* master                  e84fe43 Policy version 3.9.6: no changes required.
+  umaster                 e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+  remotes/origin/master   e84fe43 Policy version 3.9.6: no changes required.
+  remotes/origin/umaster  e84fe43 Policy version 3.9.6: no changes required.
+  remotes/upstream/HEAD   -&gt; upstream/master
+  remotes/upstream/master e84fe43 Policy version 3.9.6: no changes required.
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+
+11:25 &lt; multi_io&gt; "git push &lt;remote&gt; &lt;branch&gt;" creates a local branch pointer "remotes/&lt;remote&gt;/&lt;branch&gt;", but doesn't make the local &lt;branch&gt; track the &lt;remove&gt;/&lt;branch&gt; ??
+11:25 &lt; multi_io&gt; (if it didn't already)
+11:26 &lt; jast&gt; multi_io: you can use -u to tell git to set that up
+11:26 &lt; multi_io&gt; jast: thanks
+
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git push -u origin master
+Branch master set up to track remote branch master from origin.
+Everything up-to-date
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+(clustermgr)oklischat@oklischat:~/src/base-passwd$ git branch -avv
+* master                  e84fe43 [origin/master] Policy version 3.9.6: no changes required.
+  umaster                 e84fe43 [upstream/master] Policy version 3.9.6: no changes required.
+  remotes/origin/master   e84fe43 Policy version 3.9.6: no changes required.
+  remotes/origin/umaster  e84fe43 Policy version 3.9.6: no changes required.
+  remotes/upstream/HEAD   -&gt; upstream/master
+  remotes/upstream/master e84fe43 Policy version 3.9.6: no changes required.
+(clustermgr)oklischat@oklischat:~/src/base-passwd$
+
+
+Setting it up locally (when the local and remote branch ref already
+exist locally):
+
+git branch -u refs/remotes/&lt;remote&gt;/&lt;rbranch&gt;:&lt;lbranch&gt;
+
+
+  </pre>
+
+  <a href="."> back to git </a>
+
+  <p/>
+
+  <font size="-3">(C) 1998-2016 Olaf Klischat  &lt;olaf.klischat@gmail.com&gt; </font>
+
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+<% no strict 'refs'; no warnings; %>
+
+<% @parent_urls = (); for ($curr=$dir; $curr; $curr=$curr->{PARENT}) { @parent_urls = ($curr->{NAME}, @parent_urls); } %>
+
+<% $nd = @parent_urls; @parent_urls_names = map { [("../" x ($nd-- -1)) . '.', $_] } @parent_urls; %>
+
+<small> <%= join("/", map { '[' . $_->[1] . '](' . $_->[0] . ')' } @parent_urls_names) %>/<%= $f %> [download original]\(<%= $f %>\) </small>
+
+---
+
+<%= $text %>
+
+---
+
+<small>&copy; 1998-<%= 1900+(localtime())[5] %> Olaf Klischat <olaf.klischat@gmail.com></small>

@@ -53,12 +53,21 @@ use Publish;
 use File::Temp qw/tempdir/;
 use autodie qw(:all);  # needs libautodie-perl, libipc-system-simple-perl (on Debian at least)
 
-my $tmpdir = tempdir( CLEANUP => 1 );
-chomp(my $revision=`git rev-parse HEAD`);
+my ($target_dir) = @ARGV;
 
-# --no-checkout also deletes all files in the target's index
-system("git clone --branch gh-pages --no-checkout . $tmpdir");
-publish $root, $tmpdir;
-system("cd $tmpdir && git add . && git commit -m 'upgrade to $revision'");
-system("git fetch $tmpdir");
-system("git branch -f gh-pages FETCH_HEAD");
+if (defined $target_dir) {
+    publish $root, $target_dir;
+
+} else {
+    # no target dir given => publish to gh-pages branch
+
+    my $tmpdir = tempdir( CLEANUP => 1 );
+    chomp(my $revision=`[ -d .git ] && git rev-parse HEAD || git merge-base HEAD pub-master`);
+
+    # --no-checkout also deletes all files in the target's index
+    system("[ -d .git ] || cd ..; git clone --branch gh-pages --no-checkout . $tmpdir");
+    publish $root, $tmpdir;
+    system("cd $tmpdir && git add . && git commit -m 'upgrade to $revision'");
+    system("git fetch $tmpdir");
+    system("git branch -f gh-pages FETCH_HEAD");
+}
