@@ -7,6 +7,7 @@ BEGIN { @INC = ("perl/test", @INC); }
 use Template;
 use File::Copy;
 use File::Basename;
+use File::Temp qw/ tempfile /;
 
 sub htmlizable {
     local ($_) = shift;
@@ -104,30 +105,49 @@ sub publish($$) {
 sub htmlize($$) {
     my ($srcname, $destname) = @_;
     my ($ext) = basename($srcname) =~ /(\.[^.]+)$/;
+    $ext = '' unless $ext;
 
     for ($ext) {
         /\.md$/ and do {
+
             # markdown to html
-            system('pandoc', $srcname, '-o', $destname) == 0 or die "pandoc $srcname -o $destname failed: $?";
+
+            open(SRC, "<$srcname") or die "couldn't open $srcname: $!";
+            local $/=undef;
+            our $text = <SRC>;  # for file_md.templ below
+            close SRC;
+
+            our $f = basename($destname, '.html');
+            our $fqsrcname = $srcname;
+
+            my ($full_md_fd, $full_md_fn) = tempfile();
+            my $tpl = Template->new("wwwpublish.d/file_md.templ", *$full_md_fd);
+            $tpl->run();
+            
+            system('pandoc', $full_md_fn, '-o', $destname) == 0 or die "pandoc $full_md_fn -o $destname failed: $?";
+
+            unlink $full_md_fn;
+            
             last;
         };
 
         # fallback -- generic text to html
 
+        open(SRC, "<$srcname") or die "couldn't open $srcname: $!";
         local $/=undef;
-        open(F,"<$srcname") or die "couldn't open $srcname: $!";
-        my $_text = <F>;
-        close F;
+        my $_text = <SRC>;
+        close SRC;
+        
         our $target_templ = "wwwpublish.d/file.templ";
-        open(FILEHTM, ">$destname");
-        my $tpl = Template->new("wwwpublish.d/wrapper.templ", *FILEHTM);
+        open(DEST, ">$destname");
+        my $tpl = Template->new("wwwpublish.d/wrapper.templ", *DEST);
 
         our $f = basename($destname, '.html');
         our $fqsrcname = $srcname;
         our $text = $_text;
         $tpl->run();
 
-        close FILEHTM;
+        close DEST;
     }
 
 }
