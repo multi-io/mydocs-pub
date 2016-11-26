@@ -4,7 +4,7 @@ Inventory file name defaults to /etc/ansible/hosts. Cmdline options -i
 \<file\>
 
 
-## hosts and groups:
+## Hosts and Groups:
 
 
 ```
@@ -38,7 +38,7 @@ raleigh
 special group "all" contains all hosts.
 
 
-## Host and group variables:
+## Host and Group Variables:
 
 (TODO verify) variables in general: one namespace for variables;
 variables may be set basically anywhere, i.e. at the host/inventory,
@@ -71,7 +71,44 @@ Some variables influence ansible's built-in operations on the host(s):
 ansible_user, ansible_port, ansible_ssh_private_key_file, ...
 
 
-## Dynamic inventories:
+## Variables Preference
+
+Least to most preferred:
+
+- role defaults [1]
+
+- inventory vars [2]
+
+- inventory group_vars
+
+- inventory host_vars
+
+- playbook group_vars
+
+- playbook host_vars
+
+- host facts
+
+- play vars
+
+- play vars_prompt
+
+- play vars_files
+
+- registered vars
+
+- set_facts
+
+- role and include vars
+
+- block vars (only for tasks in block)
+
+- task vars (only for the task)
+
+- extra vars (always win precedence)
+
+
+## Dynamic Inventories:
 
 You can write scripts that provide the inventory data (including vars
 and all) dynamically. Existing scripts for Cobbler, AWS, OpenStack,
@@ -79,7 +116,7 @@ and all) dynamically. Existing scripts for Cobbler, AWS, OpenStack,
 
 
 
-# Command line
+# Command Line
 
 "ansible" for ad-hoc invocation of Ansible modules against inventory
 hosts, "ansible-playbook" for running Ansible playbooks (ordered
@@ -103,7 +140,7 @@ Ansible invocation on a host uploads all required modules to a
 temporary directory on the host, runs them, then cleans up.
 
 
-## common modules:
+## Common Modules:
 
 "shell" module instead of "command" for running a shell command with
 pipes/redirects etc.
@@ -123,7 +160,7 @@ git clone: `ansible webservers -m git -a "repo=git://foo.example.org/repo.git de
 service mgmt: `ansible webservers -m service -a "name=httpd state=started"`
 
 
-## common other commandline options, privilege escalation:
+## Common Other Commandline Options, Privilege Escalation:
 
 Use ssh password auth (rather than PKI): `--ask-pass (-k)`
 
@@ -292,7 +329,7 @@ tasks:
   - include: tasks/wordpress.yml wp_user=timmy
 ```
 
-## Playbook includes
+## Playbook Includes
 
 Playbooks can include other playbooks using an `include:` statement at
 the top level.
@@ -413,7 +450,7 @@ play or in explicitly included vars files:
 ```
 
 
-## Facts, special variables
+## Facts, Special Variables
 
 Facts: Pre-set Variables recording system states. To see them:
 `ansible host -m setup`. Sample output (partial):
