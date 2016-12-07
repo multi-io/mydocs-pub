@@ -576,6 +576,54 @@ tasks:
 ```
 
 
+# Delegations
+
+Within a play, allow tasks to be run on another host than the one the
+play is currently handling. Example:
+
+
+```
+- hosts: webservers
+  serial: 5
+
+  tasks:
+
+  - name: take out of load balancer pool
+    command: /usr/bin/take_out_of_pool {{ inventory_hostname }}
+    delegate_to: 127.0.0.1
+
+  - name: actual steps would go here
+    yum: name=acme-web-stack state=latest
+
+  - name: add back to load balancer pool
+    command: /usr/bin/add_back_to_pool {{ inventory_hostname }}
+    delegate_to: 127.0.0.1
+```
+
+Runs the first and 3rd task not on the host (out of webservers) that's
+currently being handled by the play, but on
+127.0.0.1. `inventory_hostname` is a predefined variable that names
+the host that's currently being handled.
+
+There is special syntax for the case that the delegated-to host is
+127.0.0.1: `local_action`.
+
+```
+tasks:
+
+  - name: recursively copy files from management server to target
+    local_action: command rsync -a /path/to/files {{ inventory_hostname }}:/path/to/target/
+```
+
+
+# Delegated facts
+
+If you delegate the `setup` task (which gathers facts), you can say
+`delegate_facts: True` to have the resulting fact variables assigned
+to the delegated-to host (just as if the setup task had run there
+regularly during a play) instead of to the inventory_hostname.
+
+
 
 TODO:
 
