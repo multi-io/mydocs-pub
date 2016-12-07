@@ -2,7 +2,7 @@
 <hr />
 <h1 id="inventory">Inventory</h1>
 <p>Inventory file name defaults to /etc/ansible/hosts. Cmdline options -i &lt;file&gt;</p>
-<h2 id="hosts-and-groups">hosts and groups:</h2>
+<h2 id="hosts-and-groups">Hosts and Groups:</h2>
 <pre><code>mail.example.com
 
 [webservers]
@@ -25,7 +25,7 @@ host3
 atlanta
 raleigh</code></pre>
 <p>special group &quot;all&quot; contains all hosts.</p>
-<h2 id="host-and-group-variables">Host and group variables:</h2>
+<h2 id="host-and-group-variables">Host and Group Variables:</h2>
 <p>(TODO verify) variables in general: one namespace for variables; variables may be set basically anywhere, i.e. at the host/inventory, play or task level (see below), and used in task invocations and templates (see below).</p>
 <p>Setting at the host/inventory level (&quot;host variables&quot;):</p>
 <ul>
@@ -45,16 +45,36 @@ group_vars/&lt;groupname&gt;.yml
 group_vars/&lt;groupname&gt;/&lt;anything&gt;.yml</code></pre>
 <p>Some variables influence ansible's built-in operations on the host(s):</p>
 <p>ansible_user, ansible_port, ansible_ssh_private_key_file, ...</p>
-<h2 id="dynamic-inventories">Dynamic inventories:</h2>
+<h2 id="variables-preference">Variables Preference</h2>
+<p>Least to most preferred:</p>
+<ul>
+<li><p>role defaults [1]</p></li>
+<li><p>inventory vars [2]</p></li>
+<li><p>inventory group_vars</p></li>
+<li><p>inventory host_vars</p></li>
+<li><p>playbook group_vars</p></li>
+<li><p>playbook host_vars</p></li>
+<li><p>host facts</p></li>
+<li><p>play vars</p></li>
+<li><p>play vars_prompt</p></li>
+<li><p>play vars_files</p></li>
+<li><p>registered vars</p></li>
+<li><p>set_facts</p></li>
+<li><p>role and include vars</p></li>
+<li><p>block vars (only for tasks in block)</p></li>
+<li><p>task vars (only for the task)</p></li>
+<li><p>extra vars (always win precedence)</p></li>
+</ul>
+<h2 id="dynamic-inventories">Dynamic Inventories:</h2>
 <p>You can write scripts that provide the inventory data (including vars and all) dynamically. Existing scripts for Cobbler, AWS, OpenStack, ...</p>
-<h1 id="command-line">Command line</h1>
+<h1 id="command-line">Command Line</h1>
 <p>&quot;ansible&quot; for ad-hoc invocation of Ansible modules against inventory hosts, &quot;ansible-playbook&quot; for running Ansible playbooks (ordered collections of ansible module invocations).</p>
 <p><code>ansible [-i &lt;inventory file&gt;] [other options] &lt;hosts pattern&gt; -m &lt;module_name&gt; -a &lt;arguments&gt;</code></p>
 <p>&lt;hosts pattern&gt; is a host or group name, or multiple of those, connected with a :. Globbing with * or [startnum:endnum] allowed, e.g. 192.168.1.*, webservers:app[1:10]</p>
 <p>&lt;module_name&gt; defaults to &quot;command&quot;, which takes the command line to run as its only argument.</p>
 <p>Example: <code>ansible all -a &quot;/sbin/shutdown -h now&quot;</code></p>
 <p>Besides sshd, Ansible only requires Python on the managed host. Some modules like &quot;command&quot; don't even need that -- so you can use &quot;command&quot; to install Python, then go on using other modules. Every Ansible invocation on a host uploads all required modules to a temporary directory on the host, runs them, then cleans up.</p>
-<h2 id="common-modules">common modules:</h2>
+<h2 id="common-modules">Common Modules:</h2>
 <p>&quot;shell&quot; module instead of &quot;command&quot; for running a shell command with pipes/redirects etc.</p>
 <p>file copy: <code>ansible atlanta -m copy -a &quot;src=/etc/hosts dest=/tmp/hosts&quot;</code></p>
 <p>file copy, expanding a template: <code>ansible timeservers -m template -a &quot;src=ntp.conf.j2 dest=/etc/ntp.conf&quot;</code></p>
@@ -63,7 +83,7 @@ group_vars/&lt;groupname&gt;/&lt;anything&gt;.yml</code></pre>
 <p>create user/group: <code>ansible all -m user -a &quot;name=foo password=&lt;crypted password here&gt;&quot;</code></p>
 <p>git clone: <code>ansible webservers -m git -a &quot;repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD&quot;</code></p>
 <p>service mgmt: <code>ansible webservers -m service -a &quot;name=httpd state=started&quot;</code></p>
-<h2 id="common-other-commandline-options-privilege-escalation">common other commandline options, privilege escalation:</h2>
+<h2 id="common-other-commandline-options-privilege-escalation">Common Other Commandline Options, Privilege Escalation:</h2>
 <p>Use ssh password auth (rather than PKI): <code>--ask-pass (-k)</code></p>
 <p>Run as another user, possibly using sudo: <code>-u username [--become [--ask-become-pass]]</code>.</p>
 <p>There is a corresponding set of directives, settable at the play or task level:</p>
@@ -164,7 +184,7 @@ group_vars/&lt;groupname&gt;/&lt;anything&gt;.yml</code></pre>
 <pre><code>tasks:
   - include: tasks/foo.yml
   - include: tasks/wordpress.yml wp_user=timmy</code></pre>
-<h2 id="playbook-includes">Playbook includes</h2>
+<h2 id="playbook-includes">Playbook Includes</h2>
 <p>Playbooks can include other playbooks using an <code>include:</code> statement at the top level.</p>
 <h2 id="roles">Roles</h2>
 <p>Are task include files, with built-in search paths for tasks and vars.</p>
@@ -241,7 +261,7 @@ dependencies:
     favcolor: blue
   vars_files:
     - /vars/external_vars.yml</code></pre>
-<h2 id="facts-special-variables">Facts, special variables</h2>
+<h2 id="facts-special-variables">Facts, Special Variables</h2>
 <p>Facts: Pre-set Variables recording system states. To see them: <code>ansible host -m setup</code>. Sample output (partial):</p>
 <pre><code>        &quot;ansible_all_ipv4_addresses&quot;: [
             &quot;10.0.2.15&quot;,
@@ -307,15 +327,35 @@ dependencies:
   - name: &quot;shut down Debian flavored systems&quot;
     command: /sbin/shutdown -t now
     when: ansible_os_family == &quot;Debian&quot;</code></pre>
+<h1 id="delegations">Delegations</h1>
+<p>Within a play, allow tasks to be run on another host than the one the play is currently handling. Example:</p>
+<pre><code>- hosts: webservers
+  serial: 5
+
+  tasks:
+
+  - name: take out of load balancer pool
+    command: /usr/bin/take_out_of_pool {{ inventory_hostname }}
+    delegate_to: 127.0.0.1
+
+  - name: actual steps would go here
+    yum: name=acme-web-stack state=latest
+
+  - name: add back to load balancer pool
+    command: /usr/bin/add_back_to_pool {{ inventory_hostname }}
+    delegate_to: 127.0.0.1</code></pre>
+<p>Runs the first and 3rd task not on the host (out of webservers) that's currently being handled by the play, but on 127.0.0.1. <code>inventory_hostname</code> is a predefined variable that names the host that's currently being handled.</p>
+<p>There is special syntax for the case that the delegated-to host is 127.0.0.1: <code>local_action</code>.</p>
+<pre><code>tasks:
+
+  - name: recursively copy files from management server to target
+    local_action: command rsync -a /path/to/files {{ inventory_hostname }}:/path/to/target/</code></pre>
+<h1 id="delegated-facts">Delegated facts</h1>
+<p>If you delegate the <code>setup</code> task (which gathers facts), you can say <code>delegate_facts: True</code> to have the resulting fact variables assigned to the delegated-to host (just as if the setup task had run there regularly during a play) instead of to the inventory_hostname.</p>
 <p>TODO:</p>
 <ul>
 <li><p>blocks</p></li>
 <li><p>some special modules, e.g. group_by</p></li>
 </ul>
 <hr />
-<p><small>© 1998-2016 Olaf Klischat <script type="text/javascript">
-<!--
-h='&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;';a='&#64;';n='&#x6f;&#108;&#x61;&#102;&#46;&#x6b;&#108;&#x69;&#x73;&#x63;&#104;&#x61;&#116;';e=n+a+h;
-document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
-// -->
-</script><noscript>&#x6f;&#108;&#x61;&#102;&#46;&#x6b;&#108;&#x69;&#x73;&#x63;&#104;&#x61;&#116;&#32;&#x61;&#116;&#32;&#x67;&#x6d;&#x61;&#x69;&#108;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#x6f;&#x6d;</noscript></small></p>
+<p><small>© 1998-2016 Olaf Klischat <a href="mailto:olaf.klischat@gmail.com">olaf.klischat@gmail.com</a></small></p>
