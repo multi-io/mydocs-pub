@@ -1,0 +1,41 @@
+<p><small> <a href="../.">.</a>/<a href=".">openssl</a>/misc.md <a href="misc.md">download original</a> </small></p>
+<hr />
+<h1 id="openssl">OpenSSL</h1>
+<h2 id="generate-ca-private-key-interactive-passphrase-key-passphrase-entry">generate CA private key (interactive passphrase key passphrase entry):</h2>
+<p>`` openssl genrsa -aes256 -out ca-key.pem 4096</p>
+<pre><code>
+pass passphrase on cmdline:
+</code></pre>
+<p>openssl genrsa -aes256 -passout pass:geheim -out ca-key.pem 4096</p>
+<pre><code>
+
+## generate CA certificate (interactive fields and passphrase (of input key file) entry):
+</code></pre>
+<p>openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem</p>
+<pre><code>
+
+pass fields and passphrase on cmdline:
+</code></pre>
+<p>openssl req -new -x509 -days 365 -subj '/C=DE/ST=Berlin/L=Berlin/O=My Organization/OU=SMITH/CN=My Org Development CA/emailAddress=smith@myorg.com' -key ca-key.pem -passin pass:geheim -sha256 -out ca.pem</p>
+<pre><code>
+(it computes the public key to be written into the certificate from the ca-key.pem private key)
+
+
+
+## generate server private key:
+</code></pre>
+<p>openssl genrsa -passout pass:geheim -out server-key.pem 4096</p>
+<pre><code>
+## generate server CSR:
+</code></pre>
+<p>openssl req -new -subj '/CN=*.myorg.com' -key server-key.pem -passin pass:geheim -sha256 -out server.csr</p>
+<pre><code>
+## generate server certificate, signed by CA:
+</code></pre>
+<p>openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -passin pass:geheim -CAcreateserial -out server-cert.pem -extfile &lt;(echo 'subjectAltName = DNS:*.myorg.com,IP:10.10.10.20')</p>
+<pre><code>
+# decode/print cert:
+</code></pre>
+<p>openssl x509 -in ca.pem -text ```</p>
+<hr />
+<p><small>© 1998-2017 Olaf Klischat <a href="mailto:olaf.klischat@gmail.com">olaf.klischat@gmail.com</a></small></p>
