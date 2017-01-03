@@ -3,7 +3,7 @@
 
 ## generate CA private key (interactive passphrase key passphrase entry):
 
-``
+```
 openssl genrsa -aes256 -out ca-key.pem 4096
 ```
 
