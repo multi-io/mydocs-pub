@@ -77,3 +77,19 @@ Same for a CSR:
 ```
 openssl req -text -noout -verify -in server.csr
 ```
+
+
+
+## get cert from server
+
+```
+openssl s_client -showcerts -connect www.example.com:443 </dev/null
+```
+
+(always gets and prints the whole chain, from leaf to root... :\)
+
+...with server name indication (SNI):
+
+```
+openssl s_client -showcerts -servername www.example.com -connect www.example.com:443 </dev/null
+```
