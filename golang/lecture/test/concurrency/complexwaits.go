@@ -34,8 +34,8 @@ func main() {
     fmt.Println("main start")
     wg.Add(*pn)
     for i := 0; i < *pn; i++ {
-        //go wait(fmt.Sprintf("wait %v", i))
-        go busywait(fmt.Sprintf("busywait %v", i))
+        go wait(fmt.Sprintf("wait %v", i))
+        //go busywait(fmt.Sprintf("busywait %v", i))
     }
     wg.Wait()
     fmt.Println("main done")
