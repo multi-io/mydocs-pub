@@ -1,4 +1,4 @@
-BINARIES=simplewaits complexwaits
+BINARIES=simplewaits complexwaits with-locked-counter
 
 .PHONY: default clean
 

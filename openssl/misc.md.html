@@ -1,22 +1,37 @@
 <p><small> <a href="../.">.</a>/<a href=".">openssl</a>/misc.md <a href="misc.md">download original</a> </small></p>
 <hr />
-<h1 id="openssl">OpenSSL</h1>
-<h2 id="generate-ca-private-key-interactive-passphrase-key-passphrase-entry">generate CA private key (interactive passphrase key passphrase entry):</h2>
+<h1 id="some-openssl-commands">Some OpenSSL Commands</h1>
+<h2 id="generate-ca-private-key">generate CA private key</h2>
+<p>w/ interactive passphrase key passphrase entry</p>
 <pre><code>openssl genrsa -aes256 -out ca-key.pem 4096</code></pre>
 <p>pass passphrase on cmdline:</p>
 <pre><code>openssl genrsa -aes256 -passout pass:geheim -out ca-key.pem 4096</code></pre>
-<h2 id="generate-ca-certificate-interactive-fields-and-passphrase-of-input-key-file-entry">generate CA certificate (interactive fields and passphrase (of input key file) entry):</h2>
+<h2 id="generate-ca-certificate">generate CA certificate</h2>
+<p>interactive fields and passphrase (of input key file) entry</p>
 <pre><code>openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem</code></pre>
 <p>pass fields and passphrase on cmdline:</p>
 <pre><code>openssl req -new -x509 -days 365 -subj &#39;/C=DE/ST=Berlin/L=Berlin/O=My Organization/OU=SMITH/CN=My Org Development CA/emailAddress=smith@myorg.com&#39;  -key ca-key.pem -passin pass:geheim -sha256 -out ca.pem</code></pre>
 <p>(it computes the public key to be written into the certificate from the ca-key.pem private key)</p>
-<h2 id="generate-server-private-key">generate server private key:</h2>
+<h2 id="generate-server-private-key">generate server private key</h2>
 <pre><code>openssl genrsa -passout pass:geheim -out server-key.pem 4096</code></pre>
-<h2 id="generate-server-csr">generate server CSR:</h2>
+<h2 id="generate-server-csr">generate server CSR</h2>
 <pre><code>openssl req -new -subj &#39;/CN=*.myorg.com&#39; -key server-key.pem -passin pass:geheim -sha256 -out server.csr</code></pre>
-<h2 id="generate-server-certificate-signed-by-ca">generate server certificate, signed by CA:</h2>
+<h2 id="generate-server-certificate-signed-by-ca">generate server certificate, signed by CA</h2>
 <pre><code>openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -passin pass:geheim -CAcreateserial -out server-cert.pem -extfile &lt;(echo &#39;subjectAltName = DNS:*.myorg.com,IP:10.10.10.20&#39;)</code></pre>
-<h1 id="decodeprint-cert">decode/print cert:</h1>
-<pre><code>openssl x509 -in ca.pem -text</code></pre>
+<h2 id="verify-server-cert-against-ca-cert-i.e.-verify-the-chain">verify server cert against CA cert (i.e. verify the chain)</h2>
+<pre><code>openssl verify -CAfile ca.pem server-cert.pem</code></pre>
+<p>With intermediate certs:</p>
+<pre><code>openssl verify -CAfile &lt;(cat rootca.pem intermediate1.pem intermediate2.pem ...) server-cert.pem</code></pre>
+<h2 id="decodeprint-and-check-signature-of-cert">decode/print (and check signature of) cert:</h2>
+<pre><code>openssl x509 -in some-cert.pem -text -noout</code></pre>
+<p>Same for a CSR:</p>
+<pre><code>openssl req -text -noout -verify -in server.csr</code></pre>
+<h2 id="decrypt-an-encrypted-private-key">decrypt an encrypted private key</h2>
+<pre><code>openssl rsa -in server-key.pem  -out server-key-dec.pem</code></pre>
+<h2 id="get-cert-from-server">get cert from server</h2>
+<pre><code>openssl s_client -showcerts -connect www.example.com:443 &lt;/dev/null</code></pre>
+<p>(always gets and prints the whole chain, from leaf to root... :)</p>
+<p>...with server name indication (SNI):</p>
+<pre><code>openssl s_client -showcerts -servername www.example.com -connect www.example.com:443 &lt;/dev/null</code></pre>
 <hr />
 <p><small>© 1998-2017 Olaf Klischat <a href="mailto:olaf.klischat@gmail.com">olaf.klischat@gmail.com</a></small></p>
