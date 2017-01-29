@@ -78,6 +78,11 @@ Same for a CSR:
 openssl req -text -noout -verify -in server.csr
 ```
 
+## decrypt an encrypted private key
+
+```
+openssl rsa -in server-key.pem  -out server-key-dec.pem
+```
 
 
 ## get cert from server
