@@ -98,3 +98,19 @@ openssl s_client -showcerts -connect www.example.com:443 </dev/null
 ```
 openssl s_client -showcerts -servername www.example.com -connect www.example.com:443 </dev/null
 ```
+
+## get fingerprint of certificate
+
+```
+openssl x509 -noout -fingerprint -in ca.pem
+```
+
+## add CA cert to OpenSSL's list of trusted certificates
+
+```
+# sudo su  # must be root for this
+# cp ca.pem /etc/ssl/certs/Example_CA.pem   # choose expressive name. Directory depends on OpenSSL installation; this is the default for Debian & derivatives
+# chmod 644 /etc/ssl/certs/Example_CA.pem
+# cd /etc/ssl/certs/
+# ln -s Example_CA.pem $(openssl x509 -noout -hash -in Example_CA.pem).0
+```
