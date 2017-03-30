@@ -1,5 +1,3 @@
-<p><small> <a href="../.">.</a>/<a href=".">openssl</a>/misc.md <a href="misc.md">download original</a> </small></p>
-<hr />
 <h1 id="some-openssl-commands">Some OpenSSL Commands</h1>
 <h2 id="generate-ca-private-key">generate CA private key</h2>
 <p>w/ interactive passphrase key passphrase entry</p>
@@ -26,20 +24,3 @@
 <pre><code>openssl x509 -in some-cert.pem -text -noout</code></pre>
 <p>Same for a CSR:</p>
 <pre><code>openssl req -text -noout -verify -in server.csr</code></pre>
-<h2 id="decrypt-an-encrypted-private-key">decrypt an encrypted private key</h2>
-<pre><code>openssl rsa -in server-key.pem  -out server-key-dec.pem</code></pre>
-<h2 id="get-cert-from-server">get cert from server</h2>
-<pre><code>openssl s_client -showcerts -connect www.example.com:443 &lt;/dev/null</code></pre>
-<p>(always gets and prints the whole chain, from leaf to root... :)</p>
-<p>...with server name indication (SNI):</p>
-<pre><code>openssl s_client -showcerts -servername www.example.com -connect www.example.com:443 &lt;/dev/null</code></pre>
-<h2 id="get-fingerprint-of-certificate">get fingerprint of certificate</h2>
-<pre><code>openssl x509 -noout -fingerprint -in ca.pem</code></pre>
-<h2 id="add-ca-cert-to-openssls-list-of-trusted-certificates">add CA cert to OpenSSL's list of trusted certificates</h2>
-<pre><code># sudo su  # must be root for this
-# cp ca.pem /etc/ssl/certs/Example_CA.pem   # choose expressive name. Directory depends on OpenSSL installation; this is the default for Debian &amp; derivatives
-# chmod 644 /etc/ssl/certs/Example_CA.pem
-# cd /etc/ssl/certs/
-# ln -s Example_CA.pem $(openssl x509 -noout -hash -in Example_CA.pem).0</code></pre>
-<hr />
-<p><small>© 1998-2017 Olaf Klischat <a href="mailto:olaf.klischat@gmail.com">olaf.klischat@gmail.com</a></small></p>
