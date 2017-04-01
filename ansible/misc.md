@@ -396,7 +396,8 @@ More features:
      - { role: foo_app_instance, dir: '/opt/a',  app_port: 5000 }
      ## conditional application
      - { role: some_role, when: "ansible_os_family == 'RedHat'" }
-     ## tagged
+     ## set tags on all tasks of the role while running it (see below
+     ## for tags)
      - { role: foo, tags: ["bar", "baz"] }
 ```
 
@@ -424,6 +425,67 @@ dependencies:
       of any roles, and maybe submit them to Ansible for inclusion in
       the core distribution
     
+
+# Tags
+
+A task may have zero or more tags (which are just strings) added to
+it. When running a playbook, you can specify to only run tasks having
+or not having specific tags.
+
+## Adding Tags to Tasks
+
+Directly at the task definition:
+
+```
+---
+# file: roles/common/tasks/main.yml
+
+- name: be sure ntp is installed
+  yum: name=ntp state=installed
+  tags: ntp
+```
+
+```
+tasks:
+
+    - yum: name={{ item }} state=installed
+      with_items:
+         - httpd
+         - memcached
+      tags:
+         - packages
+
+    - template: src=templates/src.j2 dest=/etc/foo.conf
+      tags:
+         - configuration
+```
+
+When running a role:
+
+```
+- hosts: somehosts
+  roles:
+     ## set tags on all tasks of the role while running it
+     - { role: foo, tags: ["bar", "baz"] }
+```
+
+## Specifying Tags When Running Playbooks
+
+*Only* possible on the command line.
+
+```
+ansible-playbook example.yml --tags "configuration,packages"
+
+ansible-playbook example.yml --skip-tags "notification"
+```
+
+
+## "always" Tag
+
+The special tag "always" will always run a task, unless specifically
+skipped (`--skip-tags always`).
+
+
 
 # Variables
 
