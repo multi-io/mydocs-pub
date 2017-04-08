@@ -140,7 +140,30 @@ Ansible invocation on a host uploads all required modules to a
 temporary directory on the host, runs them, then cleans up.
 
 
-## Common Modules:
+## Common Other Commandline Options, Privilege Escalation:
+
+Use ssh password auth (rather than PKI): `--ask-pass (-k)`
+
+Run as another user, possibly using sudo: `-u username
+[--become|-b [--ask-become-pass]]`.
+
+There is a corresponding set of directives, settable at the play or
+task level:
+
+```
+- name: Run a command as the apache user
+  command: somecommand
+  become: true
+  become_user: apache
+```
+
+There are also a corresponding variables (which, when set, will
+override the directive). Normally defined in the inventory.
+
+Number of parallel runs (when running on multiple hosts): `-f 10`
+
+
+## Examples, Common Modules:
 
 "shell" module instead of "command" for running a shell command with
 pipes/redirects etc.
@@ -157,30 +180,8 @@ create user/group: `ansible all -m user -a "name=foo password=<crypted password 
 
 git clone: `ansible webservers -m git -a "repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD"`
 
-service mgmt: `ansible webservers -m service -a "name=httpd state=started"`
+service mgmt (login user ubuntu, with `-b` (become) for sudoing): `ansible webservers -u ubuntu -b -m service -a "name=httpd state=started"`
 
-
-## Common Other Commandline Options, Privilege Escalation:
-
-Use ssh password auth (rather than PKI): `--ask-pass (-k)`
-
-Run as another user, possibly using sudo: `-u username
-[--become [--ask-become-pass]]`.
-
-There is a corresponding set of directives, settable at the play or
-task level:
-
-```
-- name: Run a command as the apache user
-  command: somecommand
-  become: true
-  become_user: apache
-```
-
-There are also a corresponding variables (which, when set, will
-override the directive). Normally defined in the inventory.
-
-Number of parallel runs (when running on multiple hosts): `-f 10`
 
 
 # Modules
