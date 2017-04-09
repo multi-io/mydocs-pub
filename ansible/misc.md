@@ -547,14 +547,16 @@ you know you won't need them) via `gather_facts:false`.
   `hostvars[hostname][var_name]`. TODO variables or just facts?
 
     - only possible if `hostname` was already accessed within the same
-      play, or if *fact caching* is enabled in ansible.conf
+      play or a previous play of the current playbook run. Or, you may
+      enable *fact caching* in ansible.conf to cache facts between
+      playbook runs.
 
 - `group_names`: list (array) of all the groups the current host is
   in.
 
-- `groups` list of all the groups (and hosts) in the
-  inventory. Example: Find all IPv4 addresses of all host in a
-  specific group:
+- `groups` dictionary mapping group names to lists of host names,
+  containing all groups and hosts in the inventory. Example: Find all
+  IPv4 addresses of all host in a specific group:
   
 ```
 {% for host in groups['app_servers'] %}
