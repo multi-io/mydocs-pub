@@ -36,10 +36,10 @@
 <h2 id="get-fingerprint-of-certificate">get fingerprint of certificate</h2>
 <pre><code>openssl x509 -noout -fingerprint -in ca.pem</code></pre>
 <h2 id="add-ca-cert-to-openssls-list-of-trusted-certificates">add CA cert to OpenSSL's list of trusted certificates</h2>
-<pre><code># sudo su  # must be root for this
-# cp ca.pem /etc/ssl/certs/Example_CA.pem   # choose expressive name. Directory depends on OpenSSL installation; this is the default for Debian &amp; derivatives
-# chmod 644 /etc/ssl/certs/Example_CA.pem
-# cd /etc/ssl/certs/
-# ln -s Example_CA.pem $(openssl x509 -noout -hash -in Example_CA.pem).0</code></pre>
+<pre><code>sudo su  # must be root for this
+cp ca.pem /etc/ssl/certs/Example_CA.pem   # choose expressive name. Directory depends on OpenSSL installation; this is the default for Debian &amp; derivatives
+chmod 644 /etc/ssl/certs/Example_CA.pem
+cd /etc/ssl/certs/
+ln -s Example_CA.pem $(openssl x509 -noout -hash -in Example_CA.pem).0</code></pre>
 <hr />
 <p><small>© 1998-2017 Olaf Klischat <a href="mailto:olaf.klischat@gmail.com">olaf.klischat@gmail.com</a></small></p>

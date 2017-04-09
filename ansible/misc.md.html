@@ -74,18 +74,9 @@ group_vars/&lt;groupname&gt;/&lt;anything&gt;.yml</code></pre>
 <p>&lt;module_name&gt; defaults to &quot;command&quot;, which takes the command line to run as its only argument.</p>
 <p>Example: <code>ansible all -a &quot;/sbin/shutdown -h now&quot;</code></p>
 <p>Besides sshd, Ansible only requires Python on the managed host. Some modules like &quot;command&quot; don't even need that -- so you can use &quot;command&quot; to install Python, then go on using other modules. Every Ansible invocation on a host uploads all required modules to a temporary directory on the host, runs them, then cleans up.</p>
-<h2 id="common-modules">Common Modules:</h2>
-<p>&quot;shell&quot; module instead of &quot;command&quot; for running a shell command with pipes/redirects etc.</p>
-<p>file copy: <code>ansible atlanta -m copy -a &quot;src=/etc/hosts dest=/tmp/hosts&quot;</code></p>
-<p>file copy, expanding a template: <code>ansible timeservers -m template -a &quot;src=ntp.conf.j2 dest=/etc/ntp.conf&quot;</code></p>
-<p>file owner/mode change: <code>ansible webservers -m file -a &quot;dest=/srv/foo/b.txt mode=600 owner=mdehaan group=mdehaan&quot;</code></p>
-<p>package mgmt: <code>ansible webservers -m yum -a &quot;name=ruby state=present&quot;</code></p>
-<p>create user/group: <code>ansible all -m user -a &quot;name=foo password=&lt;crypted password here&gt;&quot;</code></p>
-<p>git clone: <code>ansible webservers -m git -a &quot;repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD&quot;</code></p>
-<p>service mgmt: <code>ansible webservers -m service -a &quot;name=httpd state=started&quot;</code></p>
 <h2 id="common-other-commandline-options-privilege-escalation">Common Other Commandline Options, Privilege Escalation:</h2>
 <p>Use ssh password auth (rather than PKI): <code>--ask-pass (-k)</code></p>
-<p>Run as another user, possibly using sudo: <code>-u username [--become [--ask-become-pass]]</code>.</p>
+<p>Run as another user, possibly using sudo: <code>-u username [--become|-b [--ask-become-pass]]</code>.</p>
 <p>There is a corresponding set of directives, settable at the play or task level:</p>
 <pre><code>- name: Run a command as the apache user
   command: somecommand
@@ -93,6 +84,15 @@ group_vars/&lt;groupname&gt;/&lt;anything&gt;.yml</code></pre>
   become_user: apache</code></pre>
 <p>There are also a corresponding variables (which, when set, will override the directive). Normally defined in the inventory.</p>
 <p>Number of parallel runs (when running on multiple hosts): <code>-f 10</code></p>
+<h2 id="examples-common-modules">Examples, Common Modules:</h2>
+<p>&quot;shell&quot; module instead of &quot;command&quot; for running a shell command with pipes/redirects etc.</p>
+<p>file copy: <code>ansible atlanta -m copy -a &quot;src=/etc/hosts dest=/tmp/hosts&quot;</code></p>
+<p>file copy, expanding a template: <code>ansible timeservers -m template -a &quot;src=ntp.conf.j2 dest=/etc/ntp.conf&quot;</code></p>
+<p>file owner/mode change: <code>ansible webservers -m file -a &quot;dest=/srv/foo/b.txt mode=600 owner=mdehaan group=mdehaan&quot;</code></p>
+<p>package mgmt: <code>ansible webservers -m yum -a &quot;name=ruby state=present&quot;</code></p>
+<p>create user/group: <code>ansible all -m user -a &quot;name=foo password=&lt;crypted password here&gt;&quot;</code></p>
+<p>git clone: <code>ansible webservers -m git -a &quot;repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD&quot;</code></p>
+<p>service mgmt (login user ubuntu, with <code>-b</code> (become) for sudoing): <code>ansible webservers -u ubuntu -b -m service -a &quot;name=httpd state=started&quot;</code></p>
 <h1 id="modules">Modules</h1>
 <ul>
 <li><p>Named</p></li>
@@ -230,7 +230,8 @@ roles/
      - { role: foo_app_instance, dir: &#39;/opt/a&#39;,  app_port: 5000 }
      ## conditional application
      - { role: some_role, when: &quot;ansible_os_family == &#39;RedHat&#39;&quot; }
-     ## tagged
+     ## set tags on all tasks of the role while running it (see below
+     ## for tags)
      - { role: foo, tags: [&quot;bar&quot;, &quot;baz&quot;] }</code></pre>
 <ul>
 <li>dependencies on other roles read from <code>roles/&lt;role&gt;/meta/main.yml</code>. Sample:</li>
@@ -250,6 +251,40 @@ dependencies:
 <li><p>generally, it is preferable to write custom modules independently of any roles, and maybe submit them to Ansible for inclusion in the core distribution</p></li>
 </ul></li>
 </ul>
+<h1 id="tags">Tags</h1>
+<p>A task may have zero or more tags (which are just strings) added to it. When running a playbook, you can specify to only run tasks having or not having specific tags.</p>
+<h2 id="adding-tags-to-tasks">Adding Tags to Tasks</h2>
+<p>Directly at the task definition:</p>
+<pre><code>---
+# file: roles/common/tasks/main.yml
+
+- name: be sure ntp is installed
+  yum: name=ntp state=installed
+  tags: ntp</code></pre>
+<pre><code>tasks:
+
+    - yum: name={{ item }} state=installed
+      with_items:
+         - httpd
+         - memcached
+      tags:
+         - packages
+
+    - template: src=templates/src.j2 dest=/etc/foo.conf
+      tags:
+         - configuration</code></pre>
+<p>When running a role:</p>
+<pre><code>- hosts: somehosts
+  roles:
+     ## set tags on all tasks of the role while running it
+     - { role: foo, tags: [&quot;bar&quot;, &quot;baz&quot;] }</code></pre>
+<h2 id="specifying-tags-when-running-playbooks">Specifying Tags When Running Playbooks</h2>
+<p><em>Only</em> possible on the command line.</p>
+<pre><code>ansible-playbook example.yml --tags &quot;configuration,packages&quot;
+
+ansible-playbook example.yml --skip-tags &quot;notification&quot;</code></pre>
+<h2 id="always-tag">&quot;always&quot; Tag</h2>
+<p>The special tag &quot;always&quot; will always run a task, unless specifically skipped (<code>--skip-tags always</code>).</p>
 <h1 id="variables">Variables</h1>
 <p>(refresh from above)</p>
 <p>One namespace per host for variables; variables may be set basically anywhere, i.e. at the host/inventory, play or task level, and referenced directly in playbooks and in templates, usually using the notation <code>{{ var }}</code>.</p>
@@ -280,10 +315,10 @@ dependencies:
 <ul>
 <li><p>Accessing variables on other hosts: <code>hostvars</code> variable. Value: map, keyed by hostname, of other hosts' variables. E.g. <code>hostvars[hostname][var_name]</code>. TODO variables or just facts?</p>
 <ul>
-<li>only possible if <code>hostname</code> was already accessed within the same play, or if <em>fact caching</em> is enabled in ansible.conf</li>
+<li>only possible if <code>hostname</code> was already accessed within the same play or a previous play of the current playbook run. Or, you may enable <em>fact caching</em> in ansible.conf to cache facts between playbook runs.</li>
 </ul></li>
 <li><p><code>group_names</code>: list (array) of all the groups the current host is in.</p></li>
-<li><p><code>groups</code> list of all the groups (and hosts) in the inventory. Example: Find all IPv4 addresses of all host in a specific group:</p></li>
+<li><p><code>groups</code> dictionary mapping group names to lists of host names, containing all groups and hosts in the inventory. Example: Find all IPv4 addresses of all host in a specific group:</p></li>
 </ul>
 <pre><code>{% for host in groups[&#39;app_servers&#39;] %}
    {{ hostvars[host][&#39;ansible_eth0&#39;][&#39;ipv4&#39;][&#39;address&#39;] }}

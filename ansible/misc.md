@@ -140,7 +140,30 @@ Ansible invocation on a host uploads all required modules to a
 temporary directory on the host, runs them, then cleans up.
 
 
-## Common Modules:
+## Common Other Commandline Options, Privilege Escalation:
+
+Use ssh password auth (rather than PKI): `--ask-pass (-k)`
+
+Run as another user, possibly using sudo: `-u username
+[--become|-b [--ask-become-pass]]`.
+
+There is a corresponding set of directives, settable at the play or
+task level:
+
+```
+- name: Run a command as the apache user
+  command: somecommand
+  become: true
+  become_user: apache
+```
+
+There are also a corresponding variables (which, when set, will
+override the directive). Normally defined in the inventory.
+
+Number of parallel runs (when running on multiple hosts): `-f 10`
+
+
+## Examples, Common Modules:
 
 "shell" module instead of "command" for running a shell command with
 pipes/redirects etc.
@@ -157,30 +180,8 @@ create user/group: `ansible all -m user -a "name=foo password=<crypted password 
 
 git clone: `ansible webservers -m git -a "repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD"`
 
-service mgmt: `ansible webservers -m service -a "name=httpd state=started"`
+service mgmt (login user ubuntu, with `-b` (become) for sudoing): `ansible webservers -u ubuntu -b -m service -a "name=httpd state=started"`
 
-
-## Common Other Commandline Options, Privilege Escalation:
-
-Use ssh password auth (rather than PKI): `--ask-pass (-k)`
-
-Run as another user, possibly using sudo: `-u username
-[--become [--ask-become-pass]]`.
-
-There is a corresponding set of directives, settable at the play or
-task level:
-
-```
-- name: Run a command as the apache user
-  command: somecommand
-  become: true
-  become_user: apache
-```
-
-There are also a corresponding variables (which, when set, will
-override the directive). Normally defined in the inventory.
-
-Number of parallel runs (when running on multiple hosts): `-f 10`
 
 
 # Modules
@@ -396,7 +397,8 @@ More features:
      - { role: foo_app_instance, dir: '/opt/a',  app_port: 5000 }
      ## conditional application
      - { role: some_role, when: "ansible_os_family == 'RedHat'" }
-     ## tagged
+     ## set tags on all tasks of the role while running it (see below
+     ## for tags)
      - { role: foo, tags: ["bar", "baz"] }
 ```
 
@@ -424,6 +426,67 @@ dependencies:
       of any roles, and maybe submit them to Ansible for inclusion in
       the core distribution
     
+
+# Tags
+
+A task may have zero or more tags (which are just strings) added to
+it. When running a playbook, you can specify to only run tasks having
+or not having specific tags.
+
+## Adding Tags to Tasks
+
+Directly at the task definition:
+
+```
+---
+# file: roles/common/tasks/main.yml
+
+- name: be sure ntp is installed
+  yum: name=ntp state=installed
+  tags: ntp
+```
+
+```
+tasks:
+
+    - yum: name={{ item }} state=installed
+      with_items:
+         - httpd
+         - memcached
+      tags:
+         - packages
+
+    - template: src=templates/src.j2 dest=/etc/foo.conf
+      tags:
+         - configuration
+```
+
+When running a role:
+
+```
+- hosts: somehosts
+  roles:
+     ## set tags on all tasks of the role while running it
+     - { role: foo, tags: ["bar", "baz"] }
+```
+
+## Specifying Tags When Running Playbooks
+
+*Only* possible on the command line.
+
+```
+ansible-playbook example.yml --tags "configuration,packages"
+
+ansible-playbook example.yml --skip-tags "notification"
+```
+
+
+## "always" Tag
+
+The special tag "always" will always run a task, unless specifically
+skipped (`--skip-tags always`).
+
+
 
 # Variables
 
@@ -484,14 +547,16 @@ you know you won't need them) via `gather_facts:false`.
   `hostvars[hostname][var_name]`. TODO variables or just facts?
 
     - only possible if `hostname` was already accessed within the same
-      play, or if *fact caching* is enabled in ansible.conf
+      play or a previous play of the current playbook run. Or, you may
+      enable *fact caching* in ansible.conf to cache facts between
+      playbook runs.
 
 - `group_names`: list (array) of all the groups the current host is
   in.
 
-- `groups` list of all the groups (and hosts) in the
-  inventory. Example: Find all IPv4 addresses of all host in a
-  specific group:
+- `groups` dictionary mapping group names to lists of host names,
+  containing all groups and hosts in the inventory. Example: Find all
+  IPv4 addresses of all host in a specific group:
   
 ```
 {% for host in groups['app_servers'] %}
