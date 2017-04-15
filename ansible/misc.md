@@ -402,6 +402,8 @@ More features:
      - { role: foo, tags: ["bar", "baz"] }
 ```
 
+## Role dependencies
+
 - dependencies on other roles read from `roles/<role>/meta/main.yml`. Sample:
 
 ```
@@ -425,7 +427,37 @@ dependencies:
     - generally, it is preferable to write custom modules independently
       of any roles, and maybe submit them to Ansible for inclusion in
       the core distribution
-    
+
+### include_role
+
+New in Ansible 2.2, there's also the `include_role` module for
+defining a task that runs a role:
+
+```
+- include_role:
+    name: apache
+```
+
+With parameter passing:
+
+```
+- name: Install Postgres
+  include_role:
+    name: postgres 
+  vars:
+    dbname: blarg
+    other_parameter: 12
+```
+
+
+```
+22:56 < multi_io> do role dependencies in meta/main.yml have any use at all now that we have the include_role module?
+22:57 < agaffney> they have less use, but include_role is still a bit...glitchy
+22:57 < multi_io> agaffney: how so?
+22:58 < agaffney> the was weirdness in 2.2.x in certain corner cases, and I don't know if it has all been discovered/fixed in 2.3
+22:58 < agaffney> but include_role was only a "preview" feature in 2.2
+```
+
 
 # Tags
 
