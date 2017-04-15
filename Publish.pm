@@ -111,6 +111,7 @@ sub htmlize($$) {
         /\.md$/ and do {
 
             # markdown to html
+            # TODO: use pandoc templates rather than rolling our own?
 
             open(SRC, "<$srcname") or die "couldn't open $srcname: $!";
             local $/=undef;

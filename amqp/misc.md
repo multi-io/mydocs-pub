@@ -1,4 +1,8 @@
-# Overview
+---
+title: AMQP Overview
+---
+
+# AMQP Overview
 
 Broker contains exchanges and queues.
 
