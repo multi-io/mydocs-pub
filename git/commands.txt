@@ -92,3 +92,9 @@ I'm pretty sure this didn't work in 1.8, but whatever.
 (not sure which of the values is actually needed. Without the --date
 option, notthing is set, with --date but without the environment --
 probably only the author time)
+
+
+
+get useful description of current HEAD, even if detached and/or dirty:
+
+git describe --tags --dirty
