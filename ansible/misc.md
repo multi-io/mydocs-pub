@@ -722,7 +722,107 @@ regularly during a play) instead of to the inventory_hostname.
 
 
 
-TODO:
+# Development
+
+http://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html
+
+```
+~/src$ git clone git://github.com/ansible/ansible.git
+....
+$ cd ansible
+~/src/ansible$ python3.5 -m venv ~/venvs/ansible
+~/src/ansible$ . ~/venvs/ansible/bin/activate
+(ansible) ~/src/ansible$
+(ansible) ~/src/ansible$ pip install -r requirements.txt
+....
+(ansible) ~/src/ansible$
+(ansible) ~/src/ansible$ source hacking/env-setup
+....
+Setting up Ansible to run out of checkout...
+...
+Done!
+
+(ansible) ~/src/ansible$ ansible ...
+```
+
+## Testing
+
+https://docs.ansible.com/ansible/dev_guide/testing.html
+
+Unit testing everything in all pythons:
+
+`ansible-test units --tox`
+
+Spefific module in specific python:
+
+`ansible-test units --tox --python 3.5 systemd`
+
+Integration testing (in Docker):
+
+`ansible-test integration --docker ubuntu1604 -v apt`
+
+systemd module integration tests need --docker-privileged
+
+`ansible-test integration --docker ubuntu1604 --docker-privileged -v systemd`
+
+
+## Running the Docker Setup Manually
+
+(The `ansible/ansible:ubuntu1604` image is maintained by Ansible,
+built from `test/utils/docker/ubuntu1604/Dockerfile`. It it also used
+for running the integration tests.  The image is based on the Docker
+Hub Ubuntu 16.04 image; it adds various packages as well as
+`/etc/ansible/hosts` inventory file containing a "localhost" entry
+that points to the local host, and it runs systemd as its pid 1 in the
+container (with all the services installed by the base image and the
+additional packages).  The `/sys/fs/cgroup` mount and
+`--privileged=true` are needed to make systemd accessible in the
+container)
+
+```
+~/src/ansible$ docker run --detach -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v $(pwd):/root/ansible --name=ansibletests --privileged=true ansible/ansible:ubuntu1604
+5c7d0b46c97fcf3e23b8641744017055cfdc5bd420f0e91d1409b18c525edb4f
+~/src/ansible$
+
+~/src/ansible$ docker exec -ti ansibletests /bin/bash
+root@5c7d0b46c97f:/# cd /root/
+.bashrc   .cache/   .profile  .ssh/     ansible/
+root@5c7d0b46c97f:/# cd /root/
+.bashrc   .cache/   .profile  .ssh/     ansible/
+root@5c7d0b46c97f:/# cd /root/ansible/
+root@5c7d0b46c97f:~/ansible#
+root@5c7d0b46c97f:~/ansible# source hacking/env-setup
+...
+Setting up Ansible to run out of checkout...
+...
+Done!
+
+root@5c7d0b46c97f:~/ansible#
+root@5c7d0b46c97f:~/ansible# ansible localhost -m setup
+
+localhost | SUCCESS => {
+    "ansible_facts": {
+        "ansible_all_ipv4_addresses": [
+            "172.17.0.2"
+        ],
+        "ansible_all_ipv6_addresses": [
+            "fe80::42:acff:fe11:2"
+        ],
+        "ansible_apparmor": {
+            "status": "disabled"
+        },
+        "ansible_architecture": "x86_64",
+        "ansible_bios_date": "03/14/2014",
+        "ansible_bios_version": "1.00",
+....
+}
+root@5c7d0b46c97f:~/ansible#
+```
+
+
+
+
+# TODOs
 
 - blocks
 
