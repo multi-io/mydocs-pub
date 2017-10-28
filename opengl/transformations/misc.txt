@@ -197,7 +197,7 @@ produces the perspective projection.
 
 In more detail:
 
-(3rd line of above matrix equation)
+(4th line of above matrix equation)
 
 wd = -ze
 
@@ -325,7 +325,7 @@ from the right:
 
 glMultMatrix(M)
 
-==> TopOfStack := TopOfStack * M
+==> TopOfStack := TopOfStack * M   [2]
 
 ...resulting in a combined transformation that would first perform the
 new transformation M and then the previous TopOfStack transformation.

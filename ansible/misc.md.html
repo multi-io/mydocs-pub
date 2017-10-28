@@ -233,6 +233,7 @@ roles/
      ## set tags on all tasks of the role while running it (see below
      ## for tags)
      - { role: foo, tags: [&quot;bar&quot;, &quot;baz&quot;] }</code></pre>
+<h2 id="role-dependencies">Role dependencies</h2>
 <ul>
 <li>dependencies on other roles read from <code>roles/&lt;role&gt;/meta/main.yml</code>. Sample:</li>
 </ul>
@@ -251,6 +252,22 @@ dependencies:
 <li><p>generally, it is preferable to write custom modules independently of any roles, and maybe submit them to Ansible for inclusion in the core distribution</p></li>
 </ul></li>
 </ul>
+<h3 id="include_role">include_role</h3>
+<p>New in Ansible 2.2, there's also the <code>include_role</code> module for defining a task that runs a role:</p>
+<pre><code>- include_role:
+    name: apache</code></pre>
+<p>With parameter passing:</p>
+<pre><code>- name: Install Postgres
+  include_role:
+    name: postgres 
+  vars:
+    dbname: blarg
+    other_parameter: 12</code></pre>
+<pre><code>22:56 &lt; multi_io&gt; do role dependencies in meta/main.yml have any use at all now that we have the include_role module?
+22:57 &lt; agaffney&gt; they have less use, but include_role is still a bit...glitchy
+22:57 &lt; multi_io&gt; agaffney: how so?
+22:58 &lt; agaffney&gt; the was weirdness in 2.2.x in certain corner cases, and I don&#39;t know if it has all been discovered/fixed in 2.3
+22:58 &lt; agaffney&gt; but include_role was only a &quot;preview&quot; feature in 2.2</code></pre>
 <h1 id="tags">Tags</h1>
 <p>A task may have zero or more tags (which are just strings) added to it. When running a playbook, you can specify to only run tasks having or not having specific tags.</p>
 <h2 id="adding-tags-to-tasks">Adding Tags to Tasks</h2>
@@ -387,7 +404,74 @@ ansible-playbook example.yml --skip-tags &quot;notification&quot;</code></pre>
     local_action: command rsync -a /path/to/files {{ inventory_hostname }}:/path/to/target/</code></pre>
 <h1 id="delegated-facts">Delegated facts</h1>
 <p>If you delegate the <code>setup</code> task (which gathers facts), you can say <code>delegate_facts: True</code> to have the resulting fact variables assigned to the delegated-to host (just as if the setup task had run there regularly during a play) instead of to the inventory_hostname.</p>
-<p>TODO:</p>
+<h1 id="development">Development</h1>
+<p>http://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html</p>
+<pre><code>~/src$ git clone git://github.com/ansible/ansible.git
+....
+$ cd ansible
+~/src/ansible$ python3.5 -m venv ~/venvs/ansible
+~/src/ansible$ . ~/venvs/ansible/bin/activate
+(ansible) ~/src/ansible$
+(ansible) ~/src/ansible$ pip install -r requirements.txt
+....
+(ansible) ~/src/ansible$
+(ansible) ~/src/ansible$ source hacking/env-setup
+....
+Setting up Ansible to run out of checkout...
+...
+Done!
+
+(ansible) ~/src/ansible$ ansible ...</code></pre>
+<h2 id="testing">Testing</h2>
+<p>https://docs.ansible.com/ansible/dev_guide/testing.html</p>
+<p>Unit testing everything in all pythons:</p>
+<p><code>ansible-test units --tox</code></p>
+<p>Spefific module in specific python:</p>
+<p><code>ansible-test units --tox --python 3.5 systemd</code></p>
+<p>Integration testing (in Docker):</p>
+<p><code>ansible-test integration --docker ubuntu1604 -v apt</code></p>
+<p>systemd module integration tests need --docker-privileged</p>
+<p><code>ansible-test integration --docker ubuntu1604 --docker-privileged -v systemd</code></p>
+<h2 id="running-the-docker-setup-manually">Running the Docker Setup Manually</h2>
+<p>(The <code>ansible/ansible:ubuntu1604</code> image is maintained by Ansible, built from <code>test/utils/docker/ubuntu1604/Dockerfile</code>. It it also used for running the integration tests. The image is based on the Docker Hub Ubuntu 16.04 image; it adds various packages as well as <code>/etc/ansible/hosts</code> inventory file containing a &quot;localhost&quot; entry that points to the local host, and it runs systemd as its pid 1 in the container (with all the services installed by the base image and the additional packages). The <code>/sys/fs/cgroup</code> mount and <code>--privileged=true</code> are needed to make systemd accessible in the container)</p>
+<pre><code>~/src/ansible$ docker run --detach -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v $(pwd):/root/ansible --name=ansibletests --privileged=true ansible/ansible:ubuntu1604
+5c7d0b46c97fcf3e23b8641744017055cfdc5bd420f0e91d1409b18c525edb4f
+~/src/ansible$
+
+~/src/ansible$ docker exec -ti ansibletests /bin/bash
+root@5c7d0b46c97f:/# cd /root/
+.bashrc   .cache/   .profile  .ssh/     ansible/
+root@5c7d0b46c97f:/# cd /root/
+.bashrc   .cache/   .profile  .ssh/     ansible/
+root@5c7d0b46c97f:/# cd /root/ansible/
+root@5c7d0b46c97f:~/ansible#
+root@5c7d0b46c97f:~/ansible# source hacking/env-setup
+...
+Setting up Ansible to run out of checkout...
+...
+Done!
+
+root@5c7d0b46c97f:~/ansible#
+root@5c7d0b46c97f:~/ansible# ansible localhost -m setup
+
+localhost | SUCCESS =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_all_ipv4_addresses&quot;: [
+            &quot;172.17.0.2&quot;
+        ],
+        &quot;ansible_all_ipv6_addresses&quot;: [
+            &quot;fe80::42:acff:fe11:2&quot;
+        ],
+        &quot;ansible_apparmor&quot;: {
+            &quot;status&quot;: &quot;disabled&quot;
+        },
+        &quot;ansible_architecture&quot;: &quot;x86_64&quot;,
+        &quot;ansible_bios_date&quot;: &quot;03/14/2014&quot;,
+        &quot;ansible_bios_version&quot;: &quot;1.00&quot;,
+....
+}
+root@5c7d0b46c97f:~/ansible#</code></pre>
+<h1 id="todos">TODOs</h1>
 <ul>
 <li><p>blocks</p></li>
 <li><p>some special modules, e.g. group_by</p></li>
