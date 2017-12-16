@@ -7,7 +7,7 @@ default:
 	@echo 'see the Makefile for publishing options'
 
 wwwpublish:
-	mkdir --parents $(PUBHTMLDIR) && \
+	mkdir -p $(PUBHTMLDIR) && \
 	./wwwpublish $(PUBHTMLDIR)
 
 wwwpublish-remote: wwwpublish
