@@ -61,6 +61,60 @@ git symbolic-ref HEAD refs/heads/<branch>
 (after which you'd probably issue a "git reset" to copy the new HEAD
 tree into the index)
 
+===========
+
+rebase --onto foo ...: useful e.g. when you want to rebase only some
+commits, not all that are in HEAD and not in foo, or when the commit
+you're rebasing onto (foo) is an ancestor of HEAD (and thus a normal
+git rebase would do nothing).
+
+From the help:
+
+
+       First let's assume your topic is based on branch next. For example, a feature developed in topic depends on some functionality which is found in next.
+
+               o---o---o---o---o  master
+                    \
+                     o---o---o---o---o  next
+                                      \
+                                       o---o---o  topic
+
+       We want to make topic forked from branch master; for example, because the functionality on which topic depends was merged into the more stable master branch. We want our tree
+       to look like this:
+
+               o---o---o---o---o  master
+                   |            \
+                   |             o'--o'--o'  topic
+                    \
+                     o---o---o---o---o  next
+
+       We can get this using the following command:
+
+           git rebase --onto master next topic
+
+       Another example of --onto option is to rebase part of a branch. If we have the following situation:
+
+                                       H---I---J topicB
+                                      /
+                             E---F---G  topicA
+                            /
+               A---B---C---D  master
+
+       then the command
+
+           git rebase --onto master topicA topicB
+
+       would result in:
+
+                            H'--I'--J'  topicB
+                           /
+                           | E---F---G  topicA
+                           |/
+               A---B---C---D  master
+
+       This is useful when topicB does not depend on topicA.
+
+
 
 ============
 
