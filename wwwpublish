@@ -71,7 +71,7 @@ sub rejected {
          m!^./gnus/! or
          # m!^./mediamaerkte/.*?txt$! or
          m!^./wget! or
-         m!^./linux/requested-modules.txt! or
+         m!^./linux/! or
          m!^./longhorn! or
          m!^./math/! or
          m!^./dotnet/! or
