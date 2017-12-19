@@ -3,24 +3,24 @@ Failed to enable IPv6 support
 Failed to enable IPv6 Forwarding default
 Failed to enable IPv6 Forwarding
 Running 'openvpn --config /etc/openvpn/openvpn.conf --client-config-dir /etc/openvpn/ccd --crl-verify /etc/openvpn/crl.pem '
-Tue Dec 19 13:49:16 2017 80.187.119.160:31234 TLS: Initial packet from [AF_INET]80.187.119.160:31234, sid=bce1192e ef2294f0
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 VERIFY OK: depth=1, CN=Easy-RSA CA
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 VERIFY OK: depth=0, CN=olafhomeclient
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 peer info: IV_VER=2.3.18
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 peer info: IV_PLAT=mac
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 peer info: IV_PROTO=2
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 peer info: IV_GUI_VER="net.tunnelblick.tunnelblick_4920_3.7.4a__build_4920)"
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 Data Channel Encrypt: Cipher 'BF-CBC' initialized with 128 bit key
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 Data Channel Encrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 Data Channel Decrypt: Cipher 'BF-CBC' initialized with 128 bit key
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 Data Channel Decrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
-Tue Dec 19 13:49:20 2017 80.187.119.160:31234 WARNING: cipher with small block size in use, reducing reneg-bytes to 64MB to mitigate SWEET32 attacks.
-Tue Dec 19 13:49:21 2017 80.187.119.160:31234 Control Channel: TLSv1.2, cipher TLSv1/SSLv3 ECDHE-RSA-CHACHA20-POLY1305, 2048 bit RSA
-Tue Dec 19 13:49:21 2017 80.187.119.160:31234 [olafhomeclient] Peer Connection Initiated with [AF_INET]80.187.119.160:31234
-Tue Dec 19 13:49:21 2017 olafhomeclient/80.187.119.160:31234 MULTI_sva: pool returned IPv4=192.168.255.6, IPv6=(Not enabled)
-Tue Dec 19 13:49:21 2017 olafhomeclient/80.187.119.160:31234 MULTI: Learn: 192.168.255.6 -> olafhomeclient/80.187.119.160:31234
-Tue Dec 19 13:49:21 2017 olafhomeclient/80.187.119.160:31234 MULTI: primary virtual IP for olafhomeclient/80.187.119.160:31234: 192.168.255.6
-Tue Dec 19 13:49:23 2017 olafhomeclient/80.187.119.160:31234 PUSH: Received control message: 'PUSH_REQUEST'
-Tue Dec 19 13:49:23 2017 olafhomeclient/80.187.119.160:31234 SENT CONTROL [olafhomeclient]: 'PUSH_REPLY,block-outside-dns,dhcp-option DNS 8.8.8.8,dhcp-option DNS 8.8.4.4,route 192.168.255.1,topology net30,ping 10,ping-restart 60,ifconfig 192.168.255.6 192.168.255.5,peer-id 0' (status=1)
+Tue Dec 19 14:06:32 2017 80.187.119.160:1219 TLS: Initial packet from [AF_INET]80.187.119.160:1219, sid=c46d0ebb d9569c97
+Tue Dec 19 14:06:33 2017 80.187.119.160:1219 VERIFY OK: depth=1, CN=Easy-RSA CA
+Tue Dec 19 14:06:33 2017 80.187.119.160:1219 VERIFY OK: depth=0, CN=olafhomeclient
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 peer info: IV_VER=2.3.18
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 peer info: IV_PLAT=mac
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 peer info: IV_PROTO=2
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 peer info: IV_GUI_VER="net.tunnelblick.tunnelblick_4920_3.7.4a__build_4920)"
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 Data Channel Encrypt: Cipher 'BF-CBC' initialized with 128 bit key
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 Data Channel Encrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 Data Channel Decrypt: Cipher 'BF-CBC' initialized with 128 bit key
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 Data Channel Decrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 WARNING: cipher with small block size in use, reducing reneg-bytes to 64MB to mitigate SWEET32 attacks.
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 Control Channel: TLSv1.2, cipher TLSv1/SSLv3 ECDHE-RSA-CHACHA20-POLY1305, 2048 bit RSA
+Tue Dec 19 14:06:34 2017 80.187.119.160:1219 [olafhomeclient] Peer Connection Initiated with [AF_INET]80.187.119.160:1219
+Tue Dec 19 14:06:34 2017 olafhomeclient/80.187.119.160:1219 MULTI_sva: pool returned IPv4=192.168.255.6, IPv6=(Not enabled)
+Tue Dec 19 14:06:34 2017 olafhomeclient/80.187.119.160:1219 MULTI: Learn: 192.168.255.6 -> olafhomeclient/80.187.119.160:1219
+Tue Dec 19 14:06:34 2017 olafhomeclient/80.187.119.160:1219 MULTI: primary virtual IP for olafhomeclient/80.187.119.160:1219: 192.168.255.6
+Tue Dec 19 14:06:37 2017 olafhomeclient/80.187.119.160:1219 PUSH: Received control message: 'PUSH_REQUEST'
+Tue Dec 19 14:06:37 2017 olafhomeclient/80.187.119.160:1219 SENT CONTROL [olafhomeclient]: 'PUSH_REPLY,block-outside-dns,dhcp-option DNS 8.8.8.8,dhcp-option DNS 8.8.4.4,route 192.168.255.1,topology net30,ping 10,ping-restart 60,ifconfig 192.168.255.6 192.168.255.5,peer-id 0' (status=1)

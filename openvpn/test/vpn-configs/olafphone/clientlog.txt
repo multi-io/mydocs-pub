@@ -111,9 +111,9 @@ updateSendProfileInfo = 1
 Tunnelblick Log:
 
 *Tunnelblick: OS X 10.13.1; Tunnelblick 3.7.4a (build 4920); prior version 3.7.4 (build 4900)
-2017-12-19 14:49:14 *Tunnelblick: Attempting connection with olafhomeclient using shadow copy; Set nameserver = 769; monitoring connection
-2017-12-19 14:49:14 *Tunnelblick: openvpnstart start olafhomeclient.tblk 1337 769 0 1 0 1065264 -ptADGNWradsgnw 2.3.18-libressl-2.6.2
-2017-12-19 14:49:14 *Tunnelblick: openvpnstart log:
+2017-12-19 15:06:31 *Tunnelblick: Attempting connection with olafhomeclient using shadow copy; Set nameserver = 769; monitoring connection
+2017-12-19 15:06:31 *Tunnelblick: openvpnstart start olafhomeclient.tblk 1337 769 0 1 0 1065264 -ptADGNWradsgnw 2.3.18-libressl-2.6.2
+2017-12-19 15:06:31 *Tunnelblick: openvpnstart log:
      OpenVPN started successfully. Command used to start OpenVPN (one argument per displayed line):
      
           /Applications/Tunnelblick.app/Contents/Resources/openvpn/openvpn-2.3.18-libressl-2.6.2/openvpn
@@ -145,64 +145,64 @@ Tunnelblick Log:
           --down
           /Applications/Tunnelblick.app/Contents/Resources/client.down.tunnelblick.sh -9 -d -f -m -w -ptADGNWradsgnw
 
-2017-12-19 14:49:14 *Tunnelblick: openvpnstart starting OpenVPN
-2017-12-19 14:49:14 *Tunnelblick: Established communication with OpenVPN
-2017-12-19 14:49:14 OpenVPN 2.3.18 x86_64-apple-darwin [SSL (OpenSSL)] [LZO] [PKCS11] [MH] [IPv6] built on Nov 10 2017
-2017-12-19 14:49:14 library versions: LibreSSL 2.6.2, LZO 2.10
-2017-12-19 14:49:14 MANAGEMENT: TCP Socket listening on [AF_INET]127.0.0.1:1337
-2017-12-19 14:49:14 Need hold release from management interface, waiting...
-2017-12-19 14:49:14 MANAGEMENT: Client connected from [AF_INET]127.0.0.1:1337
-2017-12-19 14:49:14 MANAGEMENT: CMD 'pid'
-2017-12-19 14:49:14 MANAGEMENT: CMD 'state on'
-2017-12-19 14:49:14 MANAGEMENT: CMD 'state'
-2017-12-19 14:49:14 MANAGEMENT: CMD 'bytecount 1'
-2017-12-19 14:49:14 MANAGEMENT: CMD 'hold release'
-2017-12-19 14:49:14 NOTE: the current --script-security setting may allow this configuration to call user-defined scripts
-2017-12-19 14:49:14 Control Channel Authentication: tls-auth using INLINE static key file
-2017-12-19 14:49:14 Outgoing Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
-2017-12-19 14:49:14 Incoming Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
-2017-12-19 14:49:14 Socket Buffers: R=[196724->196724] S=[9216->9216]
-2017-12-19 14:49:14 MANAGEMENT: >STATE:1513691354,RESOLVE,,,
-2017-12-19 14:49:14 UDPv4 link local: [undef]
-2017-12-19 14:49:14 UDPv4 link remote: [AF_INET]78.55.72.204:1194
-2017-12-19 14:49:14 MANAGEMENT: >STATE:1513691354,WAIT,,,
-2017-12-19 14:49:16 MANAGEMENT: >STATE:1513691356,AUTH,,,
-2017-12-19 14:49:16 TLS: Initial packet from [AF_INET]78.55.72.204:1194, sid=4744df53 ed3d825f
-2017-12-19 14:49:17 VERIFY OK: depth=1, CN=Easy-RSA CA
-2017-12-19 14:49:17 Validating certificate key usage
-2017-12-19 14:49:17 ++ Certificate has key usage  00a0, expects 00a0
-2017-12-19 14:49:17 VERIFY KU OK
-2017-12-19 14:49:17 Validating certificate extended key usage
-2017-12-19 14:49:17 ++ Certificate has EKU (str) TLS Web Server Authentication, expects TLS Web Server Authentication
-2017-12-19 14:49:17 VERIFY EKU OK
-2017-12-19 14:49:17 VERIFY OK: depth=0, CN=olafklischat.mooo.com
-2017-12-19 14:49:20 Data Channel Encrypt: Cipher 'BF-CBC' initialized with 128 bit key
-2017-12-19 14:49:20 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
-2017-12-19 14:49:20 Data Channel Encrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
-2017-12-19 14:49:20 Data Channel Decrypt: Cipher 'BF-CBC' initialized with 128 bit key
-2017-12-19 14:49:20 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
-2017-12-19 14:49:20 Data Channel Decrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
-2017-12-19 14:49:20 Control Channel: TLSv1.2, cipher TLSv1/SSLv3 ECDHE-RSA-CHACHA20-POLY1305, 2048 bit RSA
-2017-12-19 14:49:20 [olafklischat.mooo.com] Peer Connection Initiated with [AF_INET]78.55.72.204:1194
-2017-12-19 14:49:21 MANAGEMENT: >STATE:1513691361,GET_CONFIG,,,
-2017-12-19 14:49:23 SENT CONTROL [olafklischat.mooo.com]: 'PUSH_REQUEST' (status=1)
-2017-12-19 14:49:23 PUSH: Received control message: 'PUSH_REPLY,block-outside-dns,dhcp-option DNS 8.8.8.8,dhcp-option DNS 8.8.4.4,route 192.168.255.1,topology net30,ping 10,ping-restart 60,ifconfig 192.168.255.6 192.168.255.5,peer-id 0'
-2017-12-19 14:49:23 Options error: Unrecognized option or missing parameter(s) in [PUSH-OPTIONS]:1: block-outside-dns (2.3.18)
-2017-12-19 14:49:23 OPTIONS IMPORT: timers and/or timeouts modified
-2017-12-19 14:49:23 OPTIONS IMPORT: --ifconfig/up options modified
-2017-12-19 14:49:23 OPTIONS IMPORT: route options modified
-2017-12-19 14:49:23 OPTIONS IMPORT: --ip-win32 and/or --dhcp-option options modified
-2017-12-19 14:49:23 OPTIONS IMPORT: peer-id set
-2017-12-19 14:49:23 OPTIONS IMPORT: adjusting link_mtu to 1544
-2017-12-19 14:49:23 Opening utun (connect(AF_SYS_CONTROL)): Resource busy
-2017-12-19 14:49:23 Opened utun device utun1
-2017-12-19 14:49:23 do_ifconfig, tt->ipv6=0, tt->did_ifconfig_ipv6_setup=0
-2017-12-19 14:49:23 MANAGEMENT: >STATE:1513691363,ASSIGN_IP,,192.168.255.6,
-2017-12-19 14:49:23 /sbin/ifconfig utun1 delete
+2017-12-19 15:06:31 *Tunnelblick: openvpnstart starting OpenVPN
+2017-12-19 15:06:31 OpenVPN 2.3.18 x86_64-apple-darwin [SSL (OpenSSL)] [LZO] [PKCS11] [MH] [IPv6] built on Nov 10 2017
+2017-12-19 15:06:31 library versions: LibreSSL 2.6.2, LZO 2.10
+2017-12-19 15:06:31 MANAGEMENT: TCP Socket listening on [AF_INET]127.0.0.1:1337
+2017-12-19 15:06:31 Need hold release from management interface, waiting...
+2017-12-19 15:06:31 MANAGEMENT: Client connected from [AF_INET]127.0.0.1:1337
+2017-12-19 15:06:31 *Tunnelblick: Established communication with OpenVPN
+2017-12-19 15:06:31 MANAGEMENT: CMD 'pid'
+2017-12-19 15:06:31 MANAGEMENT: CMD 'state on'
+2017-12-19 15:06:31 MANAGEMENT: CMD 'state'
+2017-12-19 15:06:31 MANAGEMENT: CMD 'bytecount 1'
+2017-12-19 15:06:31 MANAGEMENT: CMD 'hold release'
+2017-12-19 15:06:31 NOTE: the current --script-security setting may allow this configuration to call user-defined scripts
+2017-12-19 15:06:31 Control Channel Authentication: tls-auth using INLINE static key file
+2017-12-19 15:06:31 Outgoing Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
+2017-12-19 15:06:31 Incoming Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
+2017-12-19 15:06:31 Socket Buffers: R=[196724->196724] S=[9216->9216]
+2017-12-19 15:06:31 MANAGEMENT: >STATE:1513692391,RESOLVE,,,
+2017-12-19 15:06:31 UDPv4 link local: [undef]
+2017-12-19 15:06:31 UDPv4 link remote: [AF_INET]78.55.72.204:1194
+2017-12-19 15:06:31 MANAGEMENT: >STATE:1513692391,WAIT,,,
+2017-12-19 15:06:32 MANAGEMENT: >STATE:1513692392,AUTH,,,
+2017-12-19 15:06:32 TLS: Initial packet from [AF_INET]78.55.72.204:1194, sid=8c8d3810 781e3b5d
+2017-12-19 15:06:32 VERIFY OK: depth=1, CN=Easy-RSA CA
+2017-12-19 15:06:32 Validating certificate key usage
+2017-12-19 15:06:32 ++ Certificate has key usage  00a0, expects 00a0
+2017-12-19 15:06:32 VERIFY KU OK
+2017-12-19 15:06:32 Validating certificate extended key usage
+2017-12-19 15:06:32 ++ Certificate has EKU (str) TLS Web Server Authentication, expects TLS Web Server Authentication
+2017-12-19 15:06:32 VERIFY EKU OK
+2017-12-19 15:06:32 VERIFY OK: depth=0, CN=olafklischat.mooo.com
+2017-12-19 15:06:34 Data Channel Encrypt: Cipher 'BF-CBC' initialized with 128 bit key
+2017-12-19 15:06:34 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
+2017-12-19 15:06:34 Data Channel Encrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
+2017-12-19 15:06:34 Data Channel Decrypt: Cipher 'BF-CBC' initialized with 128 bit key
+2017-12-19 15:06:34 WARNING: INSECURE cipher with block size less than 128 bit (64 bit).  This allows attacks like SWEET32.  Mitigate by using a --cipher with a larger block size (e.g. AES-256-CBC).
+2017-12-19 15:06:34 Data Channel Decrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
+2017-12-19 15:06:34 Control Channel: TLSv1.2, cipher TLSv1/SSLv3 ECDHE-RSA-CHACHA20-POLY1305, 2048 bit RSA
+2017-12-19 15:06:34 [olafklischat.mooo.com] Peer Connection Initiated with [AF_INET]78.55.72.204:1194
+2017-12-19 15:06:35 MANAGEMENT: >STATE:1513692395,GET_CONFIG,,,
+2017-12-19 15:06:37 SENT CONTROL [olafklischat.mooo.com]: 'PUSH_REQUEST' (status=1)
+2017-12-19 15:06:37 PUSH: Received control message: 'PUSH_REPLY,block-outside-dns,dhcp-option DNS 8.8.8.8,dhcp-option DNS 8.8.4.4,route 192.168.255.1,topology net30,ping 10,ping-restart 60,ifconfig 192.168.255.6 192.168.255.5,peer-id 0'
+2017-12-19 15:06:37 Options error: Unrecognized option or missing parameter(s) in [PUSH-OPTIONS]:1: block-outside-dns (2.3.18)
+2017-12-19 15:06:37 OPTIONS IMPORT: timers and/or timeouts modified
+2017-12-19 15:06:37 OPTIONS IMPORT: --ifconfig/up options modified
+2017-12-19 15:06:37 OPTIONS IMPORT: route options modified
+2017-12-19 15:06:37 OPTIONS IMPORT: --ip-win32 and/or --dhcp-option options modified
+2017-12-19 15:06:37 OPTIONS IMPORT: peer-id set
+2017-12-19 15:06:37 OPTIONS IMPORT: adjusting link_mtu to 1544
+2017-12-19 15:06:37 Opening utun (connect(AF_SYS_CONTROL)): Resource busy
+2017-12-19 15:06:37 Opened utun device utun1
+2017-12-19 15:06:37 do_ifconfig, tt->ipv6=0, tt->did_ifconfig_ipv6_setup=0
+2017-12-19 15:06:37 MANAGEMENT: >STATE:1513692397,ASSIGN_IP,,192.168.255.6,
+2017-12-19 15:06:37 /sbin/ifconfig utun1 delete
                                         ifconfig: ioctl (SIOCDIFADDR): Can't assign requested address
-2017-12-19 14:49:23 NOTE: Tried to delete pre-existing tun/tap instance -- No Problem if failure
-2017-12-19 14:49:23 /sbin/ifconfig utun1 192.168.255.6 192.168.255.5 mtu 1500 netmask 255.255.255.255 up
-2017-12-19 14:49:23 /Applications/Tunnelblick.app/Contents/Resources/client.up.tunnelblick.sh -9 -d -f -m -w -ptADGNWradsgnw utun1 1500 1544 192.168.255.6 192.168.255.5 init
+2017-12-19 15:06:37 NOTE: Tried to delete pre-existing tun/tap instance -- No Problem if failure
+2017-12-19 15:06:37 /sbin/ifconfig utun1 192.168.255.6 192.168.255.5 mtu 1500 netmask 255.255.255.255 up
+2017-12-19 15:06:37 /Applications/Tunnelblick.app/Contents/Resources/client.up.tunnelblick.sh -9 -d -f -m -w -ptADGNWradsgnw utun1 1500 1544 192.168.255.6 192.168.255.5 init
                                         **********************************************
                                         Start of output from client.up.tunnelblick.sh
                                         Disabled IPv6 for 'Display Ethernet 3'
@@ -236,20 +236,20 @@ Tunnelblick Log:
                                         Setting up to monitor system configuration with process-network-changes
                                         End of output from client.up.tunnelblick.sh
                                         **********************************************
-2017-12-19 14:49:28 /sbin/route add -net 78.55.72.204 192.168.43.1 255.255.255.255
-2017-12-19 14:49:28 *Tunnelblick: No 'connected.sh' script to execute
+2017-12-19 15:06:42 /sbin/route add -net 78.55.72.204 192.168.43.1 255.255.255.255
+2017-12-19 15:06:42 *Tunnelblick: No 'connected.sh' script to execute
                                         add net 78.55.72.204: gateway 192.168.43.1
-2017-12-19 14:49:28 /sbin/route add -net 0.0.0.0 192.168.255.5 128.0.0.0
+2017-12-19 15:06:42 /sbin/route add -net 0.0.0.0 192.168.255.5 128.0.0.0
                                         add net 0.0.0.0: gateway 192.168.255.5
-2017-12-19 14:49:28 /sbin/route add -net 128.0.0.0 192.168.255.5 128.0.0.0
+2017-12-19 15:06:42 /sbin/route add -net 128.0.0.0 192.168.255.5 128.0.0.0
                                         add net 128.0.0.0: gateway 192.168.255.5
-2017-12-19 14:49:28 MANAGEMENT: >STATE:1513691368,ADD_ROUTES,,,
-2017-12-19 14:49:28 /sbin/route add -net 192.168.255.1 192.168.255.5 255.255.255.255
+2017-12-19 15:06:42 MANAGEMENT: >STATE:1513692402,ADD_ROUTES,,,
+2017-12-19 15:06:42 /sbin/route add -net 192.168.255.1 192.168.255.5 255.255.255.255
                                         add net 192.168.255.1: gateway 192.168.255.5
-2017-12-19 14:49:28 WARNING: this configuration may cache passwords in memory -- use the auth-nocache option to prevent this
-2017-12-19 14:49:28 Initialization Sequence Completed
-2017-12-19 14:49:28 MANAGEMENT: >STATE:1513691368,CONNECTED,SUCCESS,192.168.255.6,78.55.72.204
-2017-12-19 14:49:34 *Tunnelblick process-network-changes: A system configuration change was ignored
+2017-12-19 15:06:42 WARNING: this configuration may cache passwords in memory -- use the auth-nocache option to prevent this
+2017-12-19 15:06:42 Initialization Sequence Completed
+2017-12-19 15:06:42 MANAGEMENT: >STATE:1513692402,CONNECTED,SUCCESS,192.168.255.6,78.55.72.204
+2017-12-19 15:06:48 *Tunnelblick process-network-changes: A system configuration change was ignored
 
 ================================================================================
 
