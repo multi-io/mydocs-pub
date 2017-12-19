@@ -1,0 +1,39 @@
+Routing tables
+
+Internet:
+Destination        Gateway            Flags        Refs      Use   Netif Expire
+0/1                192.168.255.5      UGSc           48        0   utun1
+default            192.168.43.1       UGSc            0        0     en0
+78.55.72.204/32    192.168.43.1       UGSc            1        0     en0
+127                127.0.0.1          UCS             0       17     lo0
+127.0.0.1          127.0.0.1          UH             29   360490     lo0
+128.0/1            192.168.255.5      UGSc            4        0   utun1
+169.254            link#5             UCS             0        0     en0
+192.168.43         link#5             UCS             0        0     en0
+192.168.43.1/32    link#5             UCS             1        0     en0
+192.168.43.1       68:c4:4d:46:1e:f4  UHLWIir         4       42     en0   1186
+192.168.43.154/32  link#5             UCS             0        0     en0
+192.168.255.1/32   192.168.255.5      UGSc            0        0   utun1
+192.168.255.5      192.168.255.6      UHr            13        0   utun1
+224.0.0/4          link#5             UmCS            3        0     en0
+224.0.0.251        1:0:5e:0:0:fb      UHmLWI          0        0     en0
+230.230.230.230    1:0:5e:66:e6:e6    UHmLWI          0        4     en0
+239.255.255.250    1:0:5e:7f:ff:fa    UHmLWI          0        8     en0
+255.255.255.255/32 link#5             UCS             0        0     en0
+
+Internet6:
+Destination                             Gateway                         Flags         Netif Expire
+default                                 fe80::%utun0                    UGcI          utun0
+::1                                     ::1                             UHL             lo0
+fe80::%lo0/64                           fe80::1%lo0                     UcI             lo0
+fe80::1%lo0                             link#1                          UHLI            lo0
+fe80::%awdl0/64                         link#7                          UCI           awdl0
+fe80::18d6:bff:fe70:6ce0%awdl0          1a:d6:b:70:6c:e0                UHLI            lo0
+fe80::%utun0/64                         fe80::44c2:3b57:869b:5372%utun0 UcI           utun0
+fe80::44c2:3b57:869b:5372%utun0         link#10                         UHLI            lo0
+ff01::%lo0/32                           ::1                             UmCI            lo0
+ff01::%awdl0/32                         link#7                          UmCI          awdl0
+ff01::%utun0/32                         fe80::44c2:3b57:869b:5372%utun0 UmCI          utun0
+ff02::%lo0/32                           ::1                             UmCI            lo0
+ff02::%awdl0/32                         link#7                          UmCI          awdl0
+ff02::%utun0/32                         fe80::44c2:3b57:869b:5372%utun0 UmCI          utun0
