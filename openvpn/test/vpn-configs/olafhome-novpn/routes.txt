@@ -1,21 +1,21 @@
 Routing tables
 
 Internet:
-Destination        Gateway            Flags        Refs      Use   Netif Expire
-default            192.168.142.1      UGSc           61        0     en0
-127                127.0.0.1          UCS             0       17     lo0
-127.0.0.1          127.0.0.1          UH             27   360374     lo0
-169.254            link#5             UCS             0        0     en0
-192.168.142        link#5             UCS             2        0     en0
-192.168.142.1/32   link#5             UCS             1        0     en0
-192.168.142.1      2:c7:2:c1:10:bb    UHLWIir        26       84     en0   1172
-192.168.142.2      d0:50:99:9b:54:87  UHLWI           0       51     en0    889
-192.168.142.63     6c:ad:f8:d3:aa:3   UHLWIi          1      223     en0    738
-192.168.142.109/32 link#5             UCS             0        0     en0
-224.0.0/4          link#5             UmCS            2        0     en0
-224.0.0.251        1:0:5e:0:0:fb      UHmLWI          0        0     en0
-239.255.255.250    1:0:5e:7f:ff:fa    UHmLWI          0       16     en0
-255.255.255.255/32 link#5             UCS             0        0     en0
+Destination        Gateway            Flags         Netif
+default            192.168.142.1      UGSc            en0
+127                127.0.0.1          UCS             lo0
+127.0.0.1          127.0.0.1          UH              lo0
+169.254            link#5             UCS             en0
+192.168.142        link#5             UCS             en0
+192.168.142.1/32   link#5             UCS             en0
+192.168.142.1      2:c7:2:c1:10:bb    UHLWIir         en0
+192.168.142.2      d0:50:99:9b:54:87  UHLWI           en0
+192.168.142.63     6c:ad:f8:d3:aa:3   UHLWIi          en0
+192.168.142.109/32 link#5             UCS             en0
+224.0.0/4          link#5             UmCS            en0
+224.0.0.251        1:0:5e:0:0:fb      UHmLWI          en0
+239.255.255.250    1:0:5e:7f:ff:fa    UHmLWI          en0
+255.255.255.255/32 link#5             UCS             en0
 
 Internet6:
 Destination                             Gateway                         Flags         Netif Expire
