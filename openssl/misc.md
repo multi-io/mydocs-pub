@@ -3,13 +3,19 @@
 
 ## generate CA private key
 
-w/ interactive passphrase key passphrase entry
+Unencrypted:
+
+```
+openssl genrsa -out ca-key.pem 4096
+```
+
+Encrypted, w/ interactive passphrase entry
 
 ```
 openssl genrsa -aes256 -out ca-key.pem 4096
 ```
 
-pass passphrase on cmdline:
+Pass passphrase on command line:
 
 ```
 openssl genrsa -aes256 -passout pass:geheim -out ca-key.pem 4096
