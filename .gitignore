@@ -2,3 +2,4 @@
 **/build/**
 .DS_Store
 **/.gradle/**
+/elasticsearch/test/config/elasticsearch.keystore

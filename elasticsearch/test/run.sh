@@ -16,4 +16,6 @@ fi
 
 mkdir -p "$node/data" "$node/work" "$node/logs"
 
-"$ES_HOME/bin/elasticsearch" -Des.node.name="$node" -Des.path.conf="./config" -Des.path.data="$node/data" -Des.path.work="$node/work" -Des.path.logs="$node/logs" -f
+export ES_PATH_CONF="${PWD}/config"
+
+"$ES_HOME/bin/elasticsearch" -Enode.name="$node" -Epath.data="${PWD}/$node/data" -Epath.logs="${PWD}/$node/logs"
