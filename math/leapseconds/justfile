@@ -1,0 +1,5 @@
+notebook:
+    uv run jupyter lab
+
+export-images:
+    uv run ./export_figures.py
