@@ -3,3 +3,8 @@ notebook:
 
 export-images:
     uv run ./export_figures.py
+
+download-recorded:
+    #!/usr/bin/env -S uv run --script --quiet
+    import urllib.request
+    urllib.request.urlretrieve("https://hpiers.obspm.fr/eoppc/eop/eopc04/eopc04_IAU2000.62-now", "./recorded/eopc04_IAU2000.62-now")
