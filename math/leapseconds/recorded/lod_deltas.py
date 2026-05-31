@@ -1,4 +1,5 @@
 from datetime import datetime
+import numpy as np
 from importlib import resources
 
 
@@ -24,7 +25,7 @@ def get_past_lod_deltas(
             day = int(parts[2])
             lod = float(parts[7])
 
-            dates.append(datetime(year, month, day))
+            dates.append(np.datetime64(datetime(year, month, day)))
             lods.append(lod)
 
     return dates, lods
