@@ -8,6 +8,7 @@ def get_past_lod_deltas(
 ):
     dates = []
     lods = []
+    utcdiffs = []
 
     with resources.files(__package__).joinpath(
         filename
@@ -23,9 +24,11 @@ def get_past_lod_deltas(
             year = int(parts[0])
             month = int(parts[1])
             day = int(parts[2])
+            utcdiff = float(parts[6])
             lod = float(parts[7])
 
             dates.append(np.datetime64(datetime(year, month, day)))
             lods.append(lod)
+            utcdiffs.append(utcdiff)
 
-    return dates, lods
+    return dates, lods, utcdiffs
