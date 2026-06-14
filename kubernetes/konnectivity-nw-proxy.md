@@ -6,11 +6,11 @@
 
 * Konnectivity server usually co-located with the apiserver, connected to it via Unix domain socket
 
-* agent establishes TCP/TLS connection to the server, then waits for requests (grpc)
+* agent establishes TCP/TLS connection to the server, then waits for requests (grpc) from the api.
+  So the agent connection is established from the agent to the server, and then the user requests that use the connections are initiated from the server to the agent.
 
-* apiserver tracks the Konnectivity server, knows when it has connection to an agent
-
-* when apiserver receives a request like "kubectl logs", it sends a corresponding request through the Konnectivity server to the agent, which execites it in the cluster network and sends back the result
+* when apiserver receives a request like "kubectl logs", it sends a corresponding request to the Konnectivity server, which forwards it through one of its agent connections to an agent, which executes it in the cluster network and sends back the result.
+  If the server has no agent connection, it replies "no agent available".
 
 ## What if apiserver consists of multiple instances behind a single load balancer IP?
 
@@ -33,22 +33,31 @@ It ensures this as follows:
 
 (see pkg/agent/clientset.go / func (cs *ClientSet) sync())
 
+```
 // repeat endlessly
 for {
-    connect to server, receiving server's ID and the server count during connection establishment
+    connect to any server (randomized by the LB). Receive server's ID and the server count during connection establishment
     if we don't have a connection to this server ID yet {
         start serving requests on this connection asynchronously in the background;
+        reset exponential backoff counter (see below), configuration: start at --sync-interval (default 1s), capped at --sync-interval-cap (default 10s);
         sleep --sync-interval (default 1s)
     } else if we HAVE a connection to this server ID already {
-        close this newly created connection again
-        increase sleep time by one step using exponential backoff algorithm, starting an --sync-interval, capped at --sync-interval-cap;
+        close this newly created connection again without doing anything on it
+        advance exponential backoff counter by one step
         sleep ^^that long
     }
 }
+```
+
+So basically it'll keep establishing connections, keeping each connection alive if it hasn't seen the server yet and otherwise closing it immediately.
+Once it has all connections, it'll keep this loop going with a larger interval (default 10s), continuing to connect and disconnect until the replica count
+as reported by the servers changes and/or the agent sees a new server it hasn't seen before.
+This way it'll also notice if the server pool is expanded.
+If a server is just replaced without changing the server count, I think the agent would just notice that by its connection to that server being terminated, at which point the agent would actively "forget" that server (remove it from its internal list of known servers) and thus would be free to connect to the new server. 
 
 
 
-Example: startup of an agent with 4 servers:
+Example: startup of an agent with 4 servers, all behind a LB:
 
 ```
 I1106 04:36:54.253973       1 options.go:151] AgentCert set to "".
@@ -79,7 +88,7 @@ I1106 04:36:54.254274       1 options.go:175] ServerCountSource set to default.
 I1106 04:36:54.254282       1 options.go:176] ChannelSize set to 150.
 I1106 04:36:54.254296       1 options.go:177] APIContentType set to application/vnd.kubernetes.protobuf.
 
-### connecting client to first
+### connecting client to first server
 I1106 04:36:54.267489       1 client.go:214] "Connect to server" serverID="b415a512-2011-408e-a073-73f41fc86c96"
 I1106 04:36:54.267551       1 clientset.go:308] "sync added client connecting to proxy server" serverID="b415a512-2011-408e-a073-73f41fc86c96"
 I1106 04:36:54.267678       1 client.go:325] "Start serving" serverID="b415a512-2011-408e-a073-73f41fc86c96" agentID="9618a24e-172c-40b8-93a3-0ed77f8de1c7"
@@ -100,7 +109,7 @@ I1106 04:36:57.445350       1 client.go:214] "Connect to server" serverID="147f3
 I1106 04:36:57.445386       1 clientset.go:308] "sync added client connecting to proxy server" serverID="147f35d9-e011-45e5-96cc-fb25ca04ed86"
 I1106 04:36:57.445419       1 client.go:325] "Start serving" serverID="147f35d9-e011-45e5-96cc-fb25ca04ed86" agentID="9618a24e-172c-40b8-93a3-0ed77f8de1c7"
 
-### starting to receive and process requests from the servers
+### continuing to connect to the servers, seeing each time that we already have a connection to that server, thus closing the connection again immediately.
 I1106 04:36:58.496471       1 client.go:214] "Connect to server" serverID="c12fc149-a473-4ad4-8299-c57e877cb1f0"
 I1106 04:36:59.564175       1 client.go:214] "Connect to server" serverID="147f35d9-e011-45e5-96cc-fb25ca04ed86"
 I1106 04:37:01.143999       1 client.go:214] "Connect to server" serverID="b415a512-2011-408e-a073-73f41fc86c96"

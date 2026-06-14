@@ -87,7 +87,7 @@ kubeconfig is never used again.
 Bootstrap tokens can also be used by clients that only have a token to
 learn the CA secret of a cluster in a secure way. When a bootstrap
 secret is created, a field `jws-kubeconfig-<token-id>` is added to the
-well-known `kube-system/cluster-info` configmap, and set to an HMAC
+well-known `kube-public/cluster-info` configmap, and set to an HMAC
 signature over the "kubeconfig" field in the same configmap, with
 `<token-id>.<token-secret>` used as the HMAC shared secret. The
 kubeconfig field contains an incomplete kubeconfig for the cluster,
